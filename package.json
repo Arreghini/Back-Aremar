@@ -7,5 +7,9 @@
   },
   "author": "Mauricio Arreghini",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "nodemon": "^3.1.0"
+  }
 }
