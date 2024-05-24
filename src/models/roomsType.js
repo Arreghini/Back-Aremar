@@ -12,9 +12,13 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
         },
+    photos: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        },    
     simpleBeds: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         },
     trundleBed: {
         type: DataTypes.INTEGER,
@@ -22,7 +26,7 @@ module.exports = (sequelize) => {
         },
     kingBed: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
         },
     windows: {
         type: DataTypes.INTEGER,
