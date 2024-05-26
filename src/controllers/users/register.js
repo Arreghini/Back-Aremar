@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 
 const createUserController = async (username, email, password) => {
    try { 
-    const user = await User.findOne({ email: email })
+    const user = await User.findOne({ email })
 
     if (user) return { error: 'Email already exists' }
 

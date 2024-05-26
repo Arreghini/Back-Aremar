@@ -8,48 +8,34 @@ module.exports = (sequelize) => {
       allowNull: false, 
       primaryKey: true, 
     },
-    firstName: {
+    userId: { 
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
+    fullName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    lastName: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    phoneNumber: {
+      type: DataTypes.STRING, 
+      allowNull: true,
     },
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: true,
-      }
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        len: [8, 20],
-      }
-    },
-    address: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    code: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },    
-    photo: {
+    dni: { 
       type: DataTypes.STRING,
       allowNull: true,
     },
-    phone: {
+    address: { 
       type: DataTypes.STRING,
+      allowNull: true,
+    },
+    photoURL: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: 'not found', 
+    },
+    gender: {
+      type: DataTypes.ENUM('male', 'female', 'other'), 
       allowNull: false,
-      validate: {
-        isNumeric: true,
-        len: [10, 10],
-      }
     },
   });
 };
