@@ -1,5 +1,4 @@
-const { user } = require('../../models/users')
-const { guestProfile } = require('../../models/guestProfile')
+const { User, GuestProfile } = require('../../db')
 
 const createGuestProfileController =  async (fullname, phoneNumber, dni, address, gender,photoURL) => {
     const newGuestProfile = await guestProfile.create({ 

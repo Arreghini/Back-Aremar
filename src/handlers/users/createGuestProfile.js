@@ -1,5 +1,5 @@
 const createGuestProfileController = require('../../controllers/users/createGuestProfile');
-const upload = require('../../config/multerConfig'); // Asegúrate de usar la ruta correcta
+const upload = require('../../almacenamientoS3/multerConfig'); 
 
 const createGuestProfile = async (req, res) => {
   try {
