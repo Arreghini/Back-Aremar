@@ -1,29 +1,19 @@
-const express = require("express");
-const morgan = require("morgan");
-const cookieParser = require("cookie-parser");
-const cors = require("cors");
-const routes = require("./routes/index");
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+const loginRoutes = require('./routes/login');
+const protectedRoutes = require('./routes/protected');
 
-// Crear servidor
-const server = express();
-server.name = "API";
+require('dotenv').config();
 
-// Middlewares
-server.use(cookieParser());
-server.use(morgan("dev"));
-server.use(cors());
-server.use(express.urlencoded({ limit: "20mb", extended: true }));
-server.use(express.json({ limit: "20mb" }));
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+app.use(cookieParser());
 
 // Rutas
-server.use("/", routes);
+app.use('/', loginRoutes);
+app.use('/', protectedRoutes);
 
-// Middleware para manejo de errores
-server.use((err, req, res, next) => {
-  const status = err.status || 500;
-  const message = err.message || "Internal Server Error";
-  console.error(err);
-  res.status(status).send(message);
-});
-
-module.exports = server;
+module.exports = app;

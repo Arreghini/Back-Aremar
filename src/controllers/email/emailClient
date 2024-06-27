@@ -1,0 +1,24 @@
+// Importar el módulo de SendGrid
+const sgMail = require('@sendgrid/mail');
+
+// Configurar la API Key
+sgMail.setApiKey('YOUR_SENDGRID_API_KEY');
+
+// Configurar el correo electrónico
+const msg = {
+  to: 'recipient@example.com', // Destinatario
+  from: 'sender@example.com',  // Remitente (debe ser una dirección verificada en SendGrid)
+  subject: 'Sending with SendGrid is Fun',
+  text: 'and easy to do anywhere, even with Node.js',
+  html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+};
+
+// Enviar el correo electrónico
+sgMail
+  .send(msg)
+  .then(() => {
+    console.log('Email sent');
+  })
+  .catch((error) => {
+    console.error(error);
+  });

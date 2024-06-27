@@ -1,13 +1,12 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-
-  sequelize.define('roomsType', {
+  sequelize.define('RoomType', {
     id: {
       type: DataTypes.STRING,
-      allowNull: false, 
-      primaryKey: true, 
-        },
+      allowNull: false,
+      primaryKey: true,
+    },
     name: {
         type: DataTypes.STRING,
         allowNull: false,

@@ -1,4 +1,4 @@
-const {Users, GuestProfile} = require('../../db');
+const {GuestProfile} = require('../../db');
 
 const updateGuestProfileController = async (userId, fieldsToUpdate) => {
 

@@ -32,29 +32,27 @@ sequelize.models = Object.fromEntries(capsEntries);
 
 // Destructuración de los modelos
 const {
-    GuestProfile,
-    Reservations,
-    Rooms,
-    RoomDetails,
-    RoomTypes,
-    Users,
+    Reservation,
+    Room,
+    RoomDetail,
+    RoomType,
+    User,
 } = sequelize.models;
 
 // Relaciones
-Users.hasOne(GuestProfile, { foreignKey: "userId" });
-GuestProfile.belongsTo(Users, { foreignKey: "userId" });
 
-Users.hasMany(Reservations, { foreignKey: "userId" });
-Reservations.belongsTo(Users, { foreignKey: "userId" });
+User.hasMany(Reservation, { foreignKey: "userId" });
+Reservation.belongsTo(User, { foreignKey: "userId" });
 
-Rooms.hasMany(Reservations, { foreignKey: "roomId" });
-Reservations.belongsTo(Rooms, { foreignKey: "roomId" });
+Room.hasMany(Reservation, { foreignKey: "roomId" });
+Reservation.belongsTo(Room, { foreignKey: "roomId" });
 
-RoomTypes.hasMany(Rooms, { foreignKey: "roomTypeId" });
-Rooms.belongsTo(RoomTypes, { foreignKey: "roomTypeId" });
+RoomType.hasMany(Room, { foreignKey: "roomTypeId" });
+Room.belongsTo(RoomType, { foreignKey: "roomTypeId" });
 
-Rooms.hasOne(RoomDetails, { foreignKey: "roomId" });
-RoomDetails.belongsTo(Rooms, { foreignKey: "roomId" });
+Room.hasOne(RoomDetail, { foreignKey: "roomId" });
+RoomDetail.belongsTo(Room, { foreignKey: "roomId" });
+
 
 // Exportar modelos y conexión
 module.exports = {

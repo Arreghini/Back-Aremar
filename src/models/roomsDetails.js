@@ -1,35 +1,35 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  sequelize.define('roomsDetails', {
+  sequelize.define('RoomDetail', {
     id: {
       type: DataTypes.STRING,
       allowNull: false,
       primaryKey: true,
     },
     roomId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        references: {
-          model: 'rooms',
-          key: 'id',
-        },
+      type: DataTypes.STRING,
+      allowNull: false,
+      references: {
+        model: 'Room',
+        key: 'id',
       },
+    },
     CableTvService: {
-        type: DataTypes.BOOLEAN,
-        allowNull: true,
-      },
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
     smart_TV: {
-        type: DataTypes.BOOLEAN,
-        allowNull: true,
-      },
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
     Wifi: {
-        type: DataTypes.BOOLEAN,
-        allowNull: true,
-      },
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
     microwave: {
-        type: DataTypes.BOOLEAN,
-        allowNull: true,
-      },
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
   });
 };

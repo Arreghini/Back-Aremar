@@ -1,30 +1,30 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  sequelize.define('rooms', {
+  sequelize.define('Room', {
     id: {
       type: DataTypes.STRING,
       allowNull: false,
       primaryKey: true,
     },
-    description:{
-        type: DataTypes.STRING,
+    description: {
+      type: DataTypes.STRING,
     },
     typeRoom: {
       type: DataTypes.STRING,
       allowNull: false,
       references: {
-        model: 'roomsTypes', // Nombre del modelo de destino
-        key: 'id', // Clave primaria del modelo de destino
+        model: 'RoomType',
+        key: 'id',
       },
     },
     detailRoom: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        references: {
-        model: 'roomsDetails',
+      type: DataTypes.STRING,
+      allowNull: false,
+      references: {
+        model: 'RoomDetail',
         key: 'id',
       },
-    }
+    },
   });
 };

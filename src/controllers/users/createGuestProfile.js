@@ -1,18 +1,17 @@
-const { User, GuestProfile } = require('../../db')
+const { GuestProfile } = require('../../db');
 
-const createGuestProfileController =  async (fullname, phoneNumber, dni, address, gender,photoURL) => {
-    const newGuestProfile = await guestProfile.create({ 
-    fullname, 
-    phoneNumber, 
-    dni, 
-    address, 
-    gender, 
-    photoURL, // guarda la Url de la foto en la base de datos
-    })
-    return newGuestProfile
-
+const createGuestProfileController = async (userId, email, fullname, phoneNumber, dni, address, gender, photoUrl) => {
+  const newGuestProfile = await GuestProfile.create({
+    userId,
+    email,
+    fullname,
+    phoneNumber,
+    dni,
+    address,
+    gender,
+    photoUrl, // guarda la URL de la foto en la base de datos
+  });
+  return newGuestProfile;
 };
 
 module.exports = createGuestProfileController;
-
-
