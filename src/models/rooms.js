@@ -13,18 +13,10 @@ module.exports = (sequelize) => {
     typeRoom: {
       type: DataTypes.STRING,
       allowNull: false,
-      references: {
-        model: 'RoomType',
-        key: 'id',
-      },
     },
     detailRoom: {
       type: DataTypes.STRING,
       allowNull: false,
-      references: {
-        model: 'RoomDetail',
-        key: 'id',
-      },
     },
   });
 };

@@ -10,10 +10,6 @@ module.exports = (sequelize) => {
     roomId: {
       type: DataTypes.STRING,
       allowNull: false,
-      references: {
-        model: 'Room',
-        key: 'id',
-      },
     },
     CableTvService: {
       type: DataTypes.BOOLEAN,

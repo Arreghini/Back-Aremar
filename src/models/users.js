@@ -9,30 +9,30 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
     username: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },    
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     email: {
-        type: DataTypes.UUID,
-        allowNull: false,
-        unique: true,
-        validate: {
-            isEmail: true
-        }
-      },
+      type: DataTypes.STRING, 
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: true
+      }
+    },
     emailValidate: {
-        type: DataTypes.BOOLEAN,
-        allowNull: true,
-        default: false,
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+      defaultValue: false, 
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     isActive: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        default: true,
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true, 
     },
-});
-}
+  });
+};
