@@ -8,7 +8,7 @@ module.exports = (sequelize) => {
       primaryKey: true,
       allowNull: false,
     },
-    username: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -20,7 +20,7 @@ module.exports = (sequelize) => {
         isEmail: true
       }
     },
-    emailValidate: {
+    email_verified: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
       defaultValue: false, 
@@ -28,6 +28,10 @@ module.exports = (sequelize) => {
     password: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    picture: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     isActive: {
       type: DataTypes.BOOLEAN,
