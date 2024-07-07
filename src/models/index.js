@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const sequelize = require('../config/database');
+const sequelize = require('../config/db');
 
 const basename = path.basename(__filename);
 const modelDefiners = [];

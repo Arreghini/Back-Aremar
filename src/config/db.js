@@ -71,4 +71,6 @@ const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}
   dialect: "postgres",
 });
 
-module.exports = sequelize;
+const conn = sequelize;
+
+module.exports = { conn };

@@ -1,7 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const routes = require('./routes'); // Importar el archivo de rutas consolidado
+const routes = require('./index'); // Importar el archivo de rutas consolidado
 
 require('dotenv').config();
 
