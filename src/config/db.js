@@ -59,6 +59,7 @@
 //     ...sequelize.models,
 //     conn: sequelize,
 // };
+// db.js
 
 require('dotenv').config();
 const { Sequelize } = require("sequelize");
@@ -68,9 +69,11 @@ const { DB_USER, DB_PASSWORD, DB_HOST } = process.env;
 const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/aremar`, {
   logging: false,
   native: false,
-  dialect: "postgres",
+  dialect: 'postgres',
 });
 
 const conn = sequelize;
 
-module.exports = { conn };
+module.exports = {
+  conn: sequelize,  
+};

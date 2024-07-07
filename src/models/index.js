@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const sequelize = require('../config/db');
+const { conn } = require('../config/db');
 
 const basename = path.basename(__filename);
 const modelDefiners = [];
@@ -13,12 +13,12 @@ fs.readdirSync(__dirname)
   });
 
 // Incluir la conexión de Sequelize a cada modelo
-modelDefiners.forEach(model => model(sequelize));
+modelDefiners.forEach(model => model(conn));
 
 // Capitalizar nombres de modelos
-let entries = Object.entries(sequelize.models);
+let entries = Object.entries(conn.models);
 let capsEntries = entries.map(entry => [entry[0][0].toUpperCase() + entry[0].slice(1), entry[1]]);
-sequelize.models = Object.fromEntries(capsEntries);
+conn.models = Object.fromEntries(capsEntries);
 
 // Relaciones
 const {
@@ -27,7 +27,7 @@ const {
   RoomDetail,
   RoomType,
   User,
-} = sequelize.models;
+} = conn.models;
 
 User.hasMany(Reservation, { foreignKey: "userId" });
 Reservation.belongsTo(User, { foreignKey: "userId" });
@@ -41,4 +41,4 @@ Room.belongsTo(RoomType, { foreignKey: "roomTypeId" });
 Room.hasOne(RoomDetail, { foreignKey: "roomId" });
 RoomDetail.belongsTo(Room, { foreignKey: "roomId" });
 
-module.exports = sequelize;
+module.exports = conn;
