@@ -1,26 +1,13 @@
-const express = require("express");
-const jwt = require("jsonwebtoken");
+const express = require('express');
+const checkJwt = require('../config/jwt');
 
 const router = express.Router();
 
-function verifyToken(req, res, next) {
-  const token = req.cookies.token;
+// Aplica checkJwt a todas las rutas dentro de /protected
+router.use(checkJwt);
 
-  if (!token) {
-    return res.status(401).send("Unauthorized");
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).send("Unauthorized");
-    }
-    req.user = decoded;
-    next();
-  });
-}
-
-router.get("/", verifyToken, (req, res) => {
-  res.send("Protected data");
+router.get('/', (req, res) => {
+  res.send('Protected data');
 });
 
 module.exports = router;

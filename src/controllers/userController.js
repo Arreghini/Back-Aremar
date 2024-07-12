@@ -6,9 +6,14 @@ const { AUTH0_DOMAIN } = process.env; // Obtener el dominio de Auth0 desde las v
 
 // Definir el controlador saveUser
 exports.saveUser = async (req, res) => {
+
+
+  console.log('Request Body:', req.body);
+
+
   // Extraer el user_id del token JWT decodificado (req.user)
   const { sub: user_id } = req.user;
-
+  
   try {
     // Hacer una solicitud GET a Auth0 para obtener información del usuario
     const userInfo = await axios.get(`https://${AUTH0_DOMAIN}/userinfo`, {

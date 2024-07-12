@@ -1,10 +1,11 @@
+
 const jwt = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
 require('dotenv').config();
 
 const { AUTH0_DOMAIN, AUTH0_AUDIENCE } = process.env;
 
-// Middleware para verificar JWT
+// Configurar el middleware para verificar tokens JWT automáticamente
 const checkJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
     cache: true,

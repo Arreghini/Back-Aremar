@@ -1,14 +1,11 @@
-
-
 const { Router } = require('express');
-const loginRoutes = require('./login');
 const protectedRoutes = require('./protected');
-const userRoutes = require('./UsersRoutes'); // Importa las rutas de usuario
+const userRoutes = require('./UsersRoutes'); 
 
 const router = Router();
 
-router.use('/login', loginRoutes);
-router.use('/protected', protectedRoutes);
-router.use('/api/users', userRoutes); // Agrega las rutas de usuario
+// Rutas protegidas deben pasar por el middleware de autenticación
+router.use('/api/protected', protectedRoutes);
+router.use('/api/users', userRoutes); 
 
 module.exports = router;

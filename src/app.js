@@ -1,20 +1,47 @@
 const express = require('express');
+const jwt = require('express-jwt');
+const jwksRsa = require('jwks-rsa');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const routes = require('./routes'); // Importar el archivo de rutas consolidado
-
+const routes = require('./routes/index'); // Importa el archivo de rutas consolidado
 require('dotenv').config();
 
 const app = express();
-app.name = "API"; // Nombre descriptivo
+app.name = 'API'; // Nombre descriptivo
 
-// Middlewares
-app.use(cors());
+const { AUTH0_DOMAIN, AUTH0_AUDIENCE } = process.env;
+
+// Configuración de CORS
+const corsOptions = {
+  origin: 'http://localhost:5173', // Permitir solicitudes desde tu frontend
+  methods: ['GET', 'POST'], // Métodos HTTP permitidos
+  allowedHeaders: ['Content-Type', 'Authorization'], // Cabeceras permitidas
+  credentials: true // Permitir el uso de cookies
+};
+app.use(cors(corsOptions));
+
+// Middleware para verificar tokens JWT automáticamente
+const checkJwt = jwt({
+  secret: jwksRsa.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: `https://${AUTH0_DOMAIN}/.well-known/jwks.json`
+  }),
+  audience: AUTH0_AUDIENCE,
+  issuer: `https://${AUTH0_DOMAIN}/`,
+  algorithms: ['RS256']
+});
+
+// Middleware para manejar JSON y cookies
 app.use(express.json());
 app.use(cookieParser());
 
+// Aplica el middleware para proteger todas las rutas
+app.use(checkJwt.unless({ path: ['/public', '/another-public-route'] })); // Excluir rutas públicas del middleware
+
 // Rutas
-app.use('/', routes); // Usar el archivo de rutas consolidado
+app.use('/', routes); // Usa el archivo de rutas consolidado
 
 // Middleware para manejar rutas no encontradas (404)
 app.use((req, res, next) => {
