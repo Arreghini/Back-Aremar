@@ -9,7 +9,7 @@ async function startServer() {
     await conn.sync({ alter: true });
     console.log('Modelos sincronizados con la base de datos.');
     
-    const PORT = process.env.PORT || 3001;
+    const PORT = process.env.PORT || 3000;
     server.listen(PORT, () => {
       console.log(`Servidor escuchando en http://localhost:${PORT}`);
     });

@@ -1,13 +1,10 @@
 const express = require('express');
-const checkJwt = require('../config/jwt');
-
 const router = express.Router();
 
-// Aplica checkJwt a todas las rutas dentro de /protected
-router.use(checkJwt);
-
-router.get('/', (req, res) => {
-  res.send('Protected data');
+// Ruta protegida que requiere autenticación JWT
+router.get('/api/protected', (req, res) => {
+  res.send('Esta es una ruta protegida');
 });
 
 module.exports = router;
+

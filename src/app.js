@@ -41,7 +41,7 @@ app.use(cookieParser());
 app.use(checkJwt.unless({ path: ['/public', '/another-public-route'] })); // Excluir rutas públicas del middleware
 
 // Rutas
-app.use('/', routes); // Usa el archivo de rutas consolidado
+app.use('/api', routes); // Usa el archivo de rutas consolidado
 
 // Middleware para manejar rutas no encontradas (404)
 app.use((req, res, next) => {
