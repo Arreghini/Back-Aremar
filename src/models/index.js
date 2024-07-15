@@ -1,4 +1,3 @@
-
 const fs = require('fs');
 const path = require('path');
 const { conn } = require('../config/db');
@@ -42,4 +41,4 @@ Room.belongsTo(RoomType, { foreignKey: "roomTypeId" });
 Room.hasOne(RoomDetail, { foreignKey: "roomId" });
 RoomDetail.belongsTo(Room, { foreignKey: "roomId" });
 
-module.exports = conn;
+module.exports = conn.models;
