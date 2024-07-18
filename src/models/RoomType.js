@@ -8,29 +8,29 @@ module.exports = (sequelize) => {
       primaryKey: true,
     },
     name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        },
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     photos: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        },    
+      type: DataTypes.JSON, // Almacena un array de URLs de fotos
+      allowNull: true,
+    },
     simpleBeds: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        },
-    trundleBed: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        },
-    kingBed: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        },
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    trundleBeds: { // Cambiado a plural para mayor claridad
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    kingBeds: { // Cambiado a plural para mayor claridad
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     windows: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        },   
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   });
-}
+};
 

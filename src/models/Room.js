@@ -18,5 +18,13 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    photoRoom: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    status: {
+      type: DataTypes.ENUM('available', 'unavailable'),
+      defaultValue: 'available',
+    }
   });
 };
