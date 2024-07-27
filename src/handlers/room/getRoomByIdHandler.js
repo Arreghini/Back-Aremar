@@ -1,9 +1,8 @@
-import React from 'react'
+
+const React = require('react');
 
 function getRoomByIdHandler() {
-  return (
-    <div>getRoomByIdHandler</div>
-  )
+  
 }
 
-export default getRoomByIdHandler
+module.exports = getRoomByIdHandler;

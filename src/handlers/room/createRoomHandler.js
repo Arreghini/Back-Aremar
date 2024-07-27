@@ -1,4 +1,4 @@
-const roomCreateController = require('../../controllers/room/roomCreateController');
+const roomCreateController = require('../../controllers/room/createRoomController');
 
 exports.handlerCreateRoom = async (req, res) => {
   try {
@@ -15,3 +15,4 @@ exports.handlerCreateRoom = async (req, res) => {
     res.status(500).send('Error al manejar la solicitud');
   }
 };
+

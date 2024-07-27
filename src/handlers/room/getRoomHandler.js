@@ -1,9 +1,9 @@
-import React from 'react'
+
+const React = require('react');
 
 function getRoomHandler() {
-  return (
-    <div>getRoomHandler</div>
-  )
+  
 }
 
-export default getRoomHandler
+module.exports = getRoomHandler;
+

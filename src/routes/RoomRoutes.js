@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 
@@ -9,13 +8,11 @@ const { getRoomByQuery } = require('../handlers/room/getRoomByQueryHandler');
 const { getRooms } = require('../handlers/room/getRoomHandler');
 const { updateRoomHandler } = require('../handlers/room/updateRoomHandler');
 
-
-router.post('/rooms', createRoomHandler);
-router.delete('/rooms/:id', deleteRoomHandler);
-router.get('/rooms/:id', getRoomById);
-router.get('/rooms', getRoomByQuery);
-router.get('/rooms/all', getRooms);
-router.put('/rooms/:id', updateRoomHandler);
-
+router.post('/', createRoomHandler); // Ruta para crear habitación
+router.delete('/:id', deleteRoomHandler);
+router.get('/:id', getRoomById);
+router.get('/', getRoomByQuery);
+router.get('/all', getRooms);
+router.put('/:id', updateRoomHandler);
 
 module.exports = router;

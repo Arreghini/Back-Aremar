@@ -1,9 +1,7 @@
-import React from 'react'
+const React = require('react');
 
 function deleteRoomHandler() {
-  return (
-    <div>deleteRoomHandler</div>
-  )
+  
 }
 
-export default deleteRoomHandler
+module.exports = deleteRoomHandler;

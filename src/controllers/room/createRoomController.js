@@ -1,4 +1,4 @@
-import { Room } from '../../models/Room';
+const Room= require('../../models/Room');
 
 const roomCreateController = async (req, res) => {
 
@@ -25,4 +25,4 @@ const roomCreateController = async (req, res) => {
   }
 };
 
-export default roomCreateController;
+module.exports = roomCreateController;

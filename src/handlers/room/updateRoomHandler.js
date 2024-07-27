@@ -1,9 +1,7 @@
-import React from 'react'
+const React = require('react');
 
 function updateRoomHandler() {
-  return (
-    <div>updateRoomHandler</div>
-  )
+  
 }
 
-export default updateRoomHandler
+module.exports = updateRoomHandler;

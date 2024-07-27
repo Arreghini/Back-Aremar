@@ -1,9 +1,8 @@
-import React from 'react'
+
+const React = require('react');
 
 function getRoomByQueryHandler() {
-  return (
-    <div>getRoomByQueryHandler</div>
-  )
+  
 }
 
-export default getRoomByQueryHandler
+module.exports = getRoomByQueryHandler;
