@@ -1,7 +1,8 @@
-const React = require('react');
 
-function deleteRoomHandler() {
+const deleteRoomHandler = async (req, res) => {
+    // Lógica para eliminar una habitación
+    res.send('Room deleted');
+  };
   
-}
-
-module.exports = deleteRoomHandler;
+  module.exports = deleteRoomHandler;
+  

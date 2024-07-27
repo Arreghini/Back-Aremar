@@ -16,3 +16,4 @@ router.use('/users', userRoutes);
 router.use('/rooms', roomRoutes); // Asegúrate de que esta línea esté incluida
 
 module.exports = router;
+

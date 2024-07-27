@@ -1,6 +1,7 @@
+
 const roomCreateController = require('../../controllers/room/createRoomController');
 
-exports.handlerCreateRoom = async (req, res) => {
+const createRoomHandler = async (req, res) => {
   try {
     console.log('Request Body:', req.body);
 
@@ -16,3 +17,4 @@ exports.handlerCreateRoom = async (req, res) => {
   }
 };
 
+module.exports = createRoomHandler;

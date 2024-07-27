@@ -1,8 +1,7 @@
-
-const React = require('react');
-
-function getRoomByIdHandler() {
+const getRoomById = async (req, res) => {
+    // Lógica para obtener una habitación por ID
+    res.send('Room details');
+  };
   
-}
-
-module.exports = getRoomByIdHandler;
+  module.exports = getRoomById;
+  

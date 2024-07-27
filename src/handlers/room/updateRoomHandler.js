@@ -1,7 +1,7 @@
-const React = require('react');
-
-function updateRoomHandler() {
+const updateRoomHandler = async (req, res) => {
+    // Lógica para actualizar una habitación
+    res.send('Room updated');
+  };
   
-}
-
-module.exports = updateRoomHandler;
+  module.exports = updateRoomHandler;
+  
