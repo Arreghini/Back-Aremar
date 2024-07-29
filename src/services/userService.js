@@ -1,5 +1,5 @@
 
-const { User } = require('../models'); // Asegúrate de que esta ruta es correcta
+const { User } = require('../models'); 
 
 exports.saveOrUpdateUser = async ({ id, email, name, picture, email_verified }) => {
   try {

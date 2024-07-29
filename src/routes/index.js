@@ -13,7 +13,7 @@ router.use('/protected', protectedRoutes);
 router.use('/users', userRoutes);
 
 // Middleware para las rutas de habitaciones
-router.use('/rooms', roomRoutes); // Asegúrate de que esta línea esté incluida
+router.use('/rooms', roomRoutes); 
 
 module.exports = router;
 
