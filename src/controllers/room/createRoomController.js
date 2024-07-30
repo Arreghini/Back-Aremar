@@ -1,8 +1,8 @@
 
 const { Room } = require('../../models'); 
 
-const roomCreateController = async () => {
-  const { id, description, typeRoom, detailRoom, photoRoom, status } = req.body;
+const roomCreateController = async (req,res) => {
+  const { id, description, typeRoom, detailRoom, price, photoRoom, status } = req.body;
 
   // Verificar si la habitación ya existe
   const existingRoom = await Room.findByPk(id);
@@ -16,6 +16,7 @@ const roomCreateController = async () => {
     description,
     typeRoom,
     detailRoom,
+    price,
     photoRoom,
     status
   });

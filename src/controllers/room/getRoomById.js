@@ -1,9 +1,12 @@
-import React from 'react'
+const { Room } = require('../../models');
 
-function getRoomById() {
-  return (
-    <div>getRoomById</div>
-  )
-}
+const getRoomByIdController = async (id) => { 
+  try {
+    const room = await Room.findByPk(id); 
+  } catch (error) {
+    console.error('Error fetching room:', error); 
+    throw error;
+  }
+};
 
-export default getRoomById
+module.exports = getRoomByIdController;

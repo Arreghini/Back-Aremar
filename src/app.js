@@ -1,4 +1,3 @@
-
 const express = require('express');
 const jwt = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
@@ -15,7 +14,7 @@ const { AUTH0_DOMAIN, AUTH0_AUDIENCE } = process.env;
 // Configuración de CORS
 const corsOptions = {
   origin: ['http://localhost:5173', 'http://localhost:4000'], // Permitir solicitudes desde ambos puertos
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'], // Métodos HTTP permitidos
   allowedHeaders: ['Content-Type', 'Authorization'], // Cabeceras permitidas
   credentials: true // Permitir el uso de cookies
 };
@@ -24,6 +23,12 @@ app.use(cors(corsOptions));
 // Middleware para manejar JSON y cookies
 app.use(express.json());
 app.use(cookieParser());
+
+// Middleware de depuración para ver la ruta solicitada
+app.use((req, res, next) => {
+  console.log(`Ruta solicitada: ${req.method} ${req.originalUrl}`);
+  next();
+});
 
 // Middleware para verificar tokens JWT automáticamente
 const checkJwt = jwt({
@@ -41,6 +46,9 @@ const checkJwt = jwt({
     { url: '/api/rooms', methods: ['POST'] },
     { url: '/api/rooms/:id', methods: ['GET'] },
     { url: '/api/rooms/all', methods: ['GET'] },
+    { url: '/api/rooms/:id', methods: ['PATCH'] },
+    { url: '/api/rooms/:id', methods: ['DELETE'] },
+    { url: '/api/rooms/:id', methods: ['PUT'] },
     '/public',
     '/another-public-route'
   ]
@@ -59,8 +67,8 @@ app.use((req, res, next) => {
 
 // Middleware para manejar errores
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Ocurrió un error en el servidor' });
+  console.error('Error:', err.message);
+  res.status(err.status || 500).json({ message: err.message || 'Ocurrió un error en el servidor' });
 });
 
 module.exports = app;
