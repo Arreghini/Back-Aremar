@@ -19,6 +19,7 @@ router.get('/:id', getRoomById);
 router.post('/', createRoomHandler);
 router.delete('/:id', deleteRoomHandler);
 router.put('/:id', updateRoomHandler);
+router.patch('/:id', updateRoomHandler);
 
 module.exports = router;
 
