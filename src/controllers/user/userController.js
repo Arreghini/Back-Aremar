@@ -1,7 +1,7 @@
 
 require('dotenv').config(); // Cargar variables de entorno
 const axios = require('axios'); // Importar axios para hacer solicitudes HTTP
-const userService = require('../services/userService'); // Importar el servicio de usuario para guardar o actualizar usuarios
+const userService = require('../../services/userService'); // Importar el servicio de usuario para guardar o actualizar usuarios
 const { AUTH0_DOMAIN } = process.env; // Obtener el dominio de Auth0 desde las variables de entorno
 
 exports.saveUser = async (userData) => {

@@ -1,9 +1,17 @@
-import React from 'react'
+const { Room } = require('../../models');
 
-function deleteRoomController() {
-  return (
-    <div></div>
-  )
-}
+const deleteRoomController = async (id) => {
+  try {
+    const room = await Room.findByPk(id);
+    if (!room) {
+      return null; // La habitación no fue encontrada
+    }
+    await Room.destroy({ where: { id } });
+    return room;
+  } catch (error) {
+    console.error('Error deleting room:', error);
+    throw error;
+  }
+};
 
-export default deleteRoomController
+module.exports = deleteRoomController;

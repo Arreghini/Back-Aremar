@@ -28,6 +28,18 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    dni: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    addres: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
