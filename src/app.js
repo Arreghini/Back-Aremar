@@ -1,12 +1,10 @@
-
-
-
 const express = require('express');
 const jwt = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const routes = require('./routes/index'); // Importa el archivo de rutas consolidado
+const checkAdmin = require('./services/tokenAdministrador'); // Importa el middleware de verificación de administrador
 require('dotenv').config();
 
 const app = express();
@@ -44,21 +42,16 @@ const checkJwt = jwt({
   audience: AUTH0_AUDIENCE,
   issuer: `https://${AUTH0_DOMAIN}/`,
   algorithms: ['RS256']
-}).unless({
-  path: [
-    { url: /^\/api\/rooms\/[a-zA-Z0-9]+$/, methods: ['GET', 'PATCH', 'DELETE', 'PUT'] },
-    { url: '/api/rooms', methods: ['POST'] },
-    { url: '/api/rooms/all', methods: ['GET'] },
-    '/public',
-    '/another-public-route'
-  ]
 });
 
-// Aplica el middleware para proteger las rutas necesarias
-app.use(checkJwt);
+// Rutas públicas y no protegidas por autenticación
+app.use('/api/public', routes); // Define tus rutas públicas aquí
 
-// Rutas
-app.use('/api', routes); 
+// Aplica el middleware para proteger todas las rutas después de las rutas públicas
+app.use('/api', checkJwt, routes);
+
+// Aplica el middleware de verificación de administrador a las rutas administrativas
+app.use('/api/admin', checkJwt, checkAdmin, routes); // Suponiendo que tus rutas administrativas están bajo '/api/admin'
 
 // Middleware para manejar rutas no encontradas (404)
 app.use((req, res, next) => {
