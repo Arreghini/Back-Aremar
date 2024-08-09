@@ -1,6 +1,7 @@
 
-const checkAdminHandler = (req, res) => {
-    const user = req.user; // Esto debería contener la información del usuario decodificado del token JWT
+
+  const checkAdminHandler = (req, res) => {
+    const user = req.user; // Información del usuario decodificado del token JWT
   
     if (user && user['http://aremar/roles']?.includes('admin')) {
       res.json({ isAdmin: true });

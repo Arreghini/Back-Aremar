@@ -6,7 +6,7 @@ const createRoomHandler = async (req, res) => {
     console.log('Request Body:', req.body);
 
     // Llama al controlador de creación de habitaciones con los datos de la solicitud
-    const room = await roomCreateController(req);
+    const room = await roomCreateController(req.body);
 
     // Devuelve la respuesta exitosa con la habitación creada
     res.status(201).json(room);

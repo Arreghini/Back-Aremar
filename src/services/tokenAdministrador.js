@@ -2,7 +2,7 @@ const { expressjwt: jwt } = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
 const { AUTH0_DOMAIN, AUTH0_AUDIENCE } = process.env;
 
-const namespace = 'https://clientearemar-api/'; // Asegúrate de que este sea el namespace correcto
+const namespace = 'https://aremar.com/';
 
 const checkAdmin = (req, res, next) => {
   jwt({
@@ -22,9 +22,11 @@ const checkAdmin = (req, res, next) => {
 
     const roles = req.user[`${namespace}roles`];
     if (roles && roles.includes('admin')) {
-      next();
+      console.log('El usuario es administrador:', roles);
+      res.status(200).json({ message: 'El usuario es administrador', roles });
     } else {
-      res.status(403).json({ message: 'Access denied' });
+      console.log('Acceso denegado. El usuario no es administrador.');
+      res.status(403).json({ message: 'Acceso denegado. El usuario no es administrador.' });
     }
   });
 };
