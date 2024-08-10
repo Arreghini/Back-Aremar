@@ -14,16 +14,6 @@ router.post('/sync', (req, res, next) => {
 
 module.exports = router;
 
-
-
-
-
-
-
-
-
-
-
 // Nueva ruta para verificar si el usuario es administrador
 router.get('/admin', (req, res, next) => {
   console.log('Solicitud recibida en /admin');
