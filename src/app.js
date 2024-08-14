@@ -51,7 +51,7 @@ app.use('/api/public', routes); // Define tus rutas públicas aquí
 app.use('/api', checkJwt, routes);
 
 // Aplica el middleware de verificación de administrador a las rutas administrativas
-app.use('/api/admin', checkJwt, checkAdmin, routes); // Suponiendo que tus rutas administrativas están bajo '/api/admin'
+app.use('/api/users/check-admin', checkJwt, checkAdmin, routes); // Suponiendo que tus rutas administrativas están bajo '/api/check-admin'
 
 // Middleware para manejar rutas no encontradas (404)
 app.use((req, res, next) => {

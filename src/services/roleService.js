@@ -33,6 +33,7 @@ const checkUserRole = async (user_id, token) => {
     console.log('Roles del usuario:', roles);
 
     return roles.includes('admin'); // Verifica si el usuario tiene el rol de administrador
+    
   } catch (error) {
     console.error('Error al obtener los roles del usuario:', error);
     throw new Error('Error al obtener los roles del usuario');
@@ -43,3 +44,4 @@ module.exports = {
   getManagementApiToken,
   checkUserRole
 };
+
