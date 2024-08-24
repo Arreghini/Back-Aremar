@@ -27,15 +27,6 @@ router.use(checkJwt, (req, res, next) => {
   next();
 });
 
-
-// Ruta para verificar el rol de administrador
-router.get('/check-admin', (req, res, next) => {
-  console.log('Solicitud recibida en /check-admin');
-  console.log('Datos recibidos:', req.headers.authorization);
-  res.redirect('http://localhost:4000/');
-  next();
-}, handleCheckAdminRole);
-
 router.post('/sync', checkJwt, (req, res, next) => {
   console.log('Middleware checkJwt pasado');
   console.log('Solicitud recibida en /sync');

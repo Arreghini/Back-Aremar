@@ -12,14 +12,14 @@ const handleSaveUser = async (req, res) => {
       return res.status(401).json({ error: 'Usuario no autenticado' });
     }
 
-    const { sub: user_id } = req.user;
+    const user_id = req.user.sub || req.body.user_id;
 
     const userData = {
       user_id,
       authorization: req.headers.authorization,
     };
 
-    console.log('Llamando a userController.saveUser');
+    console.log('Llamando a userController.saveUser con userData:', userData);
     const savedUser = await userController.saveUser(userData);
     console.log('Usuario guardado:', savedUser);
     res.json(savedUser);
@@ -28,6 +28,7 @@ const handleSaveUser = async (req, res) => {
     res.status(500).send('Error al manejar la solicitud');
   }
 };
+
 
 const handleCheckAdminRole = async (req, res) => {
   try {
