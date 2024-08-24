@@ -10,19 +10,22 @@ const checkAdmin = (req, res, next) => {
       cache: true,
       rateLimit: true,
       jwksRequestsPerMinute: 5,
-      jwksUri: `https://${AUTH0_DOMAIN}/.well-known/jwks.json`
+      jwksUri: `https://${AUTH0_DOMAIN}/.well-known/jwks.json`,
     }),
     audience: AUTH0_AUDIENCE,
     issuer: `https://${AUTH0_DOMAIN}/`,
-    algorithms: ['RS256']
+    algorithms: ['RS256'],
   })(req, res, (err) => {
     if (err) {
-      console.log('Error de autenticación:', err);
-      return res.status(401).json({ message: 'Invalid token' });
+      console.error('Error al validar el token:', err);
+      if (err.name === 'UnauthorizedError') {
+        return res.status(401).json({ message: 'Token inválido o ausente' });
+      }
+      return res.status(500).json({ message: 'Error interno al procesar el token' });
     }
 
     const roles = req.user[`${namespace}roles`];
-    console.log('Roles del usuario:', roles); // Agrega esto para depuración
+    console.log('Roles del usuario:', roles);
 
     if (roles && roles.includes('admin')) {
       console.log('Usuario es administrador.');
@@ -35,3 +38,4 @@ const checkAdmin = (req, res, next) => {
 };
 
 module.exports = checkAdmin;
+

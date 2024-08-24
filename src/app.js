@@ -1,37 +1,40 @@
+// Importar las dependencias necesarias
 const express = require('express');
-const jwt = require('express-jwt');
+const { expressjwt: jwt } = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const routes = require('./routes/index'); // Importa el archivo de rutas consolidado
-const checkAdmin = require('./services/tokenAdministrador'); // Importa el middleware de verificación de administrador
+const routes = require('./routes/index');
+const checkAdmin = require('./services/tokenAdministrador');
 require('dotenv').config();
 
+// Crear una instancia de la aplicación Express
 const app = express();
-app.name = 'API'; // Nombre descriptivo
+app.name = 'API';
 
+// Obtener las variables de entorno necesarias
 const { AUTH0_DOMAIN, AUTH0_AUDIENCE } = process.env;
 
-// Configuración de CORS
+// Configurar las opciones de CORS
 const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:4000'], // Permitir solicitudes desde ambos puertos
+  origin: ['http://localhost:5173', 'http://localhost:4000'], // Orígenes permitidos
   methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'], // Métodos HTTP permitidos
   allowedHeaders: ['Content-Type', 'Authorization'], // Cabeceras permitidas
-  credentials: true // Permitir el uso de cookies
+  credentials: true // Permitir el envío de cookies
 };
 app.use(cors(corsOptions));
 
-// Middleware para manejar JSON y cookies
+// Configurar middleware para parsear JSON y cookies
 app.use(express.json());
 app.use(cookieParser());
 
-// Middleware de depuración para ver la ruta solicitada
+// Middleware para registrar las rutas solicitadas
 app.use((req, res, next) => {
   console.log(`Ruta solicitada: ${req.method} ${req.originalUrl}`);
   next();
 });
 
-// Middleware para verificar tokens JWT automáticamente
+// Configurar el middleware de autenticación JWT
 const checkJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
     cache: true,
@@ -44,16 +47,16 @@ const checkJwt = jwt({
   algorithms: ['RS256']
 });
 
-// Rutas públicas y no protegidas por autenticación
-app.use('/api/public', routes); // Define tus rutas públicas aquí
+// Configurar rutas públicas (no requieren autenticación)
+app.use('/api/public', routes);
 
-// Aplica el middleware para proteger todas las rutas después de las rutas públicas
+// Configurar rutas protegidas (requieren autenticación JWT)
 app.use('/api', checkJwt, routes);
 
-// Aplica el middleware de verificación de administrador a las rutas administrativas
-app.use('/api/users/check-admin', checkJwt, checkAdmin, routes); // Suponiendo que tus rutas administrativas están bajo '/api/check-admin'
+// Configurar rutas de administrador (requieren autenticación JWT y verificación de rol de administrador)
+app.use('/api/users/check-admin', checkJwt, checkAdmin, routes);
 
-// Middleware para manejar rutas no encontradas (404)
+// Middleware para manejar rutas no encontradas
 app.use((req, res, next) => {
   res.status(404).json({ message: 'Ruta no encontrada' });
 });
@@ -64,4 +67,5 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ message: err.message || 'Ocurrió un error en el servidor' });
 });
 
+// Exportar la aplicación para su uso en otros archivos
 module.exports = app;
