@@ -15,18 +15,21 @@ const checkJwt = jwt({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: `https://${process.env.AUTH0_DOMAIN}/.well-known/jwks.json`,
+    jwksUri: `https://${AUTH0_DOMAIN}/.well-known/jwks.json`,
   }),
-  audience: process.env.AUTH0_AUDIENCE, // Debe coincidir con lo configurado en el frontend
-  issuer: `https://${process.env.AUTH0_DOMAIN}/`,
+  audience: AUTH0_AUDIENCE, // Debe coincidir con lo configurado en el frontend
+  issuer: `https://${AUTH0_DOMAIN}/`,
   algorithms: ['RS256'],
 });
+
+// Middleware para validar JWT y agregar información de usuario autenticado
 router.use(checkJwt, (req, res, next) => {
   console.log('Respuesta completa de Auth0:', JSON.stringify(req.user, null, 2));
   console.log('Headers de la solicitud:', req.headers);
   next();
 });
 
+// Ruta protegida por autenticación, accesible por cualquier usuario autenticado
 router.post('/sync', checkJwt, (req, res, next) => {
   console.log('Middleware checkJwt pasado');
   console.log('Solicitud recibida en /sync');
@@ -35,7 +38,7 @@ router.post('/sync', checkJwt, (req, res, next) => {
   
   if (!req.user) {
     console.log('req.user is undefined. JWT payload:', req.auth);
-    // If req.user is undefined, try to use req.auth instead
+    // Si req.user no está definido, usar req.auth
     req.user = req.auth;
   }
   
@@ -46,5 +49,24 @@ router.post('/sync', checkJwt, (req, res, next) => {
   handleSaveUser(req, res);
 });
 
+// Rutas exclusivas para administradores
+// Se usa checkAdmin para verificar que el usuario es administrador
+router.post('/admin/create', checkAdmin, (req, res) => {
+  console.log('Ruta POST /admin/create recibida');
+  // Lógica para crear recurso
+  res.json({ message: 'Recurso creado por administrador' });
+});
+
+router.patch('/admin/update/:id', checkAdmin, (req, res) => {
+  console.log('Ruta PATCH /admin/update recibida');
+  // Lógica para actualizar recurso
+  res.json({ message: `Recurso con ID ${req.params.id} actualizado por administrador` });
+});
+
+router.delete('/admin/delete/:id', checkAdmin, (req, res) => {
+  console.log('Ruta DELETE /admin/delete recibida');
+  // Lógica para eliminar recurso
+  res.json({ message: `Recurso con ID ${req.params.id} eliminado por administrador` });
+});
 
 module.exports = router;
