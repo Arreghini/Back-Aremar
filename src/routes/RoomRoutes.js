@@ -20,9 +20,9 @@ router.get('/', getRoomByQuery);
 router.get('/:id', getRoomById);
 
 // Rutas protegidas para administración
-router.post('/', checkAdmin, createRoomHandler);
-router.delete('/:id', checkAdmin, deleteRoomHandler);
-router.put('/:id', checkAdmin, updateRoomHandler);
-router.patch('/:id', checkAdmin, updateRoomHandler);
+router.post('/admin', checkAdmin, createRoomHandler);
+router.delete('/admin/:id', checkAdmin, deleteRoomHandler);
+router.put('/admin/:id', checkAdmin, updateRoomHandler);
+router.patch('/admin/:id', checkAdmin, updateRoomHandler);
 
 module.exports = router;
