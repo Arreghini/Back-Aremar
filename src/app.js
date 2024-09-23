@@ -47,14 +47,12 @@ const checkJwt = jwt({
   algorithms: ['RS256']
 });
 
-// Configurar rutas públicas (no requieren autenticación)
-app.use('/api/public', routes);
+// Configurar **rutas públicas** bajo `/api/rooms/public` (no requieren autenticación)
+app.use('/api/rooms/public', routes);
 
-// Configurar rutas protegidas (requieren autenticación JWT)
-app.use('/api', checkJwt, routes);
-
-// Configurar rutas de administrador (requieren autenticación JWT y verificación de rol de administrador)
-app.use('/api/users/check-admin', checkJwt, checkAdmin, routes);
+// Configurar **rutas protegidas** para administración
+app.use('/api/rooms/admin', checkJwt, checkAdmin, routes);
+app.use('/api/users/admin', checkJwt, checkAdmin, routes);
 
 // Middleware para manejar rutas no encontradas
 app.use((req, res, next) => {
