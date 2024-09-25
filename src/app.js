@@ -1,69 +1,60 @@
-// Importar las dependencias necesarias
 const express = require('express');
-const { expressjwt: jwt } = require('express-jwt');
-const jwksRsa = require('jwks-rsa');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const routes = require('./routes/index');
-const checkAdmin = require('./services/tokenAdministrador');
+const userRoutes = require('./routes/UsersRoutes');
+const roomRoutes = require('./routes/RoomRoutes');
+const { checkAdmin, jwtCheck } = require('./services/tokenAdministrador');
 require('dotenv').config();
 
-// Crear una instancia de la aplicación Express
 const app = express();
 app.name = 'API';
 
-// Obtener las variables de entorno necesarias
-const { AUTH0_DOMAIN, AUTH0_AUDIENCE } = process.env;
-
-// Configurar las opciones de CORS
 const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:4000'], // Orígenes permitidos
-  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'], // Métodos HTTP permitidos
-  allowedHeaders: ['Content-Type', 'Authorization'], // Cabeceras permitidas
-  credentials: true // Permitir el envío de cookies
+  origin: ['http://localhost:5173', 'http://localhost:4000'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
 };
-app.use(cors(corsOptions));
 
-// Configurar middleware para parsear JSON y cookies
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
-// Middleware para registrar las rutas solicitadas
+// Middleware para verificar el token
+app.use(jwtCheck); // Aplica jwtCheck a todas las rutas
+
 app.use((req, res, next) => {
-  console.log(`Ruta solicitada: ${req.method} ${req.originalUrl}`);
+  if (!req.auth) {
+    console.log('Usuario no autenticado');
+    return res.status(401).json({ message: 'Usuario no autenticado' });
+  }
   next();
 });
 
-// Configurar el middleware de autenticación JWT
-const checkJwt = jwt({
-  secret: jwksRsa.expressJwtSecret({
-    cache: true,
-    rateLimit: true,
-    jwksRequestsPerMinute: 5,
-    jwksUri: `https://${AUTH0_DOMAIN}/.well-known/jwks.json`
-  }),
-  audience: AUTH0_AUDIENCE,
-  issuer: `https://${AUTH0_DOMAIN}/`,
-  algorithms: ['RS256']
+// Ruta de autenticación de usuario
+app.use('/api/users', jwtCheck, userRoutes)
+
+// Rutas protegidas para administración
+app.use('/api/rooms/admin', checkAdmin, roomRoutes);
+app.use('/api/users/admin', checkAdmin, userRoutes);
+
+// Rutas públicas
+app.get('/public', (req, res) => {
+  res.send('Esta es una ruta pública.');
 });
 
-// Configurar **rutas públicas** bajo `/api/rooms/public` (no requieren autenticación)
-app.use('/api/rooms/public', routes);
-
-// Configurar **rutas protegidas** para administración
-app.use('/api/rooms/admin', checkJwt, checkAdmin, routes);
-app.use('/api/users/admin', checkJwt, checkAdmin, routes);
-
-// Middleware para manejar rutas no encontradas
-app.use((req, res, next) => {
+// Manejo de rutas no encontradas
+app.use((req, res) => {
   res.status(404).json({ message: 'Ruta no encontrada' });
 });
 
-// Middleware para manejar errores
-app.use((err, req, res, next) => {
-  console.error('Error:', err.message);
+// Manejo de errores
+app.use((err, req, res) => {
+  console.error('Error en la solicitud:', err);
+  if (err.name === 'UnauthorizedError') {
+    return res.status(401).json({ message: 'Token inválido o no proporcionado' });
+  }
   res.status(err.status || 500).json({ message: err.message || 'Ocurrió un error en el servidor' });
 });
 
-// Exportar la aplicación para su uso en otros archivos
 module.exports = app;

@@ -1,26 +1,19 @@
 require('dotenv').config();
+const { expressjwt: jwt } = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
 const axios = require('axios');
-const jwt = require('jsonwebtoken'); // Para firmar/verificar/decodificar tokens
-const { expressjwt: jwtMiddleware } = require('express-jwt'); // Para el middleware de autenticación
+const { auth } = require('express-oauth2-jwt-bearer');
+const unless = require('express-unless');
 
 const { AUTH0_DOMAIN, AUTH0_AUDIENCE, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET } = process.env;
 
 const namespace = 'https://aremar.com/';
 
-// Middleware para validar el JWT
-const jwtAuthMiddleware = jwtMiddleware({
-  secret: jwksRsa.expressJwtSecret({
-    cache: true,
-    rateLimit: true,
-    jwksRequestsPerMinute: 5,
-    jwksUri: `https://${AUTH0_DOMAIN}/.well-known/jwks.json`,
-  }),
-  audience: AUTH0_AUDIENCE,
-  issuer: `https://${AUTH0_DOMAIN}/`,
-  algorithms: ['RS256'],
-  credentialsRequired: true, // Asegura que el token esté presente
-  requestProperty: 'auth',  // Para usar 'req.auth' en lugar de 'req.user'
+// Middleware global para validar JWT, excepto en rutas públicas
+const jwtCheck = auth({
+  audience: 'https://clientearemar-api',
+  issuerBaseURL: 'https://dev-mgsmdv1ylwl47mj8.us.auth0.com/',
+  tokenSigningAlg: 'RS256',
 });
 
 // Cache para el Management API Token
@@ -37,7 +30,7 @@ const getManagementApiToken = async () => {
     const response = await axios.post(`https://${AUTH0_DOMAIN}/oauth/token`, {
       client_id: AUTH0_CLIENT_ID,
       client_secret: AUTH0_CLIENT_SECRET,
-      audience: `https://${AUTH0_DOMAIN}/api/v2/`,
+      audience: AUTH0_AUDIENCE,
       grant_type: 'client_credentials',
     });
 
@@ -75,11 +68,10 @@ const checkAdmin = async (req, res, next) => {
     if (!req.auth || !req.auth.sub) {
       throw new Error('No se pudo obtener la información del usuario del token');
     }
-
     const userId = req.auth.sub;
     const managementToken = await getManagementApiToken();
     const isAdmin = await checkUserRole(userId, managementToken);
-
+  
     if (isAdmin) {
       return next();
     } else {
@@ -91,24 +83,28 @@ const checkAdmin = async (req, res, next) => {
   }
 };
 
-// Middleware principal: validar JWT y luego verificar el rol
-const jwtAndRoleMiddleware = (req, res, next) => {
-  jwtAuthMiddleware(req, res, (err) => {
-    if (err) {
-      console.error('Error al validar el token:', err);
-      if (err.name === 'UnauthorizedError') {
-        return res.status(401).json({ message: 'Token inválido o ausente' });
-      }
-      return res.status(500).json({ message: 'Error interno al procesar el token' });
-    }
+// // Middleware principal: validar JWT y luego verificar el rol
+// const jwtAndRoleMiddleware = (req, res, next) => {
+//   checkJwt(req, res, (err) => {
+//     if (err) {
+//       console.error('Error al validar el token:', err);
+//       if (err.name === 'UnauthorizedError') {
+//         return res.status(401).json({ message: 'Token inválido o ausente' });
+//       }
+//       return res.status(500).json({ message: 'Error interno al procesar el token' });
+//     }
 
-    // Loguea el token decodificado
-    console.log('Token decodificado:', req.auth);
-    console.log('req.body:', req.body)
+//     // Loguea el token decodificado
+//     console.log('Token decodificado:', req.user);
+//     console.log('req.body:', req.body);
 
-    // Continúa con la verificación de roles
-    checkAdmin(req, res, next);
-  });
-};
+//     // Continúa con la verificación de roles
+//     checkAdmin(req, res, next);
+//   });
+// };
 
-module.exports = jwtAndRoleMiddleware;
+module.exports = {
+  jwtCheck,
+  checkAdmin,
+  checkUserRole,
+}
