@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  sequelize.define('Room', {
+  const Room = sequelize.define('Room', {
     id: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -31,4 +31,6 @@ module.exports = (sequelize) => {
       defaultValue: 'available',
     }
   });
+
+  return Room; // Asegúrate de devolver el modelo
 };

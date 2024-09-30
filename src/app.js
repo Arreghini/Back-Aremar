@@ -1,6 +1,8 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const RoomModel = require('./models/Room'); 
+const { conn } = require('./config/db'); 
 const userRoutes = require('./routes/UsersRoutes');
 const roomRoutes = require('./routes/RoomRoutes');
 const { checkAdmin, jwtCheck } = require('./services/tokenAdministrador');
@@ -15,33 +17,37 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
-
-app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cors(corsOptions));
 app.use(cookieParser());
 
-// Middleware para verificar el token
-app.use(jwtCheck); // Aplica jwtCheck a todas las rutas
+const Room = RoomModel(conn);
 
 app.use((req, res, next) => {
-  if (!req.auth) {
-    console.log('Usuario no autenticado');
-    return res.status(401).json({ message: 'Usuario no autenticado' });
-  }
+  console.log('Método:', req.method);
+  console.log('URL:', req.url);
+  console.log('Cuerpo de la solicitud:', req.body);
   next();
 });
 
-// Ruta de autenticación de usuario
-app.use('/api/users', jwtCheck, userRoutes)
-
-// Rutas protegidas para administración
-app.use('/api/rooms/admin', checkAdmin, roomRoutes);
-app.use('/api/users/admin', checkAdmin, userRoutes);
-
-// Rutas públicas
+// Rutas públicas (no requieren autenticación)
 app.get('/public', (req, res) => {
   res.send('Esta es una ruta pública.');
 });
+
+// Ruta para obtener todas las habitaciones (pública)
+app.get('/api/rooms/all', (req, res) => {
+  // Aquí puedes manejar la lógica para obtener las habitaciones sin necesidad de autenticación
+  res.json({ message: 'Rutas públicas sin autenticación para obtener todas las habitaciones.' });
+});
+
+// Rutas protegidas por autenticación
+app.use('/api/users', jwtCheck, userRoutes); // Protege las rutas de usuarios con autenticación
+
+// Rutas protegidas para administración (requiere autenticación y rol de admin)
+//app.use('/api/rooms/admin', jwtCheck, checkAdmin, roomRoutes); // Protege las rutas de administración de habitaciones
+app.use('/api/rooms/admin', roomRoutes); // Protege las rutas de administración de habitaciones
+app.use('/api/users/admin', jwtCheck, checkAdmin, userRoutes); // Protege las rutas de administración de usuarios
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {
@@ -49,12 +55,14 @@ app.use((req, res) => {
 });
 
 // Manejo de errores
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   console.error('Error en la solicitud:', err);
+
   if (err.name === 'UnauthorizedError') {
     return res.status(401).json({ message: 'Token inválido o no proporcionado' });
   }
-  res.status(err.status || 500).json({ message: err.message || 'Ocurrió un error en el servidor' });
+
+  return res.status(err.status || 500).json({ message: err.message || 'Ocurrió un error en el servidor' });
 });
 
 module.exports = app;

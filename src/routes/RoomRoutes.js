@@ -19,8 +19,9 @@ router.get('/', getRoomByQuery);
 router.get('/:id', getRoomById);
 
 // Rutas protegidas para administración
-router.post('/admin', checkAdmin, (req, res, next) => {
- 
+//router.post('/admin', checkAdmin, (req, res, next) => {
+  router.post('/', (req, res, next) => {
+  console.log('Datos recibidos desde el dashboard:', req.body); // Registrar datos del body
   next();
 }, createRoomHandler);
 
