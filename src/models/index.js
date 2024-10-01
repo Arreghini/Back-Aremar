@@ -28,6 +28,8 @@ const {
   RoomType,
   User,
 } = conn.models;
+// Después de cargar los modelos
+console.log('Modelos cargados:', conn.models);
 
 User.hasMany(Reservation, { foreignKey: "userId" });
 Reservation.belongsTo(User, { foreignKey: "userId" });
@@ -35,8 +37,8 @@ Reservation.belongsTo(User, { foreignKey: "userId" });
 Room.hasMany(Reservation, { foreignKey: "roomId" });
 Reservation.belongsTo(Room, { foreignKey: "roomId" });
 
-RoomType.hasMany(Room, { foreignKey: "roomTypeId" });
-Room.belongsTo(RoomType, { foreignKey: "roomTypeId" });
+RoomType.hasMany(Room, { foreignKey: "typeRoom" });
+Room.belongsTo(RoomType, { foreignKey: "typeRoom" });
 
 Room.hasOne(RoomDetail, { foreignKey: "roomId" });
 RoomDetail.belongsTo(Room, { foreignKey: "roomId" });

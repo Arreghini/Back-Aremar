@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  const Room = sequelize.define('Room', {
+  sequelize.define('Room', {
     id: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -20,7 +20,7 @@ module.exports = (sequelize) => {
     },
     price: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
     photoRoom: {
       type: DataTypes.STRING,
@@ -29,8 +29,6 @@ module.exports = (sequelize) => {
     status: {
       type: DataTypes.ENUM('available', 'unavailable'),
       defaultValue: 'available',
-    }
+    },
   });
-
-  return Room; // Asegúrate de devolver el modelo
 };
