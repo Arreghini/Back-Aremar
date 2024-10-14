@@ -1,8 +1,8 @@
 const getRoomController = require('../../controllers/room/getRoomController');
 
-const getRoom = async (req, res) => {
+const getRooms = async (req, res) => {
   try {
-    console.log('Solicitud GET /api/rooms/all recibida'); // Agrega un log aquí
+    console.log('Solicitud GET /api/rooms/all recibida'); 
     const rooms = await getRoomController();
     console.log('Rooms sent to client:', rooms);
     res.status(200).json(rooms);
@@ -12,4 +12,4 @@ const getRoom = async (req, res) => {
   }
 }
 
-module.exports = getRoom;
+module.exports = getRooms;

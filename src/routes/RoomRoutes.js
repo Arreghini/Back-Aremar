@@ -10,11 +10,7 @@ const getRooms = require('../handlers/room/getRoomHandler');
 const updateRoomHandler = require('../handlers/room/updateRoomHandler');
 
 // Rutas públicas
-router.get('/all', (req, res, next) => {
-  console.log('Solicitud GET /api/rooms/all recibida');
-  next();
-}, getRooms);
-
+router.get('/all', getRooms);
 router.get('/', getRoomByQuery);
 router.get('/:id', getRoomById);
 

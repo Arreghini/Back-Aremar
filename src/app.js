@@ -35,12 +35,7 @@ app.get('/public', (req, res) => {
   res.send('Esta es una ruta pública.');
 });
 
-// Ruta para obtener todas las habitaciones (pública)
-app.get('/api/rooms/all', (req, res) => {
-  // Aquí puedes manejar la lógica para obtener las habitaciones sin necesidad de autenticación
-  res.json({ message: 'Rutas públicas sin autenticación para obtener todas las habitaciones.' });
-});
-
+app.use('/api/rooms', roomRoutes);
 // Rutas protegidas por autenticación
 app.use('/api/users', jwtCheck, userRoutes); // Protege las rutas de usuarios con autenticación
 
