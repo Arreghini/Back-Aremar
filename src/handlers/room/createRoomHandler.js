@@ -11,13 +11,14 @@ const createRoomHandler = async (req, res) => {
     console.log('Habitación creada:', room); // Verificar la respuesta del controlador
     return res.status(201).json(room); // Siempre retorna para evitar ejecutar código adicional
   } catch (error) {
-    // Maneja y registra el error
+    // Si el error es por un ID duplicado, devolver un 400 sin loguear como error grave
     if (error.message === 'Room with this ID already exists') {
-      return res.status(400).json({ error: error.message }); // Respuesta clara al cliente
+      return res.status(400).json({ error: error.message });
     }
 
-    console.error('Error al manejar la solicitud:', error); // Log para el servidor
-    return res.status(500).send('Error al manejar la solicitud'); // Asegura que siempre retornas una respuesta
+    // Registrar solo errores inesperados
+    console.error('Error inesperado al manejar la solicitud:', error); 
+    return res.status(500).send('Error al manejar la solicitud');
   }
 };
 

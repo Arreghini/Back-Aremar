@@ -1,19 +1,19 @@
 const { Room } = require('../../models/index'); // Ajusta esta ruta si es necesario
 
-
 const roomCreateController = async (roomData) => {
-  console.log('body recibido en el controlador:', roomData);  // Para verificar que se está recibiendo el cuerpo de la solicitud
+  console.log('Datos recibidos en el controlador:', roomData);  // Verificación de datos de entrada
   try {
     const { id, description, typeRoom, detailRoom, price, photoRoom, status } = roomData;
 
-    // Busca la habitación existente
-    const existingRoom = await Room.findByPk(id); // Esto debe funcionar si Room está definido correctamente
+    // Buscar habitación existente por ID
+    const existingRoom = await Room.findByPk(id);
 
+    // Si ya existe una habitación con el mismo ID, lanza un error controlado
     if (existingRoom) {
-      throw new Error('Room with this ID already exists'); // Lanza un error para manejarlo en el handler
+      throw new Error('Room with this ID already exists');
     }
 
-    // Crea la nueva habitación
+    // Crear la nueva habitación
     const newRoom = await Room.create({
       id,
       description,
@@ -26,7 +26,7 @@ const roomCreateController = async (roomData) => {
 
     return newRoom; // Retorna la nueva habitación creada
   } catch (error) {
-    console.error('Error al crear la habitación:', error);
+    console.error('Error al crear la habitación:', error.message); // Solo imprime el mensaje del error
     throw error; // Lanza el error para que sea manejado en el handler
   }
 };
