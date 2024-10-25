@@ -24,9 +24,9 @@ app.use(cookieParser());
 const Room = RoomModel(conn);
 
 app.use((req, res, next) => {
-  console.log('Método:', req.method);
-  console.log('URL:', req.url);
-  console.log('Cuerpo de la solicitud:', req.body);
+ // console.log('Método:', req.method);
+ //console.log('URL:', req.url);
+ // console.log('Cuerpo de la solicitud:', req.body);
   next();
 });
 
@@ -36,6 +36,7 @@ app.get('/public', (req, res) => {
 });
 
 app.use('/api/rooms', roomRoutes);
+
 // Rutas protegidas por autenticación
 app.use('/api/users', jwtCheck, userRoutes); // Protege las rutas de usuarios con autenticación
 

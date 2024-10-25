@@ -1,13 +1,12 @@
 const express = require('express');
 const handleSaveUser = require('../handlers/user/userHandler');
 const { checkAdmin, jwtCheck } = require('../services/tokenAdministrador');
-const createRoomHandler  = require('../handlers/room/createRoomHandler');
 
 const router = express.Router();
 
 // Middleware para verificar la autenticación en todas las rutas
 router.use(jwtCheck, (req, res, next) => {
-  console.log('Respuesta completa de Auth0:', JSON.stringify(req.auth, null, 2));
+//  console.log('Respuesta completa de Auth0:', JSON.stringify(req.auth, null, 2));
   next();
 });
 
@@ -30,7 +29,6 @@ router.post('/sync', async (req, res) => {
     }
   }
 });
-
 
 // Rutas protegidas para administradores
 
