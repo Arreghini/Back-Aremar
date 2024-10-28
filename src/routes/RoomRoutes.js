@@ -24,8 +24,15 @@ router.post('/', jwtCheck, checkAdmin, (req, res, next) => {
   next();
 }, createRoomHandler);
 
-router.delete('/admin/:id', jwtCheck, checkAdmin, deleteRoomHandler);
-router.put('/admin/:id', jwtCheck, checkAdmin, updateRoomHandler);
+//router.delete('/admin/:id', jwtCheck, checkAdmin, deleteRoomHandler);
+router.delete('/admin/:id', jwtCheck, checkAdmin, (req, res, next) => {
+  console.log('Datos recibidos en la solicitud DELETE:', {
+    roomId: req.params.id,
+    headers: req.headers,
+  });
+  next();
+}, deleteRoomHandler);
+
 router.patch('/admin/:id', jwtCheck, checkAdmin, updateRoomHandler);
 
 module.exports = router;
