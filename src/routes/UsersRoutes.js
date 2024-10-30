@@ -1,12 +1,15 @@
 const express = require('express');
 const handleSaveUser = require('../handlers/user/userHandler');
+const getAllUsersHandler = require('../handlers/user/getAllUsersHandler');
+const getUserByIdHandler = require('../handlers/user/getUserByIdHandler');
+const createUserHandler = require('../handlers/user/createUserHandler');
+const updateUserHandler = require('../handlers/user/updateUserHandler');
+const deleteUserHandler = require('../handlers/user/deleteUserHandler');
 const { checkAdmin, jwtCheck } = require('../services/tokenAdministrador');
-
 const router = express.Router();
 
 // Middleware para verificar la autenticación en todas las rutas
 router.use(jwtCheck, (req, res, next) => {
-//  console.log('Respuesta completa de Auth0:', JSON.stringify(req.auth, null, 2));
   next();
 });
 
@@ -14,58 +17,72 @@ router.use(jwtCheck, (req, res, next) => {
 router.post('/sync', async (req, res) => {
   console.log('Solicitud recibida en /sync');
   try {
-    await handleSaveUser(req, res);
-    
-    // Verificamos si la respuesta ya fue enviada
-    if (!res.headersSent) {
-      res.json({ message: 'Datos de usuario sincronizados correctamente' });
-    }
+    const savedUser = await handleSaveUser(req); // Llama la función y maneja la respuesta aquí
+    res.json({ message: 'Datos de usuario sincronizados correctamente', data: savedUser });
   } catch (error) {
     console.error('Error al sincronizar datos de usuario:', error);
-
-    // Verificamos si la respuesta ya fue enviada antes de enviar un mensaje de error
-    if (!res.headersSent) {
+    if (!res.headersSent) { // Verifica si los encabezados ya fueron enviados
       res.status(500).json({ message: 'Error al sincronizar los datos de usuario' });
     }
   }
 });
 
 // Rutas protegidas para administradores
-
-// Crear un nuevo recurso (ej. habitación)
-//router.post('/admin/create', checkAdmin, async (req, res) => {
-router.post('/admin/create', async (req, res) => {
-  console.log('Ruta POST /admin/create recibida');
+// Obtener todos los usuarios
+router.get('/admin/all', checkAdmin, async (req, res) => {
+  console.log('Ruta GET /admin/all recibida');
   try {
-    const result = await createRoomHandler(req, res);  // Llamamos a la función createRoomHandler
-    res.status(201).json({ message: 'Habitación creada correctamente', data: result });
+    const result = await getAllUsersHandler(req);
+    res.status(200).json({ message: 'Usuarios obtenidos correctamente', data: result });
   } catch (error) {
-    console.error('Error al crear la habitación:', error);
-    res.status(500).json({ message: 'Error al crear la habitación' });
+    console.error('Error al obtener los usuarios:', error);
+    res.status(500).json({ message: 'Error al obtener los usuarios' });
   }
 });
 
-// Actualizar un recurso por ID (ej. habitación)
-router.patch('/admin/update/:id', checkAdmin, async (req, res) => {
-  console.log('Ruta PATCH /admin/update recibida');
+// Obtener usuario por ID
+router.get('/admin/:id', checkAdmin, async (req, res) => {
+  console.log('Ruta GET /admin/:id recibida');
   try {
-    // Aquí debes llamar a la función que maneje la actualización de habitaciones, si la tienes
-    res.json({ message: `Habitación con ID ${req.params.id} actualizada correctamente` });
+    const result = await getUserByIdHandler(req);
+    res.status(200).json({ message: 'Usuario obtenido correctamente', data: result });
   } catch (error) {
-    console.error('Error al actualizar la habitación:', error);
-    res.status(500).json({ message: 'Error al actualizar la habitación' });
+    console.error('Error al obtener el usuario:', error);
+    res.status(500).json({ message: 'Error al obtener el usuario' });
   }
 });
 
-// Eliminar un recurso por ID (ej. habitación)
-router.delete('/admin/delete/:id', checkAdmin, async (req, res) => {
-  console.log('Ruta DELETE /admin/delete recibida');
+// Crear un nuevo usuario
+router.post('/admin', async (req, res) => {
   try {
-    // Aquí debes llamar a la función que maneje la eliminación de habitaciones, si la tienes
-    res.json({ message: `Habitación con ID ${req.params.id} eliminada correctamente` });
+    const result = await createUserHandler(req);
+    res.status(201).json({ message: 'Usuario creado correctamente', data: result });
   } catch (error) {
-    console.error('Error al eliminar la habitación:', error);
-    res.status(500).json({ message: 'Error al eliminar la habitación' });
+    console.error('Error al crear el usuario:', error);
+    res.status(500).json({ message: 'Error al crear el usuario' });
+  }
+});
+
+// Actualizar usuario
+router.patch('/admin/:id', checkAdmin, async (req, res) => {
+  try {
+    const result = await updateUserHandler(req);
+    res.status(200).json({ message: 'Usuario actualizado correctamente', data: result });
+  } catch (error) {
+    console.error('Error al actualizar el usuario:', error);
+    res.status(500).json({ message: 'Error al actualizar el usuario' });
+  }
+});
+
+// Eliminar usuario
+router.delete('/admin/:id', checkAdmin, async (req, res) => {
+  console.log('Ruta DELETE recibida');
+  try {
+    const result = await deleteUserHandler(req);
+    res.status(200).json({ message: 'Usuario eliminado correctamente', data: result });
+  } catch (error) {
+    console.error('Error al eliminar el usuario:', error);
+    res.status(500).json({ message: 'Error al eliminar el usuario' });
   }
 });
 

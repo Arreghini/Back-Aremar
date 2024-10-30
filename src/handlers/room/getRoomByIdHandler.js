@@ -1,4 +1,4 @@
-const getRoomByIdController = require('../../controllers/room/getRoomById');
+const getRoomByIdController = require('../../controllers/room/getRoomByIdController');
 
 const getRoomById = async (req, res) => {
   try {

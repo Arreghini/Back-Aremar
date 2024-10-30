@@ -42,7 +42,7 @@ app.use('/api/users', jwtCheck, userRoutes); // Protege las rutas de usuarios co
 
 // Rutas protegidas para administración (requiere autenticación y rol de admin)
 //app.use('/api/rooms/admin', jwtCheck, checkAdmin, roomRoutes); // Protege las rutas de administración de habitaciones
-app.use('/api/rooms/admin', roomRoutes); // Protege las rutas de administración de habitaciones
+app.use('/api/rooms/admin', jwtCheck, checkAdmin, roomRoutes); // Protege las rutas de administración de habitaciones
 app.use('/api/users/admin', jwtCheck, checkAdmin, userRoutes); // Protege las rutas de administración de usuarios
 
 // Manejo de rutas no encontradas

@@ -1,33 +1,38 @@
 const userController = require('../../controllers/user/userController');
+const roleService = require('../../services/roleService'); // Importa roleService
 
-const handleSaveUser = async (req, res) => {
+const handleSaveUser = async (req) => {
   console.log('handleSaveUser iniciado');
   try {
-    console.log('Request Body:', req.body);
-    console.log('req.auth:', req.auth);
-
     if (!req.auth) {
       console.log('Usuario no autenticado');
-      return res.status(401).json({ error: 'Usuario no autenticado' });
+      throw new Error('Usuario no autenticado');
     }
 
-   // Extraer el ID del usuario desde req.auth
-   const user_id = req.auth.payload.sub || req.body.user_id;
+    const user_id = req.auth.payload.sub || req.body.user_id;
+    const userData = {
+      user_id,
+      authorization: req.headers.authorization,
+    };
 
-   const userData = {
-     user_id,
-     authorization: req.headers.authorization,
-   };
+    // Obtener el token del Management API
+    const managementToken = await roleService.getManagementApiToken();
+    console.log('Token de Management API obtenido:', managementToken);
 
-   console.log('Llamando a userController.saveUser con userData:', userData);
-   const savedUser = await userController.saveUser(userData);
-   console.log('Usuario guardado:', savedUser);
-   res.json(savedUser);
- } catch (error) {
-   console.error('Error en handleSaveUser:', error);
-   res.status(500).send('Error al manejar la solicitud');
- }
+    // Verificar el rol del usuario
+    const isAdmin = await roleService.checkUserRole(user_id, managementToken);
+    console.log('Rol del usuario:', isAdmin ? 'admin' : 'no admin');
+
+    // Llamar a saveUser y pasar los datos del usuario
+    const savedUser = await userController.saveUser(userData);
+    console.log('Usuario guardado:', savedUser);
+
+    // Retorna savedUser incluyendo isAdmin
+    return { ...savedUser, isAdmin }; 
+  } catch (error) {
+    console.error('Error en handleSaveUser:', error);
+    throw error;
+  }
 };
 
-
-module.exports =  handleSaveUser ;
+module.exports = handleSaveUser;

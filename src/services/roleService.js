@@ -31,7 +31,7 @@ const checkUserRole = async (user_id, token) => {
 
     const roles = rolesResponse.data.map(role => role.name);
     console.log('Roles del usuario:', roles);
-
+    
     return roles.includes('admin'); // Verifica si el usuario tiene el rol de administrador
     
   } catch (error) {
