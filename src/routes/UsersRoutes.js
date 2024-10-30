@@ -28,62 +28,20 @@ router.post('/sync', async (req, res) => {
 });
 
 // Rutas protegidas para administradores
+
 // Obtener todos los usuarios
-router.get('/admin/all', checkAdmin, async (req, res) => {
-  console.log('Ruta GET /admin/all recibida');
-  try {
-    const result = await getAllUsersHandler(req);
-    res.status(200).json({ message: 'Usuarios obtenidos correctamente', data: result });
-  } catch (error) {
-    console.error('Error al obtener los usuarios:', error);
-    res.status(500).json({ message: 'Error al obtener los usuarios' });
-  }
-});
+router.get('/admin/all', checkAdmin, getAllUsersHandler); 
 
 // Obtener usuario por ID
-router.get('/admin/:id', checkAdmin, async (req, res) => {
-  console.log('Ruta GET /admin/:id recibida');
-  try {
-    const result = await getUserByIdHandler(req);
-    res.status(200).json({ message: 'Usuario obtenido correctamente', data: result });
-  } catch (error) {
-    console.error('Error al obtener el usuario:', error);
-    res.status(500).json({ message: 'Error al obtener el usuario' });
-  }
-});
+router.get('/admin/:id', checkAdmin, getUserByIdHandler);
 
 // Crear un nuevo usuario
-router.post('/admin', async (req, res) => {
-  try {
-    const result = await createUserHandler(req);
-    res.status(201).json({ message: 'Usuario creado correctamente', data: result });
-  } catch (error) {
-    console.error('Error al crear el usuario:', error);
-    res.status(500).json({ message: 'Error al crear el usuario' });
-  }
-});
+router.post('/admin', checkAdmin, createUserHandler);
 
 // Actualizar usuario
-router.patch('/admin/:id', checkAdmin, async (req, res) => {
-  try {
-    const result = await updateUserHandler(req);
-    res.status(200).json({ message: 'Usuario actualizado correctamente', data: result });
-  } catch (error) {
-    console.error('Error al actualizar el usuario:', error);
-    res.status(500).json({ message: 'Error al actualizar el usuario' });
-  }
-});
-
+router.patch('/admin/:id', checkAdmin, updateUserHandler);
+   
 // Eliminar usuario
-router.delete('/admin/:id', checkAdmin, async (req, res) => {
-  console.log('Ruta DELETE recibida');
-  try {
-    const result = await deleteUserHandler(req);
-    res.status(200).json({ message: 'Usuario eliminado correctamente', data: result });
-  } catch (error) {
-    console.error('Error al eliminar el usuario:', error);
-    res.status(500).json({ message: 'Error al eliminar el usuario' });
-  }
-});
+router.delete('/admin/:id', checkAdmin, deleteUserHandler);
 
 module.exports = router;
