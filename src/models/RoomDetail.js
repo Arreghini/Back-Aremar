@@ -6,11 +6,7 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
       primaryKey: true,
-    },
-    roomId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+    },  
     CableTvService: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
@@ -27,5 +23,8 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
+  }, {
+    tableName: 'RoomDetail', // Agrega esto para especificar el nombre exacto de la tabla
+    timestamps: true 
   });
 };

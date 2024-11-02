@@ -27,20 +27,16 @@ router.post('/sync', async (req, res) => {
   }
 });
 
-// Rutas protegidas para administradores
 
+// Rutas protegidas para administradores
 // Obtener todos los usuarios
 router.get('/admin/all', checkAdmin, getAllUsersHandler); 
-
 // Obtener usuario por ID
 router.get('/admin/:id', checkAdmin, getUserByIdHandler);
-
 // Crear un nuevo usuario
 router.post('/admin', checkAdmin, createUserHandler);
-
 // Actualizar usuario
-router.patch('/admin/:id', checkAdmin, updateUserHandler);
-   
+router.patch('/admin/:id', checkAdmin, updateUserHandler);   
 // Eliminar usuario
 router.delete('/admin/:id', checkAdmin, deleteUserHandler);
 

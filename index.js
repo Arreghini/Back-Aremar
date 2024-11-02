@@ -1,15 +1,16 @@
-
-const server = require('./src/app.js'); 
-const { conn } = require('./src/config/db.js');
+const server = require('./src/app.js');
+const conn = require('./src/config/db.js'); 
+const { User, Room, RoomDetail, RoomType, Reservation } = require('./src/models'); // Ajusta la ruta si es necesario
 
 async function startServer() {
   try {
     await conn.authenticate();
     console.log('Conexión a la base de datos establecida correctamente.');
-    
-    await conn.sync({ alter: true }); // Sincroniza modelos con la base de datos
-    console.log('Modelos sincronizados con la base de datos.');
-    
+
+    // Sincronizar todos los modelos de una sola vez
+    await conn.sync({ alter: true });
+    console.log('Todos los modelos sincronizados con la base de datos.');
+
     const PORT = process.env.PORT || 3000;
     server.listen(PORT, () => {
       console.log(`Servidor escuchando en http://localhost:${PORT}`);
@@ -20,4 +21,3 @@ async function startServer() {
 }
 
 startServer();
-

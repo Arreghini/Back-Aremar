@@ -19,11 +19,11 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    trundleBeds: { // Cambiado a plural para mayor claridad
+    trundleBeds: { 
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
-    kingBeds: { // Cambiado a plural para mayor claridad
+    kingBeds: { 
       type: DataTypes.INTEGER,
       allowNull: true,
     },
@@ -31,6 +31,9 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+  }, {
+    tableName: 'RoomType', // Agrega esto para especificar el nombre exacto de la tabla
+    timestamps: true 
   });
 };
 

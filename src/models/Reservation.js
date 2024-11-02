@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  sequelize.define('Reservation', {
+  const Reservation = sequelize.define('Reservation', {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
@@ -16,23 +16,23 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    guests: {
+    checkIn: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      validate: {
+        isDate: true,
+      },
+    },
+    checkOut: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      validate: {
+        isDate: true,
+      },
+    },
+    numberOfGuests: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    },
-    checkInDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      validate: {
-        isDate: true,
-      }
-    },
-    checkOutDate: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      validate: {
-        isDate: true,
-      }
     },
     totalPrice: {
       type: DataTypes.INTEGER,
@@ -43,4 +43,6 @@ module.exports = (sequelize) => {
       defaultValue: 'pending',
     },
   });
+
+  return Reservation; // Devuelve el modelo para que esté disponible en conn.models
 };
