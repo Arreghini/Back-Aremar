@@ -5,6 +5,9 @@ const getRoomById = require('../handlers/room/getRoomByIdHandler');
 const getRoomByQuery = require('../handlers/room/getRoomByQueryHandler');
 const getRooms = require('../handlers/room/getRoomHandler');
 const updateRoomHandler = require('../handlers/room/updateRoomHandler');
+const roomTypeHandler = require('../handlers/room/roomTypeHandler');
+const roomDetailHandler = require('../handlers/room/roomDetailHandler');
+
 const { checkAdmin, jwtCheck } = require('../services/tokenAdministrador');
 
 const router = express.Router();
@@ -27,14 +30,13 @@ router.post('/', jwtCheck, checkAdmin, (req, res, next) => {
 // Rutas protegidas para administración para cargar tipos de habitaciones
 router.post('/admin', jwtCheck, checkAdmin, (req, res, next) => {
   next();
-}, roomTyperHandler);
+}, roomTypeHandler);
 
 // Rutas protegidas para administración para cargar detalles de habitaciones
 router.post('/admin', jwtCheck, checkAdmin, (req, res, next) => {
   next();
-}, roomDetailsHandler);
+}, roomDetailHandler);
 
-//router.delete('/admin/:id', jwtCheck, checkAdmin, deleteRoomHandler);
 router.delete('/admin/:id', jwtCheck, checkAdmin, (req, res, next) => {
   console.log('Datos recibidos en la solicitud DELETE:', {
     roomId: req.params.id,
