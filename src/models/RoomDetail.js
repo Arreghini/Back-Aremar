@@ -7,7 +7,7 @@ module.exports = (sequelize) => {
       allowNull: false,
       primaryKey: true,
     },  
-    CableTvService: {
+    cableTvService: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
@@ -15,7 +15,7 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
-    Wifi: {
+    wifi: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
