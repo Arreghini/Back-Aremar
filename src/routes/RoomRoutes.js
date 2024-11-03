@@ -28,12 +28,17 @@ router.post('/', jwtCheck, checkAdmin, (req, res, next) => {
 }, createRoomHandler);
 
 // Rutas protegidas para administración para cargar tipos de habitaciones
-router.post('/admin', jwtCheck, checkAdmin, (req, res, next) => {
+router.get('/admin/roomType', jwtCheck, checkAdmin, (req, res, next) => {
   next();
 }, roomTypeHandler);
-
+router.post('/admin/roomType', jwtCheck, checkAdmin, (req, res, next) => {
+  next();
+}, roomTypeHandler);
 // Rutas protegidas para administración para cargar detalles de habitaciones
-router.post('/admin', jwtCheck, checkAdmin, (req, res, next) => {
+router.post('/admin/roomDetail', jwtCheck, checkAdmin, (req, res, next) => {
+  next();
+}, roomDetailHandler);
+roture.get('/admin/roomDetail', jwtCheck, checkAdmin, (req, res, next) => {
   next();
 }, roomDetailHandler);
 
