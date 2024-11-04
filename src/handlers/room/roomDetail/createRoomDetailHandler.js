@@ -1,14 +1,13 @@
+const createDetailController = require('../../controllers/room/roomDetailController');
 
-const roomDetailController = require('../../controllers/room/roomDetailController');
-
-const roomDetailHandler = async (req, res) => {
+const createDetailHandler = async (req, res) => {
   try {
-    const roomTypes = await roomDetailController(req.body); 
+    const createTypes = await createDetailController(req.body); 
 
-    return res.status(201).json(roomTypes); 
+    return res.status(201).json({ message: 'RoomDetail creado con éxito', data: createTypes }); 
   } catch (error) {
-    // Si el error es por un ID duplicado, devolver un 400 sin loguear como error grave
-    if (error.message === 'RoomType with this ID already exists') {
+    // Si el error es por un ID duplicado, devolver un 400
+    if (error.message === 'RoomDetail con este ID ya existe') {
       return res.status(400).json({ error: error.message });
     }
 
@@ -18,4 +17,4 @@ const roomDetailHandler = async (req, res) => {
   }
 };
 
-module.exports = roomDetailHandler;
+module.exports = createDetailHandler;

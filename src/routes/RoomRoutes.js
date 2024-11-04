@@ -5,8 +5,6 @@ const getRoomById = require('../handlers/room/getRoomByIdHandler');
 const getRoomByQuery = require('../handlers/room/getRoomByQueryHandler');
 const getRooms = require('../handlers/room/getRoomHandler');
 const updateRoomHandler = require('../handlers/room/updateRoomHandler');
-const roomTypeHandler = require('../handlers/room/roomTypeHandler');
-const roomDetailHandler = require('../handlers/room/roomDetailHandler');
 
 const { checkAdmin, jwtCheck } = require('../services/tokenAdministrador');
 
@@ -26,21 +24,6 @@ router.post('/', jwtCheck, checkAdmin, (req, res, next) => {
   console.log('Datos recibidos desde el dashboard:', req.body); // Registrar datos del body
   next();
 }, createRoomHandler);
-
-// Rutas protegidas para administración para cargar tipos de habitaciones
-router.get('/admin/roomType', jwtCheck, checkAdmin, (req, res, next) => {
-  next();
-}, roomTypeHandler);
-router.post('/admin/roomType', jwtCheck, checkAdmin, (req, res, next) => {
-  next();
-}, roomTypeHandler);
-// Rutas protegidas para administración para cargar detalles de habitaciones
-router.post('/admin/roomDetail', jwtCheck, checkAdmin, (req, res, next) => {
-  next();
-}, roomDetailHandler);
-roture.get('/admin/roomDetail', jwtCheck, checkAdmin, (req, res, next) => {
-  next();
-}, roomDetailHandler);
 
 router.delete('/admin/:id', jwtCheck, checkAdmin, (req, res, next) => {
   console.log('Datos recibidos en la solicitud DELETE:', {

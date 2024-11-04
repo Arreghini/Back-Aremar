@@ -1,28 +1,28 @@
 const { RoomDetail } = require('../../models');
 
-const roomTypeController = async (data) => {
+const createDetailController = async (data) => {
   try {
     const {
       id,
-      cableTvService,
-      smart_TV,
-      wifi,
-      microwave,
+      roomId,
+      description,
+      amenities,
+      photos,
     } = data;
 
-    const roomDetail = await RoomDetail.create({
+    const newDetail = await RoomDetail.create({
       id,
-      cableTvService,
-      smart_TV,
-      wifi,
-      microwave,
+      roomId,
+      description,
+      amenities,
+      photos,
     });
     
-    return roomDetail; 
+    return newDetail; 
   } catch (error) {
-    console.error('Error al crear la habitación:', error); // Muestra el error completo
-    throw error; // Lanza el error para que sea manejado en el handler
+    console.error('Error al crear el detalle de la habitación:', error); 
+    throw error; 
   }
 };
 
-module.exports = roomTypeController;
+module.exports = createDetailController; 

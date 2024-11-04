@@ -1,6 +1,6 @@
 const { RoomType } = require('../../models');
 
-const roomTypeController = async (data) => {
+const createTypeController = async (data) => {
   try {
     const {
       id,
@@ -24,9 +24,9 @@ const roomTypeController = async (data) => {
     
     return newType; 
   } catch (error) {
-    console.error('Error al crear la habitación:', error); // Muestra el error completo
-    throw error; // Lanza el error para que sea manejado en el handler
+    console.error('Error al crear el tipo de habitación:', error); 
+    throw error; 
   }
 };
 
-module.exports = roomTypeController;
+module.exports = createTypeController; 

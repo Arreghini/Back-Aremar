@@ -1,6 +1,6 @@
 const server = require('./src/app.js');
 const conn = require('./src/config/db.js'); 
-const { User, Room, RoomDetail, RoomType, Reservation } = require('./src/models'); // Ajusta la ruta si es necesario
+const { User, Room, RoomDetail, RoomType, Reservation } = require('./src/models'); 
 
 async function startServer() {
   try {

@@ -1,16 +1,13 @@
+const createTypeController = require('../../../controllers/room/roomType/createRoomTypeController');
 
-const roomTypeController = require('../../controllers/room/roomTypeController');
-
-const roomTypeHandler = async (req, res) => {
+const createTypeHandler = async (req, res) => {
   try {
-    console.log('Request Body:', req.body); // Log para verificar los datos de la solicitud
+    const newRoomType = await createTypeController(req.body);
 
-    const roomTypes = await roomTypeController(req.body); 
-
-    return res.status(201).json(roomTypes); 
+    return res.status(201).json({ message: 'RoomType creado con éxito', data: newRoomType });
   } catch (error) {
-    // Si el error es por un ID duplicado, devolver un 400 sin loguear como error grave
-    if (error.message === 'RoomType with this ID already exists') {
+    // Si el error es por un ID duplicado, devolver un 400
+    if (error.message === 'RoomType con este ID ya existe') {
       return res.status(400).json({ error: error.message });
     }
 
@@ -20,4 +17,4 @@ const roomTypeHandler = async (req, res) => {
   }
 };
 
-module.exports = roomTypeHandler;
+module.exports = createTypeHandler;
