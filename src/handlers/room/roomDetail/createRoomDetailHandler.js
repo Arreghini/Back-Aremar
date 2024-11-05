@@ -1,4 +1,4 @@
-const createDetailController = require('../../controllers/room/roomDetailController');
+const createDetailController = require('../../../controllers/room/roomDetail/createRoomDetailController');
 
 const createDetailHandler = async (req, res) => {
   try {

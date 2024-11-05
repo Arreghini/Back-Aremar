@@ -41,11 +41,11 @@ app.use('/api/users', jwtCheck, userRoutes); // Protege las rutas de usuarios co
 app.use('/api/reservations',jwtCheck, reservationsRoutes); // Protege las rutas de reservas con autenticación 
 
 // Rutas protegidas para administración (requiere autenticación y rol de admin)
-app.use('/api/rooms/admin', jwtCheck, checkAdmin, roomRoutes); // Protege las rutas de administración de habitaciones
-app.use('/api/users/admin', jwtCheck, checkAdmin, userRoutes); // Protege las rutas de administración de usuarios
-app.use('/api/reservations/admin', jwtCheck, checkAdmin, reservationsRoutes); // Protege las rutas de administración de reservas
-app.use('/api/rooms/admin/roomType', jwtCheck, checkAdmin, roomTypeRoutes );
-app.use('/api/users/admin/roomDetail', jwtCheck, checkAdmin, roomDetailsRoutes);
+app.use('/api/rooms/admin',jwtCheck, checkAdmin, roomRoutes); // Protege las rutas de administración de habitaciones
+app.use('/api/users/admin',jwtCheck,checkAdmin, userRoutes); // Protege las rutas de administración de usuarios
+app.use('/api/reservations/admin',jwtCheck, checkAdmin, reservationsRoutes); // Protege las rutas de administración de reservas
+app.use('/api/rooms/admin/roomType',jwtCheck, checkAdmin, roomTypeRoutes );
+app.use('/api/rooms/admin/roomDetail',jwtCheck, checkAdmin, roomDetailsRoutes);
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {

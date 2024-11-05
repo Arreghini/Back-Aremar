@@ -1,4 +1,4 @@
-const { RoomType } = require('../../models');
+const { RoomType } = require('../../../models');
 
 const updateTypeController = async (id, data) => {
   try {

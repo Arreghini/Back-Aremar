@@ -1,4 +1,4 @@
-const { RoomDetail } = require('../../models');
+const { RoomDetail } = require('../../../models');
 
 const getDetailsController = async () => {
   try {

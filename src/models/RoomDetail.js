@@ -3,9 +3,10 @@ const { DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   sequelize.define('RoomDetail', {
     id: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4, 
       primaryKey: true,
+      allowNull: false
     },  
     cableTvService: {
       type: DataTypes.BOOLEAN,
