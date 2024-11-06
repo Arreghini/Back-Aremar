@@ -24,6 +24,10 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       allowNull: true,
     },
+    pava_electrica: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
   }, {
     tableName: 'RoomDetail', // Agrega esto para especificar el nombre exacto de la tabla
     timestamps: true 
