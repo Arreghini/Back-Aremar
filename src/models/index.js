@@ -26,8 +26,8 @@ const { User, Room, RoomType, RoomDetail, Reservation } = conn.models;
 RoomType.hasMany(Room, { foreignKey: 'roomType' });
 Room.belongsTo(RoomType, { foreignKey: 'roomType' });
 
-RoomDetail.hasMany(Room, { foreignKey: 'id' });
-Room.belongsTo(RoomDetail, { foreignKey: 'id' });
+RoomDetail.hasMany(Room, { foreignKey: 'roomDetail' });
+Room.belongsTo(RoomDetail, { foreignKey: 'roomDetail' });
 
 Reservation.belongsTo(Room, { foreignKey: 'roomId' });
 Room.hasMany(Reservation, { foreignKey: 'roomId' });
