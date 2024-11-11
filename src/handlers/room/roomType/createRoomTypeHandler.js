@@ -2,7 +2,7 @@ const createTypeController = require('../../../controllers/room/roomType/createR
 
 const createTypeHandler = async (req, res) => {
   try {
-    console.log('Datos recibidos para crear el tipo de habitación:', req.body);
+    //console.log('Datos recibidos para crear el tipo de habitación:', req.body);
     const newRoomType = await createTypeController(req.body);
 
     return res.status(201).json({ message: 'RoomType creado con éxito', data: newRoomType });

@@ -4,18 +4,20 @@ const createDetailController = async (data) => {
   try {
     const {
       id,
-      roomId,
-      description,
-      amenities,
-      photos,
+      cableTvService,
+      smart_TV,
+      wifi,  
+      microwave,
+      pava_electrica,
     } = data;
 
     const newDetail = await RoomDetail.create({
       id,
-      roomId,
-      description,
-      amenities,
-      photos,
+      cableTvService,
+      smart_TV,
+      wifi,  
+      microwave,
+      pava_electrica,
     });
     
     return newDetail; 

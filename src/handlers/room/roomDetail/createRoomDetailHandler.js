@@ -3,6 +3,7 @@ const createDetailController = require('../../../controllers/room/roomDetail/cre
 const createDetailHandler = async (req, res) => {
   try {
     const createTypes = await createDetailController(req.body); 
+   // console.log("Desde el frontend:", req.body);
 
     return res.status(201).json({ message: 'RoomDetail creado con éxito', data: createTypes }); 
   } catch (error) {

@@ -23,8 +23,8 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 
 app.use((req, res, next) => {
-  console.log(`Solicitud entrante: ${req.method} ${req.originalUrl}`);
-  console.log('Encabezados:', req.headers);
+//  console.log(`Solicitud entrante: ${req.method} ${req.originalUrl}`);
+//  console.log('Encabezados:', req.headers);
   next();
 });
 
