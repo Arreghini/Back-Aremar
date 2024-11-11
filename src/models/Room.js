@@ -11,7 +11,7 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    roomType: {
+    roomTypeId: {
       type: DataTypes.UUID, // Cambiar de STRING a UUID
       allowNull: true,
       references: {
@@ -19,7 +19,7 @@ module.exports = (sequelize) => {
         key: 'id',
       },
     },
-    roomDetail: {
+    roomDetailId: {
       type: DataTypes.UUID, // Cambiar de STRING a UUID
       allowNull: true,
       references: {
