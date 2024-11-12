@@ -10,7 +10,7 @@ const { checkAdmin, jwtCheck } = require('../services/tokenAdministrador');
 const router = express.Router();
 
 // Rutas protegidas para administración para cargar detalles de habitaciones
-router.get('/', jwtCheck, checkAdmin, getRoomDetailHandler);
+router.get('/', getRoomDetailHandler);
 
 // Rutas protegidas para administración para crear detalles de habitaciones
 router.post('/', jwtCheck, checkAdmin, createRoomDetailHandler);
