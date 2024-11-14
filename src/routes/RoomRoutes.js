@@ -10,8 +10,9 @@ const { checkAdmin, jwtCheck } = require('../services/tokenAdministrador');
 
 const router = express.Router();
 
-// Rutas protegidas por autenticación
-router.get('/all', getRooms);
+// Rutas públicas para consulta de habitaciones
+router.get('/all', getRooms.getAllRooms);
+router.get('/available', getRooms.getAvailableRooms);
 
 // Ruta pública para consulta de habitaciones por query
 router.get('/', getRoomByQuery);

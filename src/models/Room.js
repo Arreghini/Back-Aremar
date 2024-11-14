@@ -32,7 +32,7 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
     photoRoom: {
-      type: DataTypes.STRING,
+      type: DataTypes.JSONB, 
       allowNull: true,
     },
     status: {
