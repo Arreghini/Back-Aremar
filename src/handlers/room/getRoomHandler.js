@@ -12,34 +12,27 @@ const getAllRooms = async (req, res) => {
   }
 }
 const getAvailableRooms = async (req, res) => {
-  console.log('Solicitud Get Available', req.query);
+  const { roomType } = req.query;
+  console.log('Buscando habitaciones para tipo:', roomType);
+
   try {
-    const { numberOfGuests, checkInDate, checkOutDate, roomType } = req.query;
+    const rooms = await getRoomController.getAvailableRoomsController(null, null, null, roomType);
     
-    // Convertir las fechas a objetos Date
-    const checkIn = new Date(checkInDate);
-    const checkOut = new Date(checkOutDate);
-
-    const availableRooms = await getRoomController.getAvailableRoomsController(
-      numberOfGuests,
-      checkIn,
-      checkOut,
-      roomType
-    );
-
-    console.log('Rooms sent to client:', availableRooms);
     return res.status(200).json({
-      message: `Se encontraron ${availableRooms.length} habitaciones disponibles`,
-      data: availableRooms
+      success: true,
+      totalRooms: rooms.length,
+      rooms: rooms
     });
+    
   } catch (error) {
-    return res.status(500).json({ 
-      message: 'Error al obtener habitaciones disponibles', 
-      error: error.message 
+    console.log('Error en handler:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error en la búsqueda de habitaciones',
+      error: error.message
     });
   }
 };
-
 
 const getRoom  = {
   getAllRooms,

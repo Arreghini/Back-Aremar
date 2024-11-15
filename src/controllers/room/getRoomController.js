@@ -13,38 +13,33 @@ const getAllRoomController = async () => {
 };
 const getAvailableRoomsController = async (numberOfGuests, checkInDate, checkOutDate, roomType) => {
   try {
-    console.log('Iniciando búsqueda de habitaciones disponibles');
-    
-    // Primero verificamos si hay habitaciones sin filtrar por tipo
-    const allRooms = await Room.findAll({
-      include: [{
-        model: RoomType,
-      }]
-    });
-
-    console.log('Total de habitaciones en sistema:', allRooms.length);
-    
-    // Luego buscamos con el filtro específico
     const rooms = await Room.findAll({
       where: {
-        roomTypeId: roomType,
+        roomTypeId: roomType
       },
       include: [{
         model: RoomType,
-        attributes: ['name', 'simpleBeds', 'trundleBeds', 'kingBeds']
-      }]
+        required: true
+      }],
+      raw: false
     });
 
-    console.log('Detalles completos:', {
-      habitacionesTotales: allRooms.length,
-      habitacionesDelTipo: rooms.length,
-      tipoHabitacion: roomType
+    const formattedRooms = rooms.map(room => {
+      return {
+        id: room.id,
+        description: room.description,
+        price: room.price,
+        status: room.status,
+        roomTypeId: room.roomTypeId,
+        roomTypeName: room.RoomType ? room.RoomType.name : null
+      };
     });
 
-    return rooms;
+    console.log('Habitaciones formateadas:', JSON.stringify(formattedRooms, null, 2));
+    return formattedRooms;
 
   } catch (error) {
-    console.error('Error en la búsqueda:', error);
+    console.log('Error en la búsqueda:', error);
     throw error;
   }
 };
