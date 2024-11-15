@@ -1,4 +1,4 @@
-const { Room, Reservation } = require('../../models');
+const { Room, RoomType, Reservation } = require('../../models');
 const { Op } = require('sequelize'); // Importar Op para usar operadores
 
 // Controlador para obtener todas las habitaciones
@@ -11,57 +11,43 @@ const getAllRoomController = async () => {
     throw error;
   }
 };
-
-// Controlador para obtener habitaciones disponibles
 const getAvailableRoomsController = async (numberOfGuests, checkInDate, checkOutDate, roomType) => {
   try {
-    // Validamos que tengamos todos los parámetros necesarios
-    if (!checkInDate || !checkOutDate) {
-      throw new Error('Las fechas son requeridas');
-    }
-
-    // Construimos el objeto de consulta base
-    const whereClause = {
-      status: 'available'
-    };
-
-    // Solo agregamos roomType si está presente
-    if (roomType) {
-      whereClause.roomTypeId = roomType;
-    }
-
-    const rooms = await Room.findAll({
-      where: whereClause,
+    console.log('Iniciando búsqueda de habitaciones disponibles');
+    
+    // Primero verificamos si hay habitaciones sin filtrar por tipo
+    const allRooms = await Room.findAll({
       include: [{
-        model: Reservation,
-        required: false,
-        where: {
-          [Op.or]: [
-            {
-              checkIn: {
-                [Op.between]: [checkInDate, checkOutDate]
-              }
-            },
-            {
-              checkOut: {
-                [Op.between]: [checkInDate, checkOutDate]
-              }
-            }
-          ]
-        }
+        model: RoomType,
       }]
     });
 
-    // Filtramos las habitaciones que no tienen reservas en ese período
-    const availableRooms = rooms.filter(room => !room.Reservations?.length);
+    console.log('Total de habitaciones en sistema:', allRooms.length);
+    
+    // Luego buscamos con el filtro específico
+    const rooms = await Room.findAll({
+      where: {
+        roomTypeId: roomType,
+      },
+      include: [{
+        model: RoomType,
+        attributes: ['name', 'simpleBeds', 'trundleBeds', 'kingBeds']
+      }]
+    });
 
-    return availableRooms;
+    console.log('Detalles completos:', {
+      habitacionesTotales: allRooms.length,
+      habitacionesDelTipo: rooms.length,
+      tipoHabitacion: roomType
+    });
+
+    return rooms;
+
   } catch (error) {
-    console.error('Error fetching available rooms:', error);
+    console.error('Error en la búsqueda:', error);
     throw error;
   }
 };
-
 
 // Exportar controladores
 const getRoomController = {

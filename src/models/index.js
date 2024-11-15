@@ -23,11 +23,11 @@ conn.models = Object.fromEntries(capsEntries);
 // Relaciones entre modelos
 const { User, Room, RoomType, RoomDetail, Reservation } = conn.models;
 
-RoomType.hasMany(Room, { foreignKey: 'roomType' });
-Room.belongsTo(RoomType, { foreignKey: 'roomType' });
+RoomType.hasMany(Room, { foreignKey: 'roomTypeId' });
+Room.belongsTo(RoomType, { foreignKey: 'roomTypeId' });
 
-RoomDetail.hasMany(Room, { foreignKey: 'roomDetail' });
-Room.belongsTo(RoomDetail, { foreignKey: 'roomDetail' });
+RoomDetail.hasMany(Room, { foreignKey: 'roomDetailId' });
+Room.belongsTo(RoomDetail, { foreignKey: 'roomDetailId' });
 
 Reservation.belongsTo(Room, { foreignKey: 'roomId' });
 Room.hasMany(Reservation, { foreignKey: 'roomId' });

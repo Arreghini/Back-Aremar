@@ -19,7 +19,7 @@ module.exports = (sequelize) => {
         key: 'id',
       },
     },
-    roomDetailId: {
+    detailRoomId: {
       type: DataTypes.UUID, // Cambiar de STRING a UUID
       allowNull: true,
       references: {
