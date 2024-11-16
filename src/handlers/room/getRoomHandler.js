@@ -12,16 +12,27 @@ const getAllRooms = async (req, res) => {
   }
 }
 const getAvailableRooms = async (req, res) => {
-  const { roomType } = req.query;
-  console.log('Buscando habitaciones para tipo:', roomType);
+  const { roomType, checkInDate, checkOutDate, numberOfGuests } = req.query;
+
+  // Aseguramos que se pasen los parámetros necesarios
+  if (!roomType || !checkInDate || !checkOutDate || !numberOfGuests) {
+    return res.status(400).json({
+      success: false,
+      message: 'Faltan parámetros necesarios: roomType, checkInDate, checkOutDate, numberOfGuests',
+    });
+  }
+
+  console.log('Buscando habitaciones disponibles para el tipo:', roomType);
 
   try {
-    const rooms = await getRoomController.getAvailableRoomsController(null, null, null, roomType);
-    
+    // Aquí ya no pasamos null, sino los valores correctos obtenidos de req.query
+    const rooms = await getRoomController.getAvailableRoomsController(
+      roomType, checkInDate, checkOutDate, numberOfGuests
+    )
     return res.status(200).json({
       success: true,
       totalRooms: rooms.length,
-      rooms: rooms
+      rooms: rooms,
     });
     
   } catch (error) {

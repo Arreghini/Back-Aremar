@@ -12,7 +12,11 @@ const router = express.Router();
 
 // Rutas públicas para consulta de habitaciones
 router.get('/all', getRooms.getAllRooms);
-router.get('/available', getRooms.getAvailableRooms);
+router.get('/available', (req, res, next) => {
+  console.log('Datos recibidos desde el cliente para verificar disponibilidad:', req.query); // Registrar query params
+  next(); // Pasar al siguiente middleware o controlador
+}, getRooms.getAvailableRooms);
+
 
 // Ruta pública para consulta de habitaciones por query
 router.get('/', getRoomByQuery);

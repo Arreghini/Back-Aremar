@@ -11,35 +11,60 @@ const getAllRoomController = async () => {
     throw error;
   }
 };
-const getAvailableRoomsController = async (numberOfGuests, checkInDate, checkOutDate, roomType) => {
+const getAvailableRoomsController = async (roomType, checkInDate, checkOutDate, numberOfGuests) => {
   try {
+    console.log('Iniciando búsqueda de habitaciones...');
+    
+    // Verificar reservas solapadas
+    const overlappingReservations = await Reservation.findAll({
+      where: {
+        status: 'confirmed',
+        [Op.or]: [
+          {
+            checkIn: {
+              [Op.between]: [checkInDate, checkOutDate]
+            }
+          },
+          {
+            checkOut: {
+              [Op.between]: [checkInDate, checkOutDate]
+            }
+          },
+          {
+            [Op.and]: [
+              { checkIn: { [Op.lte]: checkInDate } },
+              { checkOut: { [Op.gte]: checkOutDate } }
+            ]
+          }
+        ]
+      }
+    });
+    
+    console.log('Reservas solapadas encontradas:', overlappingReservations.length);
+    
+    const reservedRoomIds = overlappingReservations.map(res => res.roomId);
+    console.log('IDs de habitaciones reservadas:', reservedRoomIds);
+
+    // Buscar habitaciones disponibles
     const rooms = await Room.findAll({
       where: {
-        roomTypeId: roomType
+        roomTypeId: roomType,
+        id: {
+          [Op.notIn]: reservedRoomIds
+        },
+        status: 'available'
       },
       include: [{
         model: RoomType,
         required: true
-      }],
-      raw: false
+      }]
     });
 
-    const formattedRooms = rooms.map(room => {
-      return {
-        id: room.id,
-        description: room.description,
-        price: room.price,
-        status: room.status,
-        roomTypeId: room.roomTypeId,
-        roomTypeName: room.RoomType ? room.RoomType.name : null
-      };
-    });
-
-    console.log('Habitaciones formateadas:', JSON.stringify(formattedRooms, null, 2));
-    return formattedRooms;
-
+    console.log('Habitaciones encontradas:', rooms.length);
+    
+    return rooms;
   } catch (error) {
-    console.log('Error en la búsqueda:', error);
+    console.log('Error específico:', error.message);
     throw error;
   }
 };
