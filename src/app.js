@@ -3,7 +3,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const userRoutes = require('./routes/UsersRoutes');
 const roomRoutes = require('./routes/RoomRoutes');
-const reservationsRoutes = require('./routes/ReservationsRoutes');
+const reservationRoutes = require('./routes/ReservationRoutes');
 const roomTypeRoutes = require('./routes/RoomTypeRoutes');
 const roomDetailsRoutes = require('./routes/RoomsDetailsRoutes');
 const { checkAdmin, jwtCheck } = require('./services/tokenAdministrador');
@@ -33,7 +33,7 @@ app.get('/public', (req, res) => {
 
 // Rutas protegidas por autenticación
 app.use('/api/users', jwtCheck, userRoutes); // Protege las rutas de usuarios con autenticación
-app.use('/api/reservations',jwtCheck, reservationsRoutes); // Protege las rutas de reservas con autenticación 
+app.use('/api/reservations',jwtCheck, reservationRoutes); // Protege las rutas de reservas con autenticación 
 
 // Primero las rutas de administración
 
@@ -43,7 +43,7 @@ app.use('/api/rooms/admin/roomDetail', roomDetailsRoutes);
 // Rutas protegidas para administración (requiere autenticación y rol de admin)
 app.use('/api/rooms/admin',jwtCheck, checkAdmin, roomRoutes); // Protege las rutas de administración de habitaciones
 app.use('/api/users/admin',jwtCheck,checkAdmin, userRoutes); // Protege las rutas de administración de usuarios
-app.use('/api/reservations/admin',jwtCheck, checkAdmin, reservationsRoutes); // Protege las rutas de administración de reservas
+app.use('/api/reservations/admin',jwtCheck, checkAdmin, reservationRoutes); // Protege las rutas de administración de reservas
 
 app.use('/api/rooms', roomRoutes);
 

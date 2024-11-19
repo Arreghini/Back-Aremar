@@ -10,7 +10,7 @@ const getAllRooms = async (req, res) => {
     console.error('Error in getRoom handler:', error);
     res.status(500).json({ message: error.message });
   }
-}
+};
 const getAvailableRooms = async (req, res) => {
   const { roomType, checkInDate, checkOutDate, numberOfGuests } = req.query;
 

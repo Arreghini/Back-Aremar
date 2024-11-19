@@ -1,12 +1,19 @@
-import React from 'react'
+const React = require('react');
 
-export function DeleteReservationBeforePayHandler(props) {
-    
+function DeleteReservationHandler(req, res) {
+    // Lógica para actualizar una reserva
+    try {
+        // Ejemplo: Obtén datos del cuerpo de la solicitud
+        const { reservationId, newDetails } = req.body;
 
-    return (
-        <>
-            
-        </>
-    )
+        // Aquí iría tu lógica para actualizar la reserva en la base de datos
+        // Por ejemplo:
+        // const updatedReservation = await updateReservationInDB(reservationId, newDetails);
+
+        res.status(200).json({ message: 'Reserva actualizada con éxito' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar la reserva', details: error.message });
+    }
 }
-export default DeleteReservationBeforePayHandler;
+
+module.exports = DeleteReservationHandler;

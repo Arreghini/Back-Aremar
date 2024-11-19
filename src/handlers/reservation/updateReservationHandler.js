@@ -1,14 +1,17 @@
-import React from 'react'
+function UpdateReservationHandler(req, res) {
+    // Lógica para actualizar una reserva
+    try {
+        // Ejemplo: Obtén datos del cuerpo de la solicitud
+        const { reservationId, newDetails } = req.body;
 
-export function UpdateReservationBeforePayHandler(props) {
-    
+        // Aquí iría tu lógica para actualizar la reserva en la base de datos
+        // Por ejemplo:
+        // const updatedReservation = await updateReservationInDB(reservationId, newDetails);
 
-    return (
-        <>
-            
-        </>
-    )
+        res.status(200).json({ message: 'Reserva actualizada con éxito' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al actualizar la reserva', details: error.message });
+    }
 }
 
-export default UpdateReservationBeforePayHandler;
-
+module.exports = UpdateReservationHandler;
