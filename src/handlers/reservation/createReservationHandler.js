@@ -1,4 +1,30 @@
-const createReservationController = require('../../controllers/reservation/createReservationController');
+const createReservationControll
+
+const checkRoomAvailability = async (roomId, checkIn, checkOut) => {
+  const existingReservations = await Reservation.findAll({
+    where: {
+      roomId,
+      [Op.or]: [
+        {
+          checkIn: {
+            [Op.between]: [checkIn, checkOut]
+          }
+        },
+        {
+          checkOut: {
+            [Op.between]: [checkIn, checkOut]
+          }
+        }
+      ]
+    }
+  });
+  return existingReservations.length === 0;
+};
+const calculateTotalPrice = async (roomId, checkIn, checkOut) => {
+  const room = await Room.findByPk(roomId);
+  const days = Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24));
+  return room.pricePerNight * days;
+};
 
 const createReservationHandler = async (req, res) => {
   const { sub: userId } = req.user; // Obtenemos el ID del usuario del token

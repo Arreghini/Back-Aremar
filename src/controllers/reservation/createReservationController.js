@@ -1,24 +1,32 @@
-const { Reservation } = require('../../models/index'); // Ajusta esta ruta si es necesario
+const { Reservation } = require('../../models/index'); 
+const { getAvailableRoomsController } = require('../room/getRoomController'); 
+const calculateTotalPrice = require('../../utils/calculateTotalPrice'); 
 
 const createReservationController = async (reservationData) => {
-  console.log('Datos recibidos en el controlador:', reservationData);  // Verificación de datos de entrada
+  const { roomId, checkIn, checkOut } = reservationData;
+
   try {
-    const { userId, roomId, checkIn, checkOut, numberOfGuests, totalPrice, status } = reservationData;
-    // Crear la nueva reserva
+    // Verificar disponibilidad
+    const isAvailable = await getAvailableRoomsController(roomId, checkIn, checkOut);
+    if (!isAvailable) {
+      throw new Error('La habitación no está disponible para las fechas seleccionadas');
+    }
+
+    // Calcular precio total
+    const totalPrice = await calculateTotalPrice(roomId, checkIn, checkOut);
+
+    // Crear la reserva con estado pending
     const newReservation = await Reservation.create({
-      userId,
-      roomId,
-      checkIn,
-      checkOut,
-      numberOfGuests,
+      ...reservationData,
       totalPrice,
-      status,
+      status: 'pending',
     });
-    return newReservation; // Retorna la nueva reserva creada
-  }catch (error) {
+
+    return newReservation;
+  } catch (error) {
     console.error('Error al crear la reserva:', error.message); // Solo imprime el mensaje del error
     throw error; // Lanza el error para que sea manejado en el handler
   }
 };
-module.exports = createReservationController;
 
+module.exports = createReservationController;
