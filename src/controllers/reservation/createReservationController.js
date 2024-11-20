@@ -3,6 +3,12 @@ const { getAvailableRoomsController } = require('../room/getRoomController');
 const calculateTotalPrice = require('../../utils/calculateTotalPrice'); 
 
 const createReservationController = async (reservationData) => {
+  console.log('Datos recibidos en controlador:', {
+    roomId: reservationData.roomId,
+    checkIn: reservationData.checkIn,
+    checkOut: reservationData.checkOut,
+    datosCompletos: reservationData
+  });
   const { roomId, checkIn, checkOut } = reservationData;
 
   try {

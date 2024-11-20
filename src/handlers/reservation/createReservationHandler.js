@@ -1,9 +1,13 @@
 const createReservationController = require('../../controllers/reservation/createReservationController');
 
 const createReservationHandler = async (req, res) => {
+  console.log('Headers recibidos:', req.headers);
+  console.log('Body completo:', req.body);
   try {
     const reservationData = req.body;
-    const newReservation = await createReservationController(reservationData);
+    console.log('Datos de la reserva recibidos:', reservationData);
+    const newReservation = await createReservationController(reservationData)
+    console.log('Reserva creada con éxito:', newReservation);
     res.status(201).json(newReservation);
   } catch (error) {
     console.error('Error al crear la reserva:', error.message);
@@ -12,3 +16,5 @@ const createReservationHandler = async (req, res) => {
 };
 
 module.exports = createReservationHandler;
+
+
