@@ -17,7 +17,7 @@ const confirmPayment = async (req, res) => {
       // Liberar la habitación (ya no está pendiente)
       const room = await Room.findByPk(reservation.roomId);
       if (room) {
-        room.status = 'available';
+        room.status = 'confirmed';
         await room.save();
       }
     };
