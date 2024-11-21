@@ -3,7 +3,10 @@ const { Room } = require('../../models');
 
 const updateRoomController = async (id, roomData) => {
   try {
-    const room = await Room.findByPk(id);
+    const room = await Room.findAll(
+      { where: { id } }
+    );
+
     if (!room) {
       return null;
     }

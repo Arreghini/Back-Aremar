@@ -1,3 +1,4 @@
+
 const { Room, RoomType, Reservation } = require('../../models');
 const { Op } = require('sequelize'); // Importar Op para usar operadores
 
@@ -47,7 +48,6 @@ const getAvailableRoomsController = async (roomType, checkInDate, checkOutDate, 
 
     // Buscar habitaciones disponibles
     const rooms = await Room.findAll({
-      
       where: {
         roomTypeId: roomType,
         id: {

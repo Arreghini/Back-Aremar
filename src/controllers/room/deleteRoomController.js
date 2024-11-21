@@ -2,7 +2,7 @@ const { Room } = require('../../models');
 
 const deleteRoomController = async (id) => {
   try {
-    const room = await Room.findByPk(id);
+    const room = await Room.findAll({ where: { id } });
     if (!room) {
       return null; // La habitación no fue encontrada
     }
