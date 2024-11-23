@@ -3,7 +3,7 @@ const roomCreateController = require('../../controllers/room/createRoomControlle
 
 const createRoomHandler = async (req, res) => {
   try {
-    console.log('Request Body:', req.body); // Log para verificar los datos de la solicitud
+    console.log('datos para la creación de una habitación:', req.body); // Log para verificar los datos de la solicitud
 
     // Llama al controlador de creación de habitaciones con los datos de la solicitud
     const room = await roomCreateController(req.body); // Asegúrate de que esto sea correcto según la firma del controlador

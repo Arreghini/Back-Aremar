@@ -19,7 +19,9 @@ const getAvailableRoomsController = async (roomType, checkInDate, checkOutDate, 
     // Verificar reservas solapadas
     const overlappingReservations = await Reservation.findAll({
       where: {
-        status: 'confirmed',
+        status: {
+          [Op.in]: ['confirmed', 'pending']
+        },
         [Op.or]: [
           {
             checkIn: {

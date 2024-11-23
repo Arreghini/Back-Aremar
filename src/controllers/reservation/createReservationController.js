@@ -1,37 +1,40 @@
-const { Reservation } = require('../../models/index'); 
-const { getAvailableRoomsController } = require('../room/getRoomController'); 
-const calculateTotalPrice = require('../../utils/calculateTotalPrice'); 
+const { Room, Reservation } = require('../../models');
+const { getAvailableRoomsController } = require('../room/getRoomController');
 
 const createReservationController = async (reservationData) => {
-  console.log('Datos recibidos en controlador:', {
-    roomId: reservationData.roomId,
-    checkIn: reservationData.checkIn,
-    checkOut: reservationData.checkOut,
-    datosCompletos: reservationData
-  });
-  const { roomId, checkIn, checkOut } = reservationData;
-
   try {
-    // Verificar disponibilidad
-    const isAvailable = await getAvailableRoomsController(roomId, checkIn, checkOut);
-    if (!isAvailable) {
-      throw new Error('La habitación no está disponible para las fechas seleccionadas');
+    const availableRooms = await Room.findAll({
+      where: {
+        roomTypeId: reservationData.datosCompletos.roomTypeId,
+        status: 'available'
+      },
+      include: ['RoomType']
+    });
+
+    if (!availableRooms || availableRooms.length === 0) {
+      throw new Error('No hay habitaciones disponibles del tipo solicitado');
     }
 
-    // Calcular precio total
-    const totalPrice = await calculateTotalPrice(roomId, checkIn, checkOut);
+    // Cálculo mejorado del precio total
+    const checkIn = new Date(reservationData.checkIn);
+    const checkOut = new Date(reservationData.checkOut);
+    const numberOfDays = Math.max(1, Math.floor((checkOut - checkIn) / (1000 * 60 * 60 * 24)));
+    const pricePerNight = parseFloat(availableRooms[0].price);
+    const totalPrice = Math.round(numberOfDays * pricePerNight);
 
-    // Crear la reserva con estado pending
     const newReservation = await Reservation.create({
-      ...reservationData,
-      totalPrice,
-      status: 'pending',
+      roomId: availableRooms[0].id,
+      checkIn: reservationData.checkIn,
+      checkOut: reservationData.checkOut,
+      userId: reservationData.datosCompletos.userId,
+      numberOfGuests: reservationData.datosCompletos.guestsNumber,
+      totalPrice: totalPrice || 0, // Aseguramos un valor numérico válido
+      status: 'pending'
     });
 
     return newReservation;
   } catch (error) {
-    console.error('Error al crear la reserva:', error.message); // Solo imprime el mensaje del error
-    throw error; // Lanza el error para que sea manejado en el handler
+    throw error;
   }
 };
 
