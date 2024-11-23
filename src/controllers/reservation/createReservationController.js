@@ -3,19 +3,27 @@ const { getAvailableRoomsController } = require('../room/getRoomController');
 
 const createReservationController = async (reservationData) => {
   try {
+    // Primero obtenemos la habitación para saber su tipo
+    const room = await Room.findByPk(reservationData.roomId, {
+      include: ['RoomType']
+    });
+
+    if (!room) {
+      throw new Error('Habitación no encontrada');
+    }
+
     const availableRooms = await Room.findAll({
       where: {
-        roomTypeId: reservationData.datosCompletos.roomTypeId,
+        id: reservationData.roomId,
         status: 'available'
       },
       include: ['RoomType']
     });
 
     if (!availableRooms || availableRooms.length === 0) {
-      throw new Error('No hay habitaciones disponibles del tipo solicitado');
+      throw new Error('La habitación seleccionada no está disponible');
     }
 
-    // Cálculo mejorado del precio total
     const checkIn = new Date(reservationData.checkIn);
     const checkOut = new Date(reservationData.checkOut);
     const numberOfDays = Math.max(1, Math.floor((checkOut - checkIn) / (1000 * 60 * 60 * 24)));
@@ -23,12 +31,12 @@ const createReservationController = async (reservationData) => {
     const totalPrice = Math.round(numberOfDays * pricePerNight);
 
     const newReservation = await Reservation.create({
-      roomId: availableRooms[0].id,
+      roomId: reservationData.roomId,
       checkIn: reservationData.checkIn,
       checkOut: reservationData.checkOut,
       userId: reservationData.datosCompletos.userId,
       numberOfGuests: reservationData.datosCompletos.guestsNumber,
-      totalPrice: totalPrice || 0, // Aseguramos un valor numérico válido
+      totalPrice: totalPrice || 0,
       status: 'pending'
     });
 
@@ -37,5 +45,6 @@ const createReservationController = async (reservationData) => {
     throw error;
   }
 };
+
 
 module.exports = createReservationController;
