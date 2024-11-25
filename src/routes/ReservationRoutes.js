@@ -21,16 +21,16 @@ router.get('/', getReservationHandler.getAllReservationHandler);
 router.get('/user/:userId', getReservationHandler.getReservationByUserIdHandler);
 
 // Obtener una reserva específica por su ID
-router.get('/:id', getReservationHandler.getReservationByIdHandler);
+router.get('/:reservationId', getReservationHandler.getReservationByIdHandler);
 
 // Actualizar una reserva
-router.patch('/:id', updateReservationHandler);
+router.patch('/:reservationId', updateReservationHandler);
 
 // Eliminar una reserva
-router.delete('/:id', deleteReservationByIdHandler);
+router.delete('/:reservationId', deleteReservationByIdHandler);
 
 // Confirmar el pago de una reserva
-router.post('/:id/payment', confirmPaymentHandler);
+router.post('/:reservatinId/payment', confirmPaymentHandler);
 
 // Rutas exclusivas para administradores
 
@@ -41,12 +41,12 @@ router.post('/admin', checkAdmin, createReservationHandler);
 router.get('/admin', checkAdmin, getReservationHandler.getAllReservationHandler);
 
 // Obtener una reserva específica como administrador
-router.get('/admin/:id', checkAdmin, getReservationHandler.getReservationByIdHandler);
+router.get('/admin/:reservationId', checkAdmin, getReservationHandler.getReservationByIdHandler);
 
 // Actualizar una reserva como administrador
-router.patch('/admin/:id', checkAdmin, updateReservationHandler);
+router.patch('/admin/:reservationId', checkAdmin, updateReservationHandler);
 
 // Eliminar una reserva como administrador
-router.delete('/admin/:id', checkAdmin, deleteReservationByIdHandler);
+router.delete('/admin/:reservationId', checkAdmin, deleteReservationByIdHandler);
 
 module.exports = router;

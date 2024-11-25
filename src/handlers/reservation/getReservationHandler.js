@@ -3,7 +3,7 @@ const getReservationController = require('../../controllers/reservation/getReser
 // Handler para obtener todas las reservas
 const getAllReservationHandler = async (req, res) => {
   try {
-    const reservations = await getReservationController.getAllReservations(); 
+    const reservations = await getReservationController.getAllReservationController(); 
     console.log('Obtención de todas las reservas:', reservations);
     res.status(200).json(reservations);
   } catch (error) {
@@ -16,7 +16,7 @@ const getAllReservationHandler = async (req, res) => {
 const getReservationByUserIdHandler = async (req, res) => {
   const { userId } = req.query; 
   try {
-    const userReservations = await getReservationController.getReservationsByUserId(userId);
+    const userReservations = await getReservationController.getReservationByUserIdController(userId);
     console.log('Obtención de las reservas del usuario:', userReservations);
     res.status(200).json(userReservations);
   } catch (error) {
@@ -29,7 +29,7 @@ const getReservationByUserIdHandler = async (req, res) => {
 const getReservationByIdHandler = async (req, res) => {
   const { reservationId } = req.query; 
   try {
-    const reservation = await getReservationController.getReservationById(reservationId);
+    const reservation = await getReservationController.getReservationByIdController(reservationId);
     if (!reservation) {
       return res.status(404).json({ message: 'Reserva no encontrada' });
     }
