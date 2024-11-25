@@ -4,11 +4,11 @@ const { Reservation, Room, User } = require('../../models')
 const getAllReservationController = async () => {
     try {
         const reservations = await Reservation.findAll({
-            attributes: ['id', 'checkIn', 'checkOut', 'status'],
+            attributes: ['id', 'checkIn', 'checkOut', 'numberOfGuests','status'],
             include: [
                 {
                     model: Room,
-                    attributes: ['id', 'name', 'status'], // Atributos relevantes de Room
+                    attributes: ['id', 'status'], // Atributos relevantes de Room
                 },
                 {
                     model: User,
