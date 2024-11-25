@@ -1,34 +1,52 @@
 const express = require('express');
 const router = express.Router();
 const { checkAdmin, jwtCheck } = require('../services/tokenAdministrador');
-const createReservationHandler = require('../handlers/reservation/createReservationHandler'); // Handler para reservas
-const getReservationHandler = require('../handlers/reservation/getReservationsHandler'); // Handler para obtener reservas
-const updateReservationHandler = require('../handlers/reservation/updateReservationHandler'); // Handler para actualizar reservas
-const deleteReservationHandler = require('../handlers/reservation/deleteReservationHandler'); // Handler para eliminar reservas
-const confirmPaymentHandler = require('../handlers/reservation/confirmPaymentHandler'); // Handler para confirmar el pago de una reserva
+const createReservationHandler = require('../handlers/reservation/createReservationHandler');
+const getReservationHandler = require('../handlers/reservation/getReservationHandler');
+const updateReservationHandler = require('../handlers/reservation/updateReservationHandler');
+const deleteReservationByIdHandler = require('../handlers/reservation/deleteReservationByIdHandler');
+const confirmPaymentHandler = require('../handlers/reservation/confirmPaymentHandler');
 
 // Middleware para verificar la autenticación en todas las rutas
-router.use(jwtCheck, (req, res, next) => {
-  next();
-});
+router.use(jwtCheck);
 
-// Rutas para reservas de ususarios
+// Rutas para usuarios
+// Crear una reserva
 router.post('/', createReservationHandler);
-router.get('/', getReservationHandler);
-router.get('/:id', getReservationHandler);
-router.patch('/:id', updateReservationHandler);
-router.delete('/:id', deleteReservationHandler);
 
-// Ruta para confirmar el pago de una reserva
+// Obtener todas las reservas (general o del usuario actual, dependiendo de la lógica en el handler)
+router.get('/', getReservationHandler.getAllReservationHandler);
+
+// Obtener todas las reservas de un usuario específico (por `userId`)
+router.get('/user/:userId', getReservationHandler.getReservationByUserIdHandler);
+
+// Obtener una reserva específica por su ID
+router.get('/:id', getReservationHandler.getReservationByIdHandler);
+
+// Actualizar una reserva
+router.patch('/:id', updateReservationHandler);
+
+// Eliminar una reserva
+router.delete('/:id', deleteReservationByIdHandler);
+
+// Confirmar el pago de una reserva
 router.post('/:id/payment', confirmPaymentHandler);
 
-// Rutas para reservas de administradores
-router.post('/admin', checkAdmin, createReservationHandler);
-router.get('/admin', checkAdmin, getReservationHandler);
-router.get('/admin/:id', checkAdmin, getReservationHandler);
-router.patch('/admin/:id', checkAdmin, updateReservationHandler);
-router.delete('/admin/: id', checkAdmin, deleteReservationHandler);
+// Rutas exclusivas para administradores
 
+// Crear una reserva como administrador
+router.post('/admin', checkAdmin, createReservationHandler);
+
+// Obtener todas las reservas (general) como administrador
+router.get('/admin', checkAdmin, getReservationHandler.getAllReservationHandler);
+
+// Obtener una reserva específica como administrador
+router.get('/admin/:id', checkAdmin, getReservationHandler.getReservationByIdHandler);
+
+// Actualizar una reserva como administrador
+router.patch('/admin/:id', checkAdmin, updateReservationHandler);
+
+// Eliminar una reserva como administrador
+router.delete('/admin/:id', checkAdmin, deleteReservationByIdHandler);
 
 module.exports = router;
-

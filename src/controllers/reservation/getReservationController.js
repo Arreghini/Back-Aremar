@@ -1,9 +1,7 @@
-const Reservation = require('../../models/reservation.js');
-const Room = require('../../models/room.js');
-const User = require('../../models/user.js');
+const { Reservation, Room, User } = require('../../models')
 
 // Controlador para obtener todas las reservas
-const getAllReservationsController = async () => {
+const getAllReservationController = async () => {
     try {
         const reservations = await Reservation.findAll({
             attributes: ['id', 'checkIn', 'checkOut', 'status'],
@@ -26,7 +24,7 @@ const getAllReservationsController = async () => {
 };
 
 // Controlador para obtener reservas de un usuario por su ID
-const getReservationsByUserIdController = async (userId) => {
+const getReservationByUserIdController = async (userId) => {
     try {
         const reservations = await Reservation.findAll({
             where: { userId },
@@ -77,10 +75,10 @@ const getReservationByIdController = async (reservationId) => {
 };
 
 // Exportar los controladores
-const getReservationsController = {
-    getAllReservationsController,
-    getReservationsByUserIdController,
+const getReservationController = {
+    getAllReservationController,
+    getReservationByUserIdController,
     getReservationByIdController,
 };
 
-module.exports = getReservationsController;
+module.exports = getReservationController;

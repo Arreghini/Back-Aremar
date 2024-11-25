@@ -1,25 +1,22 @@
 const { Reservation } = require('../../models');
 
-const deleteReservationById = async (reservationId) => {
+const deleteReservationByIdController = async (reservationId) => {
   try {
-    const reservation = await Reservation.findOne({
+    const rowsDeleted = await Reservation.destroy({
       where: {
         id: reservationId,
-        status: 'pending',
+        status: 'pending', // Solo eliminar reservas en estado 'pending'
       },
     });
 
-    if (!reservation) {
+    if (rowsDeleted === 0) {
       throw new Error('No se encontró la reserva o no está pendiente.');
     }
 
-    // Elimina la reserva
-    await reservation.destroy();
-
-    return 'Reserva eliminada con éxito';
+    return `Reserva eliminada con éxito. Reservas afectadas: ${rowsDeleted}`;
   } catch (error) {
     throw new Error(`Error eliminando la reserva: ${error.message}`);
   }
 };
 
-module.exports = deleteReservationById;
+module.exports = deleteReservationByIdController;
