@@ -14,13 +14,14 @@ const getAllReservationHandler = async (req, res) => {
 
 // Handler para obtener las reservas de un usuario específico por su ID
 const getReservationByUserIdHandler = async (req, res) => {
-  const { userId } = req.query; 
+  const { userId } = req.params;
+  console.log('ID de Auth0 recibido:', userId);
   try {
     const userReservations = await getReservationController.getReservationByUserIdController(userId);
-    console.log('Obtención de las reservas del usuario:', userReservations);
+    console.log('Reservas encontradas:', userReservations.length);
     res.status(200).json(userReservations);
   } catch (error) {
-    console.error('Error al obtener las reservas del usuario:', error.message);
+    console.error('Error detallado:', error);
     res.status(400).json({ message: error.message });
   }
 };

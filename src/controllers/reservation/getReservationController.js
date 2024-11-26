@@ -25,6 +25,7 @@ const getAllReservationController = async () => {
 
 // Controlador para obtener reservas de un usuario por su ID
 const getReservationByUserIdController = async (userId) => {
+    console.log('userId recibido:', userId);
     try {
         const reservations = await Reservation.findAll({
             where: { userId },
@@ -32,7 +33,7 @@ const getReservationByUserIdController = async (userId) => {
             include: [
                 {
                     model: Room,
-                    attributes: ['id', 'name', 'status'], // Atributos relevantes de Room
+                    attributes: ['id', 'status'], // Atributos relevantes de Room
                 },
                 {
                     model: User,
@@ -40,6 +41,7 @@ const getReservationByUserIdController = async (userId) => {
                 },
             ],
         });
+        console.log('Reservas encontradas:', reservations);
         return reservations;
     } catch (error) {
         console.error('Error al obtener reservas del usuario:', error.message);
