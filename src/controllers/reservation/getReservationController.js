@@ -58,7 +58,7 @@ const getReservationByIdController = async (reservationId) => {
             include: [
                 {
                     model: Room,
-                    attributes: ['id', 'name', 'status'], // Atributos relevantes de Room
+                    attributes: ['id', 'status'], // Atributos relevantes de Room
                 },
                 {
                     model: User,
