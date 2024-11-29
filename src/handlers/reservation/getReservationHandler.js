@@ -19,6 +19,7 @@ const getReservationByUserIdHandler = async (req, res) => {
   try {
     const userReservations = await getReservationController.getReservationByUserIdController(userId);
     console.log('Reservas encontradas:', userReservations.length);
+    console.log('Reservas encontradas:', userReservations);
     res.status(200).json(userReservations);
   } catch (error) {
     console.error('Error detallado:', error);
