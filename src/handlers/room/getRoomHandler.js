@@ -14,7 +14,6 @@ const getAllRooms = async (req, res) => {
 const getAvailableRooms = async (req, res) => {
   const { roomType, checkInDate, checkOutDate, numberOfGuests } = req.query;
 
-  // Aseguramos que se pasen los parámetros necesarios
   if (!roomType || !checkInDate || !checkOutDate || !numberOfGuests) {
     return res.status(400).json({
       success: false,
@@ -22,25 +21,56 @@ const getAvailableRooms = async (req, res) => {
     });
   }
 
-  console.log('Buscando habitaciones disponibles para el tipo:', roomType);
-
   try {
-    // Aquí ya no pasamos null, sino los valores correctos obtenidos de req.query
     const rooms = await getRoomController.getAvailableRoomsController(
-      roomType, checkInDate, checkOutDate, numberOfGuests
-    )
+      roomType,
+      checkInDate,
+      checkOutDate,
+      numberOfGuests
+    );
     return res.status(200).json({
       success: true,
       totalRooms: rooms.length,
-      rooms: rooms,
+      rooms,
     });
-    
   } catch (error) {
-    console.log('Error en handler:', error);
+    console.error('Error en handler:', error);
     return res.status(500).json({
       success: false,
       message: 'Error en la búsqueda de habitaciones',
-      error: error.message
+      error: error.message,
+    });
+  }
+};
+
+const getAvailableRoomById = async (req, res) => {
+  const { checkInDate, checkOutDate, numberOfGuests } = req.query;
+  const { roomId } = req.params;
+
+  if (!roomId || !checkInDate || !checkOutDate || !numberOfGuests) {
+    return res.status(400).json({
+      success: false,
+      message: 'Faltan parámetros necesarios: roomId, checkInDate, checkOutDate, numberOfGuests',
+    });
+  }
+
+  try {
+    const room = await getRoomController.getAvailableRoomsByIdController(
+      roomId,
+      checkInDate,
+      checkOutDate,
+      numberOfGuests
+    );
+    return res.status(200).json({
+      success: true,
+      room,
+    });
+  } catch (error) {
+    console.error('Error en handler:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error en la búsqueda de la habitación',
+      error: error.message,
     });
   }
 };
@@ -48,6 +78,7 @@ const getAvailableRooms = async (req, res) => {
 const getRoom  = {
   getAllRooms,
   getAvailableRooms,
+  getAvailableRoomById,
 };
 // Exportar el controlador para obtener habitaciones
 module.exports = getRoom;
