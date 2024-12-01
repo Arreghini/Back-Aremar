@@ -1,17 +1,13 @@
-
 const { Room } = require('../../models'); 
 
 const updateRoomController = async (id, roomData) => {
   try {
-    const room = await Room.findAll(
-      { where: { id } }
-    );
+    const room = await Room.findByPk(id);
 
     if (!room) {
       return null;
     }
 
-    // Validar que `photoRoom` es un array antes de actualizar
     if (roomData.photoRoom && !Array.isArray(roomData.photoRoom)) {
       console.error('photoRoom debe ser un array.');
       throw new Error('photoRoom debe ser un array.');
@@ -24,6 +20,5 @@ const updateRoomController = async (id, roomData) => {
     throw error;
   }
 };
-
 
 module.exports = updateRoomController;
