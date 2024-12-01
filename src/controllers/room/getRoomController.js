@@ -47,11 +47,12 @@ const getAvailableRoomsController = async (roomType, checkInDate, checkOutDate, 
         id: {
           [Op.notIn]: reservedRoomIds
         },
-        status: 'available'
+        status: 'available',
       },
       include: [{
         model: RoomType,
-        required: true
+        required: true,
+        attributes:['price'],
       }]
     });
 

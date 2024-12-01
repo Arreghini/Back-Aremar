@@ -27,10 +27,6 @@ module.exports = (sequelize) => {
         key: 'id',
       }
     },    
-    price: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
     photoRoom: {
       type: DataTypes.JSONB, 
       allowNull: true,

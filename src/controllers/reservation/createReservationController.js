@@ -35,8 +35,8 @@ const createReservationController = async (reservationData) => {
       checkIn: reservationData.checkIn,
       checkOut: reservationData.checkOut,
       userId: reservationData.datosCompletos.userId,
-      numberOfGuests: reservationData.datosCompletos.guestsNumber,
-      totalPrice: totalPrice || 0,
+      numberOfGuests: reservationData.datosCompletos.numberOfGuests,
+      totalPrice,
       status: 'pending'
     });
 

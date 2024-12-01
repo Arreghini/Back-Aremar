@@ -8,8 +8,9 @@ const createTypeController = async (data) => {
       photos,
       simpleBeds,
       trundleBeds,
-      KingBeds,
+      kingBeds, 
       windows,
+      price, 
     } = data;
 
     const newType = await RoomType.create({
@@ -18,10 +19,11 @@ const createTypeController = async (data) => {
       photos,
       simpleBeds,
       trundleBeds,
-      KingBeds,
+      kingBeds,
       windows,
+      price, 
     });
-    
+
     return newType; 
   } catch (error) {
     console.error('Error al crear el tipo de habitación:', error); 
@@ -29,4 +31,4 @@ const createTypeController = async (data) => {
   }
 };
 
-module.exports = createTypeController; 
+module.exports = createTypeController;

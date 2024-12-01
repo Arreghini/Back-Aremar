@@ -32,8 +32,12 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    price: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   }, {
-    tableName: 'RoomType', // Agrega esto para especificar el nombre exacto de la tabla
+    tableName: 'RoomType', 
     timestamps: true 
   });
 };
