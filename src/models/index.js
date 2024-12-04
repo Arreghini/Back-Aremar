@@ -29,8 +29,8 @@ Room.belongsTo(RoomType, { foreignKey: 'roomTypeId' });
 RoomDetail.hasMany(Room, { foreignKey: 'roomDetailId' });
 Room.belongsTo(RoomDetail, { foreignKey: 'roomDetailId' });
 
-Reservation.belongsTo(Room, { foreignKey: 'roomId' });
-Room.hasMany(Reservation, { foreignKey: 'roomId' });
+Reservation.belongsTo(Room, { foreignKey: 'roomId',targetKey: 'id'});
+Room.hasMany(Reservation, { foreignKey: 'roomId', sourceKey: 'id'});
 
 Reservation.belongsTo(User, { foreignKey: 'userId' });
 User.hasMany(Reservation, { foreignKey: 'userId' });

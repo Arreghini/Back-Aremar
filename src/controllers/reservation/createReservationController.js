@@ -3,8 +3,10 @@ const { getAvailableRoomsController } = require('../room/getRoomController');
 
 const createReservationController = async (reservationData) => {
   try {
-    // Primero obtenemos la habitación para saber su tipo
-    const room = await Room.findByPk(reservationData.roomId, {
+    const room = await Room.findOne({
+      where: {
+        id: reservationData.roomId
+      },
       include: ['RoomType']
     });
 
@@ -27,16 +29,18 @@ const createReservationController = async (reservationData) => {
     const checkIn = new Date(reservationData.checkIn);
     const checkOut = new Date(reservationData.checkOut);
     const numberOfDays = Math.max(1, Math.floor((checkOut - checkIn) / (1000 * 60 * 60 * 24)));
-    const pricePerNight = parseFloat(availableRooms[0].price);
-    const totalPrice = Math.round(numberOfDays * pricePerNight);
+    
+    // Establecemos un precio por defecto si no existe
+    const pricePerNight = room.RoomType?.price || 100; // Precio por defecto de 100
+    const totalPrice = numberOfDays * pricePerNight;
 
     const newReservation = await Reservation.create({
-      roomId: reservationData.roomId,
+      roomId: room.id,
       checkIn: reservationData.checkIn,
       checkOut: reservationData.checkOut,
       userId: reservationData.datosCompletos.userId,
-      numberOfGuests: reservationData.datosCompletos.numberOfGuests,
-      totalPrice,
+      numberOfGuests: reservationData.numberOfGuests,
+      totalPrice: Math.round(totalPrice), // Aseguramos que sea un número entero
       status: 'pending'
     });
 
@@ -45,6 +49,5 @@ const createReservationController = async (reservationData) => {
     throw error;
   }
 };
-
 
 module.exports = createReservationController;
