@@ -29,7 +29,7 @@ const getReservationByUserIdController = async (userId) => {
     try {
         const reservations = await Reservation.findAll({
             where: { userId },
-            attributes: ['id', 'checkIn', 'checkOut', 'totalPrice', 'status'],
+            attributes: ['id', 'checkIn', 'checkOut', 'totalPrice', 'numberOfGuest','status'],
             include: [
                 {
                     model: Room,

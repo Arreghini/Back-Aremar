@@ -1,29 +1,20 @@
 const { Reservation } = require('../../models');
 
-const updateReservationController = async (reservationId, reservationData) => {
-  console.log('ID recibido:', reservationId);
-  console.log('Datos recibidos:', reservationData);
-
+const updateReservationController = async (id, data) => {
   const reservation = await Reservation.findOne({
-    where: { id: parseInt(reservationId) }
+    where: { id: id }
   });
 
   if (!reservation) {
-    console.log('No se encontró la reserva con ID:', reservationId);
-    throw new Error('Reserva no encontrada');
+    throw new Error(`No se encontró la reserva ${id}`);
   }
 
-  const dataToUpdate = reservationData.body || reservationData;
-
-  const updatedReservation = await reservation.update({
-    checkIn: dataToUpdate.checkIn,
-    checkOut: dataToUpdate.checkOut,
-    numberOfGuests: dataToUpdate.numberOfGuests,
-    roomId: dataToUpdate.roomId,
-    status: dataToUpdate.status
+  const updated = await reservation.update({
+    ...data,
+    numberOfGuests: Number(data.numberOfGuests)
   });
 
-  return updatedReservation;
+  return updated;
 };
 
 module.exports = updateReservationController;

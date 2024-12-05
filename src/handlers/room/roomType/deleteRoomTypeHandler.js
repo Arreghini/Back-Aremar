@@ -1,18 +1,22 @@
 const deleteTypeController = require('../../../controllers/room/roomType/deleteRoomTypeController');
 
 const deleteTypeHandler = async (req, res) => {
+  const { id } = req.params;
+  
   try {
-    const { id } = req.params; 
-    const deletedType = await deleteTypeController(id); 
-
-    if (!deletedType) {
-      return res.status(404).json({ error: 'RoomType no encontrado' });
-    }
-
-    return res.status(200).json({ message: 'RoomType eliminado con éxito' });
+    await deleteTypeController(id);
+    
+    // Enviamos solo la confirmación de eliminación
+    res.status(200).json({
+      deleted: true,
+      id: id
+    });
+    
   } catch (error) {
-    console.error('Error inesperado al manejar la solicitud:', error); 
-    return res.status(500).send('Error al manejar la solicitud');
+    res.status(500).json({
+      deleted: false,
+      error: error.message
+    });
   }
 };
 
