@@ -2,7 +2,7 @@ const { Room } = require('../../models');
 
 const createRoomController = async (data) => {
   try {
-    const { id, description, roomTypeId, detailRoomId, photoRoom, status } = data;
+    const { id, description, roomTypeId, detailRoomId, photoRoom, price,status } = data;
 
     const newRoom = await Room.create({
       id,
@@ -10,6 +10,7 @@ const createRoomController = async (data) => {
       roomTypeId,      
       detailRoomId,    
       photoRoom,
+      price,
       status,
     });
 

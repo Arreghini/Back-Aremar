@@ -14,16 +14,33 @@ const getAllReservationHandler = async (req, res) => {
 
 // Handler para obtener las reservas de un usuario específico por su ID
 const getReservationByUserIdHandler = async (req, res) => {
-  const { userId } = req.params;
-  console.log('ID de Auth0 recibido:', userId);
   try {
+    const { userId } = req.params;
+    
+    // Validación del formato
+    if (!userId) {
+      return res.status(400).json({ message: 'UserId es requerido' });
+    }
+
+    console.log('ID de usuario recibido:', userId);
+    console.log('ID de usuario en auth:', req.auth?.payload?.sub);
+
     const userReservations = await getReservationController.getReservationByUserIdController(userId);
-    console.log('Reservas encontradas:', userReservations.length);
-    console.log('Reservas encontradas:', userReservations);
-    res.status(200).json(userReservations);
+
+    return res.status(200).json({
+      success: true,
+      data: userReservations,
+      userId: userId,
+      formattedUserId: `google-oauth2|${userId}`
+    });
+
   } catch (error) {
-    console.error('Error detallado:', error);
-    res.status(400).json({ message: error.message });
+    console.error('Error completo:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error al obtener las reservas',
+      error: error.message
+    });
   }
 };
 

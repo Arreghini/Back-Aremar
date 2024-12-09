@@ -16,6 +16,10 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     checkIn: {
       type: DataTypes.DATE,
       allowNull: false,

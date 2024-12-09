@@ -1,4 +1,4 @@
-const { Reservation, Room, User } = require('../../models')
+const { Reservation, Room, User, RoomType } = require('../../models')
 
 // Controlador para obtener todas las reservas
 const getAllReservationController = async () => {
@@ -25,56 +25,69 @@ const getAllReservationController = async () => {
 
 // Controlador para obtener reservas de un usuario por su ID
 const getReservationByUserIdController = async (userId) => {
-    console.log('userId recibido:', userId);
+    // Agregar el prefijo si no está presente
+    const formattedUserId = userId.includes('google-oauth2|') 
+        ? userId 
+        : `google-oauth2|${userId}`;
+        
+    console.log('Buscando reservas con userId formateado:', formattedUserId);
+    
     try {
         const reservations = await Reservation.findAll({
-            where: { userId },
-            attributes: ['id', 'checkIn', 'checkOut', 'totalPrice', 'numberOfGuest','status'],
+            where: { 
+                userId: formattedUserId
+            },
+            attributes: ['id', 'checkIn', 'checkOut', 'totalPrice', 'numberOfGuests', 'status'],
             include: [
                 {
                     model: Room,
-                    attributes: ['id', 'status'], // Atributos relevantes de Room
+                    attributes: ['id', 'status'],
+                    include: [{
+                        model: RoomType,
+                        attributes: ['name']
+                    }]
                 },
                 {
                     model: User,
-                    attributes: ['id', 'name', 'email'], // Atributos relevantes de User
-                },
+                    attributes: ['id', 'name', 'email']
+                }
             ],
         });
-        console.log('Reservas encontradas:', reservations);
+        
+        console.log('Reservas encontradas:', reservations.length);
         return reservations;
     } catch (error) {
-        console.error('Error al obtener reservas del usuario:', error.message);
-        throw new Error('Hubo un problema al obtener las reservas del usuario. Inténtelo nuevamente más tarde.');
+        console.error('Error en la búsqueda:', error);
+        throw error;
     }
 };
 
 // Controlador para obtener una reserva por su ID
 const getReservationByIdController = async (reservationId) => {
     try {
-        const reservation = await Reservation.findOne({
-            where: { id: reservationId },
-            attributes: ['id', 'checkIn', 'checkOut', 'status'],
-            include: [
-                {
-                    model: Room,
-                    attributes: ['id', 'status'], // Atributos relevantes de Room
-                },
-                {
-                    model: User,
-                    attributes: ['id', 'name', 'email'], // Atributos relevantes de User
-                },
-            ],
-        });
-        if (!reservation) {
-            throw new Error(`La reserva con ID ${reservationId} no existe.`);
-        }
-        return reservation;
+      const reservation = await Reservation.findOne({
+        where: { id: reservationId },
+        attributes: ['id', 'checkIn', 'checkOut', 'totalPrice', 'status', 'type'], // Añadimos 'type'
+        include: [
+          {
+            model: Room,
+            attributes: ['id', 'description', 'status'],
+            include: [{
+              model: RoomType,
+              attributes: ['name']
+            }]
+          },
+          {
+            model: User,
+            attributes: ['id', 'name', 'email']
+          }
+        ]
+      });
+      return reservation;
     } catch (error) {
-        console.error('Error al obtener la reserva:', error.message);
-        throw new Error('Hubo un problema al obtener la reserva. Inténtelo nuevamente más tarde.');
+      throw error;
     }
-};
+  };  
 
 // Exportar los controladores
 const getReservationController = {

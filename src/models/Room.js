@@ -31,6 +31,10 @@ module.exports = (sequelize) => {
       type: DataTypes.JSONB, 
       allowNull: true,
     },
+    price: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
     status: {
       type: DataTypes.ENUM('available', 'unavailable'),
       defaultValue: 'available',

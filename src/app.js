@@ -35,13 +35,17 @@ app.get('/public', (req, res) => {
 app.use('/api/users', jwtCheck, userRoutes); // Protege las rutas de usuarios con autenticación
 //app.use('/api/reservations',jwtCheck, reservationRoutes); // Protege las rutas de reservas con autenticación 
 app.use('/api/reservations', (req, res, next) => {
-  console.log('Nueva solicitud a /api/reservations:', {
-    método: req.method,
-    ruta: req.path,
-    body: req.body
+  console.log('Debug Middleware:', {
+    method: req.method,
+    path: req.path,
+    params: req.params,
+    query: req.query,
+    user: req.user,
+    auth: req.auth
   });
   next();
 }, jwtCheck, reservationRoutes);
+
 
 // Primero las rutas de administración
 
