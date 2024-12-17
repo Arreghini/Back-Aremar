@@ -30,7 +30,7 @@ router.patch('/:reservationId', updateReservationHandler);
 router.delete('/:reservationId', deleteReservationByIdHandler);
 
 // Confirmar el pago de una reserva
-router.post('/:reservatinId/payment', confirmPaymentHandler);
+router.post('/:reservationId/payment', confirmPaymentHandler);
 
 // Rutas exclusivas para administradores
 
