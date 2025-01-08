@@ -34,7 +34,7 @@ router.delete('/:reservationId', deleteReservationByIdHandler);
 router.post('/:reservationId/create-preference', createPreferenceHandler);
 
 // Confirmar el pago de una reserva
-router.post('/:reservationId/payment', confirmPaymentHandler);
+router.post('/:reservationId/payment-order', confirmPaymentHandler);
 
 // Rutas exclusivas para administradores
 
