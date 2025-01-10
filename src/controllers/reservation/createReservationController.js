@@ -1,5 +1,4 @@
 const { Room, Reservation, RoomType } = require('../../models');
-const { getAvailableRoomsController } = require('../room/getRoomController');
 
 const createReservationController = async (reservationData) => {
   try {
@@ -45,7 +44,7 @@ const createReservationController = async (reservationData) => {
     // Corregimos esta línea
     const newReservation = await Reservation.create({
       roomId: room.id,
-      type: room.RoomType?.name || 'Desconocido', // Cambiamos room.Room.RoomType por room.RoomType
+      type: room.RoomType?.name || 'Desconocido', 
       checkIn: reservationData.checkIn,
       checkOut: reservationData.checkOut,
       userId: reservationData.datosCompletos?.userId || null,

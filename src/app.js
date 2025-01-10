@@ -6,6 +6,7 @@ const roomRoutes = require('./routes/RoomRoutes');
 const reservationRoutes = require('./routes/ReservationRoutes');
 const roomTypeRoutes = require('./routes/RoomTypeRoutes');
 const roomDetailsRoutes = require('./routes/RoomsDetailsRoutes');
+const preferencesRoutes = require('./routes/PaymentRoutes');
 const { checkAdmin, jwtCheck } = require('./services/tokenAdministrador');
 require('dotenv').config();
 
@@ -35,17 +36,13 @@ app.get('/public', (req, res) => {
 app.use('/api/users', jwtCheck, userRoutes); // Protege las rutas de usuarios con autenticación
 //app.use('/api/reservations',jwtCheck, reservationRoutes); // Protege las rutas de reservas con autenticación 
 app.use('/api/reservations', (req, res, next) => {
-  console.log('Debug Middleware:', {
-    method: req.method,
-    path: req.path,
-    params: req.params,
-    query: req.query,
-    user: req.user,
-    auth: req.auth
+  console.log('Nueva solicitud a /api/reservations:', {
+    método: req.method,
+    ruta: req.path,
+    body: req.body
   });
   next();
 }, jwtCheck, reservationRoutes);
-
 
 // Primero las rutas de administración
 
@@ -58,6 +55,9 @@ app.use('/api/users/admin',jwtCheck,checkAdmin, userRoutes); // Protege las ruta
 app.use('/api/reservations/admin',jwtCheck, checkAdmin, reservationRoutes); // Protege las rutas de administración de reservas
 
 app.use('/api/rooms', roomRoutes);
+
+// Ruta para crear preferencias de pagos  
+app.post('/api', preferencesRoutes);
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {

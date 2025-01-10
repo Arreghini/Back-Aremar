@@ -6,6 +6,7 @@ const getReservationHandler = require('../handlers/reservation/getReservationHan
 const updateReservationHandler = require('../handlers/reservation/updateReservationHandler');
 const deleteReservationByIdHandler = require('../handlers/reservation/deleteReservationByIdHandler');
 const confirmPaymentHandler = require('../handlers/reservation/confirmPaymentHandler');
+const createPreferenceHandler = require('../handlers/reservation/createPreferenceHandler');
 
 // Middleware para verificar la autenticación en todas las rutas
 router.use(jwtCheck);
@@ -29,8 +30,11 @@ router.patch('/:reservationId', updateReservationHandler);
 // Eliminar una reserva
 router.delete('/:reservationId', deleteReservationByIdHandler);
 
+// Definir preferencia de pago 
+router.post('/:reservationId/create-preference', createPreferenceHandler);
+
 // Confirmar el pago de una reserva
-router.post('/:reservatinId/payment', confirmPaymentHandler);
+router.post('/:reservationId/payment-order', confirmPaymentHandler);
 
 // Rutas exclusivas para administradores
 
