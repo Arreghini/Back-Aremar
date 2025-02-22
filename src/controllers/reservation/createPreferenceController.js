@@ -1,10 +1,13 @@
 const { MercadoPagoConfig, Preference } = require('mercadopago');
 
-const client = new MercadoPagoConfig({ 
-    accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN 
+const client = new MercadoPagoConfig({
+    accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
+    options: {
+        sandbox: true
+    }
 });
 
-const createPreferenceController = async (reservationId, amount, currency) => {
+const createPreferenceController = async (reservationId, amount, currency, userId) => {
     try {
         const preference = new Preference(client);
         const preferenceData = {
@@ -14,17 +17,19 @@ const createPreferenceController = async (reservationId, amount, currency) => {
                 quantity: 1,
                 currency_id: currency
             }],
+            payer: {
+                id: userId
+            },
             back_urls: {
                 success: `${process.env.FRONTEND_URL}/payment/success`,
-                failure: `${process.env.FRONTEND_URL}/payment/failure`
+                failure: `${process.env.FRONTEND_URL}/payment/failure`,
+                pending: `${process.env.FRONTEND_URL}/payment/pending`
             },
-            auto_return: "approved"
         };
-        
         const result = await preference.create({ body: preferenceData });
         return result;
     } catch (error) {
-        console.log("Error en MercadoPago:", error);
+        console.error("Error en MercadoPago:", error);
         throw error;
     }
 };

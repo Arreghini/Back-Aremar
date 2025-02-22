@@ -1,6 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const helmet = require('helmet'); // Para gestionar la CSP
 const userRoutes = require('./routes/UsersRoutes');
 const roomRoutes = require('./routes/RoomRoutes');
 const reservationRoutes = require('./routes/ReservationRoutes');
@@ -15,7 +16,7 @@ app.name = 'API';
 
 const corsOptions = {
   origin: ['http://localhost:5173', 'http://localhost:4000'],
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'HEAD'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
@@ -26,6 +27,54 @@ app.use(cookieParser());
 app.use((req, res, next) => {
   next();
 });
+// Configuración de la Content Security Policy (CSP) con helmet
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: false,
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        "'unsafe-eval'",
+        "https://www.gstatic.com",
+        "https://www.google.com",
+        "https://www.recaptcha.net",
+        "https://*.gstatic.com",
+        "https://*.google.com",
+        "https://*.recaptcha.net",
+        "https://*.mercadopago.com",
+        "https://*.mercadopago.com.ar",
+        "https://*.mercadopago.com.br",
+        "https://*.mercadopago.com.co",
+        "https://*.mercadopago.com.mx",
+        "https://*.mercadopago.com.pe",
+        "https://*.mercadopago.com.uy",
+        "https://*.mercadopago.com.ve",
+        "https://*.hotjar.com",
+        "https://*.newrelic.com",
+        "https://js-agent.newrelic.com",
+        "https://http2.mlstatic.com",
+        "https://static.hotjar.com"
+      ],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      fontSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https:", "wss:"],
+      frameSrc: [
+        "'self'",
+        "https://www.google.com",
+        "https://recaptcha.google.com",
+        "https://www.recaptcha.net",
+        "https://*.mercadopago.com",
+        "https://*.mercadopago.com.ar"
+      ],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      workerSrc: ["'self'", "blob:"]
+    }
+  }
+}));
 
 // Rutas públicas (no requieren autenticación)
 app.get('/public', (req, res) => {
