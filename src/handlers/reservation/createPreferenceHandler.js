@@ -1,16 +1,26 @@
-const createPreferenceController = require('../../controllers/reservation/createPreferenceController');
+const createPreference = require('../../controllers/reservation/createPreferenceController');
 
 const createPreferenceHandler = async (req, res) => {
     try {
-      const { reservationId, amount, currency } = req.body;
-      const preference = await createPreferenceController(reservationId, amount, currency);
-      return res.status(200).json({ preferenceId: preference.id });
+        const reservationId = parseInt(req.params.reservationId);
+        console.log('Procesando pago para reserva ID:', reservationId);
+        
+        const preference = await createPreference({ reservationId });
+        
+        return res.status(200).json({
+            success: true,
+            preferenceId: preference.id,
+            init_point: preference.init_point,
+            sandbox_init_point: preference.sandbox_init_point
+        });
     } catch (error) {
-      console.error('Error al crear preferencia:', error);
-      return res.status(500).json({ error: 'Error al crear preferencia de pago' });
+        console.error('Error en createPreferenceHandler:', error);
+        return res.status(500).json({
+            success: false,
+            error: 'Error al crear preferencia de pago',
+            message: error.message
+        });
     }
-  };
-  
-  module.exports = createPreferenceHandler;
+};
 
-  
+module.exports = createPreferenceHandler;

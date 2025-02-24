@@ -1,37 +1,39 @@
 const { MercadoPagoConfig, Preference } = require('mercadopago');
+const { Reservation } = require('../../models');
 
-const client = new MercadoPagoConfig({
-    accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
-    options: {
-        sandbox: true
-    }
-});
+// Definimos la función como una expresión de función
+const createPreference = async ({ reservationId }) => {
+    const client = new MercadoPagoConfig({
+        accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
+        options: { sandbox: true }
+    });
 
-const createPreferenceController = async (reservationId, amount, currency, userId) => {
-    try {
-        const preference = new Preference(client);
-        const preferenceData = {
-            items: [{
-                title: `Reserva #${reservationId}`,
-                unit_price: Number(amount),
-                quantity: 1,
-                currency_id: currency
-            }],
-            payer: {
-                id: userId
-            },
-            back_urls: {
-                success: `${process.env.FRONTEND_URL}/payment/success`,
-                failure: `${process.env.FRONTEND_URL}/payment/failure`,
-                pending: `${process.env.FRONTEND_URL}/payment/pending`
-            },
-        };
-        const result = await preference.create({ body: preferenceData });
-        return result;
-    } catch (error) {
-        console.error("Error en MercadoPago:", error);
-        throw error;
+    const reservation = await Reservation.findByPk(reservationId);
+    if (!reservation) {
+        throw new Error('Reserva no encontrada');
     }
+
+    const preference = new Preference(client);
+    
+    const preferenceData = {
+        items: [{
+            id: String(reservation.id),
+            title: `Reserva ${reservation.type} - ${reservation.numberOfGuests} huéspedes`,
+            description: `Habitación ${reservation.roomId}`,
+            unit_price: Number(reservation.totalPrice),
+            quantity: 1,
+            currency_id: 'ARS'
+        }],
+        back_urls: {
+            success: `${process.env.FRONTEND_URL}/payment/success/${reservation.id}`,
+            failure: `${process.env.FRONTEND_URL}/payment/failure/${reservation.id}`,
+            pending: `${process.env.FRONTEND_URL}/payment/pending/${reservation.id}`
+        },
+        auto_return: "approved"
+    };
+
+    return await preference.create({ body: preferenceData });
 };
 
-module.exports = createPreferenceController;
+// Exportamos directamente la función
+module.exports = createPreference;

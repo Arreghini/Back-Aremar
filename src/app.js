@@ -106,7 +106,8 @@ app.use('/api/reservations/admin',jwtCheck, checkAdmin, reservationRoutes); // P
 app.use('/api/rooms', roomRoutes);
 
 // Ruta para crear preferencias de pagos  
-app.post('/api', preferencesRoutes);
+// Modifica esta línea
+app.use('/api/reservations/:reservationId/payment', preferencesRoutes);
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {
