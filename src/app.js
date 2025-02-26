@@ -1,13 +1,14 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const helmet = require('helmet'); // Para gestionar la CSP
+const helmet = require('helmet'); // Para gestionar la CSPs
 const userRoutes = require('./routes/UsersRoutes');
 const roomRoutes = require('./routes/RoomRoutes');
 const reservationRoutes = require('./routes/ReservationRoutes');
 const roomTypeRoutes = require('./routes/RoomTypeRoutes');
 const roomDetailsRoutes = require('./routes/RoomsDetailsRoutes');
 const preferencesRoutes = require('./routes/PaymentRoutes');
+const webhookHandler = require('./handlers/reservation/webhookHandler');
 const { checkAdmin, jwtCheck } = require('./services/tokenAdministrador');
 require('dotenv').config();
 
@@ -81,6 +82,8 @@ app.get('/public', (req, res) => {
   res.send('Esta es una ruta pública.');
 });
 
+// Ruta pública para webhooks
+app.use('/api/webhooks/mercadopago', webhookHandler());
 // Rutas protegidas por autenticación
 app.use('/api/users', jwtCheck, userRoutes); // Protege las rutas de usuarios con autenticación
 //app.use('/api/reservations',jwtCheck, reservationRoutes); // Protege las rutas de reservas con autenticación 
@@ -107,7 +110,7 @@ app.use('/api/rooms', roomRoutes);
 
 // Ruta para crear preferencias de pagos  
 // Modifica esta línea
-app.use('/api/reservations/:reservationId/payment', preferencesRoutes);
+app.use('/api/reservations/:reservationId/payment', jwtCheck, preferencesRoutes);
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {

@@ -4,8 +4,7 @@ const { Reservation } = require('../../models');
 // Definimos la función como una expresión de función
 const createPreference = async ({ reservationId }) => {
     const client = new MercadoPagoConfig({
-        accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
-        options: { sandbox: true }
+        accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN
     });
 
     const reservation = await Reservation.findByPk(reservationId);
@@ -18,20 +17,21 @@ const createPreference = async ({ reservationId }) => {
     const preferenceData = {
         items: [{
             id: String(reservation.id),
-            title: `Reserva ${reservation.type} - ${reservation.numberOfGuests} huéspedes`,
-            description: `Habitación ${reservation.roomId}`,
+            title: `Reserva Aremar`,
+            description: `Reserva habitación ${reservation.roomId}`,
             unit_price: Number(reservation.totalPrice),
             quantity: 1,
             currency_id: 'ARS'
         }],
         back_urls: {
-            success: `${process.env.FRONTEND_URL}/payment/success/${reservation.id}`,
-            failure: `${process.env.FRONTEND_URL}/payment/failure/${reservation.id}`,
-            pending: `${process.env.FRONTEND_URL}/payment/pending/${reservation.id}`
+            success: "http://localhost:5173/payment/success",
+            failure: "http://localhost:5173/payment/failure",
+            pending: "http://localhost:5173/payment/pending"
         },
-        auto_return: "approved"
+        auto_return: "approved",
+        external_reference: String(reservation.id)
     };
-
+            
     return await preference.create({ body: preferenceData });
 };
 
