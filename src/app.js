@@ -83,7 +83,16 @@ app.get('/public', (req, res) => {
 });
 
 // Ruta pública para webhooks
-app.use('/api/webhooks/mercadopago', webhookHandler());
+// Ruta específica para webhooks de MercadoPago
+app.post('/api/webhooks/mercadopago', (req, res) => {
+  console.log('Datos completos del webhook:', {
+    headers: req.headers,
+    body: req.body,
+    query: req.query
+  });
+  webhookController(req, res);
+});
+
 // Rutas protegidas por autenticación
 app.use('/api/users', jwtCheck, userRoutes); // Protege las rutas de usuarios con autenticación
 //app.use('/api/reservations',jwtCheck, reservationRoutes); // Protege las rutas de reservas con autenticación 

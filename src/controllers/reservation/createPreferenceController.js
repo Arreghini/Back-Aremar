@@ -1,10 +1,9 @@
 const { MercadoPagoConfig, Preference } = require('mercadopago');
 const { Reservation } = require('../../models');
 
-// Definimos la función como una expresión de función
 const createPreference = async ({ reservationId }) => {
     const client = new MercadoPagoConfig({
-        accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN
+        accessToken: process.env.MP_ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN
     });
 
     const reservation = await Reservation.findByPk(reservationId);
@@ -14,6 +13,8 @@ const createPreference = async ({ reservationId }) => {
 
     const preference = new Preference(client);
     
+    const notification_url = "https://0780-2800-810-441-9eda-dc95-1be1-6d12-d0b9.ngrok-free.app/api/webhooks/mercadopago";
+    console.log('URL de notificación configurada:', notification_url);
     const preferenceData = {
         items: [{
             id: String(reservation.id),
@@ -28,12 +29,17 @@ const createPreference = async ({ reservationId }) => {
             failure: "http://localhost:5173/payment/failure",
             pending: "http://localhost:5173/payment/pending"
         },
+        notification_url: notification_url,
         auto_return: "approved",
         external_reference: String(reservation.id)
     };
-            
-    return await preference.create({ body: preferenceData });
+
+    console.log('Creando preferencia con datos:', preferenceData);
+    
+    const response = await preference.create({ body: preferenceData });
+    console.log('Respuesta de MercadoPago:', response);
+    
+    return response;
 };
 
-// Exportamos directamente la función
 module.exports = createPreference;
