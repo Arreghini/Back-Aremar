@@ -13,7 +13,8 @@ const createPreference = async ({ reservationId }) => {
 
     const preference = new Preference(client);
     
-    const notification_url = "https://0780-2800-810-441-9eda-dc95-1be1-6d12-d0b9.ngrok-free.app/api/webhooks/mercadopago";
+    const notification_url = "https://ff76-2800-810-441-9eda-594c-55f6-e2a3-f3c1.ngrok-free.app/api/webhooks/mercadopago";
+
     console.log('URL de notificación configurada:', notification_url);
     const preferenceData = {
         items: [{

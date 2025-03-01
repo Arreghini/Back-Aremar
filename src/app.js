@@ -84,14 +84,7 @@ app.get('/public', (req, res) => {
 
 // Ruta pública para webhooks
 // Ruta específica para webhooks de MercadoPago
-app.post('/api/webhooks/mercadopago', (req, res) => {
-  console.log('Datos completos del webhook:', {
-    headers: req.headers,
-    body: req.body,
-    query: req.query
-  });
-  webhookController(req, res);
-});
+app.post('/api/webhooks/mercadopago', express.json(), webhookHandler());
 
 // Rutas protegidas por autenticación
 app.use('/api/users', jwtCheck, userRoutes); // Protege las rutas de usuarios con autenticación
