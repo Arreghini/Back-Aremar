@@ -1,51 +1,56 @@
 const axios = require('axios');
-const { Reservation } = require('../../models/Reservation');
+const { Reservation } = require('../../models');
 
 const webhookController = async (req, res) => {
     try {
-        console.log('Iniciando procesamiento de webhook');
-        const { action, data } = req.body;
+        console.log('Iniciando procesamiento de notificación de MercadoPago');
+        const { topic, resource } = req.body;
         
-        const accessToken = process.env.MP_ACCESS_TOKEN;
-        if (!accessToken) {
-            throw new Error('Token de acceso no configurado');
-        }
+        // Obtener token de las variables de entorno
+        const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+        console.log('Token de MercadoPago:', accessToken ? 'Configurado correctamente' : 'No encontrado');
 
-        if (action === 'payment.created' || action === 'payment.updated') {
-            const paymentId = data.id;
-            console.log('Procesando pago ID:', paymentId);
+        if (topic === 'payment') {
+            const paymentId = resource;
+            console.log('Procesando pago con ID:', paymentId);
             
+            // Consultar estado del pago en MercadoPago
             const response = await axios.get(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
                 headers: {
-                    'Authorization': `Bearer ${accessToken}`
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
                 }
             });
 
-            console.log('Respuesta de MercadoPago:', response.data);
+            console.log('Información del pago:', {
+                estado: response.data.status,
+                referencia: response.data.external_reference
+            });
 
+            // Si el pago está aprobado, actualizar la reserva
             if (response.data.status === 'approved') {
                 const reservationId = response.data.external_reference;
-                console.log('Actualizando reserva:', reservationId);
-                
-                const [rowsUpdated] = await Reservation.update(
+                console.log('Actualizando estado de reserva:', reservationId);
+
+                const [filasActualizadas] = await Reservation.update(
                     { status: 'confirmed' },
-                    { 
-                        where: { id: reservationId },
-                        returning: true
-                    }
+                    { where: { id: reservationId } }
                 );
-                
-                console.log(`Reserva ${reservationId} actualizada. Filas modificadas: ${rowsUpdated}`);
+
+                console.log('Actualización completada:', {
+                    reservaId: reservationId,
+                    filasModificadas: filasActualizadas
+                });
             }
         }
 
-        res.status(200).send();
+        res.status(200).json({ exito: true });
     } catch (error) {
-        console.error('Error en webhook:', {
+        console.error('Error en procesamiento:', {
             mensaje: error.message,
             detalles: error.response?.data
         });
-        res.status(200).send();
+        res.status(200).json({ exito: false });
     }
 };
 
