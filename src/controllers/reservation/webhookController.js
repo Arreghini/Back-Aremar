@@ -6,7 +6,6 @@ const webhookController = async (req, res) => {
         console.log('Iniciando procesamiento de notificación de MercadoPago');
         const { topic, resource } = req.body;
         
-        // Obtener token de las variables de entorno
         const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
         console.log('Token de MercadoPago:', accessToken ? 'Configurado correctamente' : 'No encontrado');
 
@@ -14,7 +13,6 @@ const webhookController = async (req, res) => {
             const paymentId = resource;
             console.log('Procesando pago con ID:', paymentId);
             
-            // Consultar estado del pago en MercadoPago
             const response = await axios.get(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -27,24 +25,33 @@ const webhookController = async (req, res) => {
                 referencia: response.data.external_reference
             });
 
-            // Si el pago está aprobado, actualizar la reserva
             if (response.data.status === 'approved') {
                 const reservationId = response.data.external_reference;
                 console.log('Actualizando estado de reserva:', reservationId);
 
                 const [filasActualizadas] = await Reservation.update(
-                    { status: 'confirmed' },
+                    { 
+                        status: 'confirmed',
+                        mensaje: 'Reserva Confirmada'  // Agregamos el mensaje
+                    },
                     { where: { id: reservationId } }
                 );
 
+                // Emitir evento o notificación al frontend
+                // Aquí puedes implementar websockets o SSE para actualización en tiempo real
+
                 console.log('Actualización completada:', {
                     reservaId: reservationId,
-                    filasModificadas: filasActualizadas
+                    filasModificadas: filasActualizadas,
+                    mensaje: 'Reserva Confirmada'
                 });
             }
         }
 
-        res.status(200).json({ exito: true });
+        res.status(200).json({ 
+            exito: true,
+            mensaje: response.data.status === 'approved' ? 'Reserva Confirmada' : ''
+        });
     } catch (error) {
         console.error('Error en procesamiento:', {
             mensaje: error.message,

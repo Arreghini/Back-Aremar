@@ -13,7 +13,7 @@ const createPreference = async ({ reservationId }) => {
 
     const preference = new Preference(client);
     
-    const notification_url = "https://ddfe-38-7-55-3.ngrok-free.app/api/webhooks/mercadopago";
+    const notification_url = "   https://927c-38-7-55-4.ngrok-free.app/api/webhooks/mercadopago";
     //const notification_url = "https://[new-ngrok-subdomain].ngrok-free.app/api/webhooks/mercadopago";
 
 
