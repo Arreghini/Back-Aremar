@@ -2,19 +2,31 @@ const createPreference = require('../../controllers/reservation/createPreference
 
 const createPreferenceHandler = async (req, res) => {
     try {
+        console.log('📌 Se llamó a createPreferenceHandler');
+        console.log('🔹 Parámetros recibidos:', req.params);
+        console.log('🔹 Cuerpo de la solicitud:', req.body);
+
         const reservationId = parseInt(req.params.reservationId);
-        console.log('Procesando pago para reserva ID:', reservationId);
-        
-        const preference = await createPreference({ reservationId });
-        
-        return res.status(200).json({
-            success: true,
-            preferenceId: preference.id,
-            init_point: preference.init_point,
-            sandbox_init_point: preference.sandbox_init_point
-        });
+        if (!reservationId) {
+            console.error('❌ ERROR: No se recibió reservationId o no es válido');
+            return res.status(400).json({
+                success: false,
+                error: 'Falta el ID de la reserva o es inválido'
+            });
+        }
+
+        // Modificamos el body para incluir el reservationId
+        req.body = {
+            ...req.body,
+            reservationId: reservationId
+        };
+
+        console.log('✅ ID de reserva válido, llamando a createPreference...');
+        // Pasamos req y res directamente al controlador
+        await createPreference(req, res);
+
     } catch (error) {
-        console.error('Error en createPreferenceHandler:', error);
+        console.error('❌ ERROR en createPreferenceHandler:', error);
         return res.status(500).json({
             success: false,
             error: 'Error al crear preferencia de pago',

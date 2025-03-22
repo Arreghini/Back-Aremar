@@ -41,7 +41,6 @@ const createReservationController = async (reservationData) => {
     const pricePerNight = room.RoomType?.price || 100;
     const totalPrice = numberOfDays * pricePerNight;
 
-    // Corregimos esta línea
     const newReservation = await Reservation.create({
       roomId: room.id,
       type: room.RoomType?.name || 'Desconocido', 
@@ -54,6 +53,7 @@ const createReservationController = async (reservationData) => {
     });
 
     return newReservation;
+    console.log('Reserva creada:', newReservation);
   } catch (error) {
     console.error('Error detallado:', error);
     throw new Error(error.message || 'Error al crear la reserva');
