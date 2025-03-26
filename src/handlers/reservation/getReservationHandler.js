@@ -46,17 +46,22 @@ const getReservationByUserIdHandler = async (req, res) => {
 
 // Handler para obtener una reserva específica por su ID
 const getReservationByIdHandler = async (req, res) => {
-  const { reservationId } = req.query; 
+  const { reservationId } = req.params; // Cambiado de req.query a req.params
   try {
+    if (!reservationId) {
+      return res.status(400).json({ message: 'El ID de la reserva es obligatorio' });
+    }
+
     const reservation = await getReservationController.getReservationByIdController(reservationId);
     if (!reservation) {
       return res.status(404).json({ message: 'Reserva no encontrada' });
     }
+
     console.log('Obtención de la reserva por ID:', reservation);
     res.status(200).json(reservation);
   } catch (error) {
     console.error('Error al obtener la reserva por ID:', error.message);
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: 'Error al obtener la reserva' });
   }
 };
 

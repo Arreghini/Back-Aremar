@@ -2,36 +2,37 @@ const { Room, Reservation, RoomType } = require('../../models');
 
 const createReservationController = async (reservationData) => {
   try {
+    if (!reservationData.userId) {
+      throw new Error("El campo userId es obligatorio para crear una reserva.");
+    }
+
     const room = await Room.findOne({
       where: {
-        id: reservationData.roomId
+        id: reservationData.roomId,
       },
       include: {
         model: RoomType,
-        attributes: ['name', 'price']
-      }
+        attributes: ["name", "price"],
+      },
     });
 
-    console.log('Room encontrada:', JSON.stringify(room, null, 2));
-    console.log('RoomType:', room.RoomType);
-
     if (!room) {
-      throw new Error('Habitación no encontrada');
+      throw new Error("Habitación no encontrada");
     }
 
     const availableRooms = await Room.findAll({
       where: {
         id: reservationData.roomId,
-        status: 'available'
+        status: "available",
       },
       include: {
         model: RoomType,
-        attributes: ['name']
-      }
+        attributes: ["name"],
+      },
     });
 
     if (!availableRooms || availableRooms.length === 0) {
-      throw new Error('La habitación seleccionada no está disponible');
+      throw new Error("La habitación seleccionada no está disponible");
     }
 
     const checkIn = new Date(reservationData.checkIn);
@@ -43,21 +44,19 @@ const createReservationController = async (reservationData) => {
 
     const newReservation = await Reservation.create({
       roomId: room.id,
-      type: room.RoomType?.name || 'Desconocido', 
+      type: room.RoomType?.name || "Desconocido",
       checkIn: reservationData.checkIn,
       checkOut: reservationData.checkOut,
-      userId: reservationData.datosCompletos?.userId || null,
+      userId: reservationData.userId, 
       numberOfGuests: reservationData.numberOfGuests,
       totalPrice: Math.round(totalPrice),
-      status: 'pending'
+      status: "pending",
     });
 
     return newReservation;
-    console.log('Reserva creada:', newReservation);
   } catch (error) {
-    console.error('Error detallado:', error);
-    throw new Error(error.message || 'Error al crear la reserva');
+    console.error("Error detallado:", error);
+    throw new Error(error.message || "Error al crear la reserva");
   }
-};
-
+}; 
 module.exports = createReservationController;

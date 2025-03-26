@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { Reservation } = require('../../models');
 
-const processedPayments = new Set();
+const processedOrders = new Set();
 
 const webhookController = async (req, res) => {
     try {
@@ -11,65 +11,63 @@ const webhookController = async (req, res) => {
         const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
         console.log('Token de MercadoPago:', accessToken ? 'Configurado correctamente' : 'No encontrado');
 
-        if (topic === 'payment') {
-            // ... (Este código se mantiene igual)
-        } else if (topic === 'merchant_order') {
-            console.log('Recibida notificación de merchant_order:', resource);
-            const merchantOrderId = resource.split('/').pop();
+        if (topic === 'merchant_order') {
+            console.log('Recibida notificación de merchant_order con resource:', resource);
 
-            const merchantOrderResponse = await axios.get(`https://api.mercadopago.com/merchant_orders/${merchantOrderId}`, {
+            // Consultar la orden de pago
+            const orderResponse = await axios.get(resource, {
                 headers: {
-                    Authorization: `Bearer ${accessToken}`
-                }
+                    Authorization: `Bearer ${accessToken}`,
+                },
             });
 
-            const payments = merchantOrderResponse.data.payments;
+            const orderData = orderResponse.data;
+            console.log('Información de la orden:', orderData);
 
-            if (payments && payments.length > 0) {
-                const paymentId = payments[0].id; // Asumiendo un solo pago por orden
+            // Idempotency check
+            if (processedOrders.has(orderData.id)) {
+                console.log(`Orden ${orderData.id} ya procesada. Omitiendo.`);
+                return res.status(200).send('OK');
+            }
 
-                // Idempotency check
-                if (processedPayments.has(paymentId)) {
-                    console.log(`Payment ${paymentId} already processed. Skipping.`);
-                    return res.status(200).send('OK');
-                }
+            // Verificar si hay pagos asociados a la orden
+            if (orderData.payments && orderData.payments.length > 0) {
+                const payment = orderData.payments.find(p => p.status === 'approved');
+                if (payment) {
+                    const reservationId = orderData.external_reference; // Asegúrate de que external_reference sea el ID de la reserva
+                    console.log('Pago aprobado. Actualizando reserva con ID:', reservationId);
 
-
-                const paymentResponse = await axios.get(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${accessToken}`,
-                    }
-                });
-
-                console.log('Información del pago desde merchant_order:', paymentResponse.data);
-
-                if (paymentResponse.data.status === 'approved') {
-                    const reservationId = paymentResponse.data.external_reference;
                     await actualizarReserva(reservationId);
-                    processedPayments.add(paymentId);
+                    processedOrders.add(orderData.id);
+                } else {
+                    console.log('No se encontraron pagos aprobados en la orden.');
                 }
             } else {
-                console.log('No se encontraron pagos asociados a la orden.');
+                console.log('No se encontraron pagos asociados a la orden. Esperando futuras notificaciones.');
             }
+        } else {
+            console.log(`Topic no manejado: ${topic}`);
+            return res.status(400).send('Topic no válido');
         }
 
-        return res.status(200).send('OK');
+        return res.status(200).send('OK'); // Responder con 200 para evitar reintentos
 
     } catch (error) {
         console.error('Error en procesamiento:', {
             mensaje: error.message,
-            detalles: error.response?.data
+            detalles: error.response?.data,
         });
         return res.status(200).send('OK'); // Mantén el 200 para evitar reintentos de MercadoPago
     }
 };
+
 async function actualizarReserva(reservationId) {
     console.log('Actualizando estado de reserva:', reservationId);
 
     const [filasActualizadas] = await Reservation.update(
         {
             status: 'confirmed',
-            mensaje: 'Reserva Confirmada'
+            mensaje: 'Reserva Confirmada',
         },
         { where: { id: reservationId } }
     );
@@ -77,9 +75,8 @@ async function actualizarReserva(reservationId) {
     console.log('Actualización completada:', {
         reservaId: reservationId,
         filasModificadas: filasActualizadas,
-        mensaje: 'Reserva Confirmada'
+        mensaje: 'Reserva Confirmada',
     });
 }
-
 
 module.exports = webhookController;
