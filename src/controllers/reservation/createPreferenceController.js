@@ -14,14 +14,13 @@ const createPreference = async (req, res) => {
       return res.status(404).json({ error: "Reserva no encontrada" });
     }
 
-    console.log('Precio total de la reserva:', reservation.totalPrice);
+    console.log("Precio total de la reserva:", reservation.totalPrice);
 
     if (!reservation.totalPrice) {
-      throw new Error('El precio total de la reserva no está definido.');
+      throw new Error("El precio total de la reserva no está definido.");
     }
 
     const preference = new Preference(client);
-
     const preferenceData = {
       items: [
         {
@@ -34,21 +33,22 @@ const createPreference = async (req, res) => {
         },
       ],
       back_urls: {
-        success: `${process.env.FRONTEND_URL}/success`, // Página de éxito
-        failure: `${process.env.FRONTEND_URL}/failure`, // Página de fallo
-        pending: `${process.env.FRONTEND_URL}/pending`, // Página de pendiente
+        success: `${process.env.FRONTEND_URL}/confirmed-pay?reservationId=${reservation.id}`, // Redirige a ConfirmedPay
+        failure: `${process.env.FRONTEND_URL}/payment-status?status=failure`, // Página de fallo
+        pending: `${process.env.FRONTEND_URL}/payment-status?status=pending`, // Página de pendiente
       },
-      auto_return: "approved", // Redirige automáticamente en caso de éxito
-      external_reference: String(reservation.id),
+      auto_return: "approved", // Redirige automáticamente al success si el pago es aprobado
+      external_reference: String(reservation.id), // ID de la reserva para identificarla en el webhook
+      notification_url: `${process.env.NGROK_URL}/api/webhooks/mercadopago`, // URL del webhook
       payer: {
-        email: "test_user_buyer@testuser.com",
+        email: "test_user_2026113555@testuser.com",
         identification: {
           type: "DNI",
           number: "12345678",
         },
       },
-      notification_url: `${process.env.NGROK_URL}/api/webhooks/mercadopago`,
     };
+
     const response = await preference.create({ body: preferenceData });
     return res.json({ preferenceId: response.id });
 
