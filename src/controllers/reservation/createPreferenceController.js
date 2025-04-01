@@ -33,9 +33,9 @@ const createPreference = async (req, res) => {
         },
       ],
       back_urls: {
-        success: `${process.env.FRONTEND_URL}/confirmed-pay?reservationId=${reservation.id}`, // Redirige a ConfirmedPay
-        failure: `${process.env.FRONTEND_URL}/payment-status?status=failure`, // Página de fallo
-        pending: `${process.env.FRONTEND_URL}/payment-status?status=pending`, // Página de pendiente
+        success: `${process.env.NGROK_URL}/api/payment/redirect?status=approved&reservationId=${reservation.id}`,
+        failure: `${process.env.NGROK_URL}/api/payment/redirect?status=failure&reservationId=${reservation.id}`,
+        pending: `${process.env.NGROK_URL}/api/payment/redirect?status=pending&reservationId=${reservation.id}`,
       },
       auto_return: "approved", // Redirige automáticamente al success si el pago es aprobado
       external_reference: String(reservation.id), // ID de la reserva para identificarla en el webhook
@@ -48,6 +48,8 @@ const createPreference = async (req, res) => {
         },
       },
     };
+    console.log("Back URLs:", preferenceData.back_urls);
+    console.log("Webhook URL:", preferenceData.notification_url);
 
     const response = await preference.create({ body: preferenceData });
     return res.json({ preferenceId: response.id });

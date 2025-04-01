@@ -8,6 +8,7 @@ const reservationRoutes = require('./routes/ReservationRoutes');
 const roomTypeRoutes = require('./routes/RoomTypeRoutes');
 const roomDetailsRoutes = require('./routes/RoomsDetailsRoutes');
 const preferencesRoutes = require('./routes/PaymentRoutes');
+const paymentRedirectRoutes = require('./routes/PaymentRedirectRoutes');
 const webhookHandler = require('./handlers/reservation/webhookHandler');
 const { checkAdmin, jwtCheck } = require('./services/tokenAdministrador');
 require('dotenv').config();
@@ -98,8 +99,9 @@ app.use('/api/reservations', (req, res, next) => {
   next();
 }, jwtCheck, reservationRoutes);
 
-// Primero las rutas de administración
+app.use('/api/payment', express.json(), paymentRedirectRoutes);
 
+// Primero las rutas de administración
 app.use('/api/rooms/admin/roomType', roomTypeRoutes );
 app.use('/api/rooms/admin/roomDetail', roomDetailsRoutes);
 
