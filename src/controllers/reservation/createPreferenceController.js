@@ -33,13 +33,13 @@ const createPreference = async (req, res) => {
         },
       ],
       back_urls: {
-        success: `${process.env.NGROK_URL}/api/payment/redirect?status=approved&reservationId=${reservation.id}`,
-        failure: `${process.env.NGROK_URL}/api/payment/redirect?status=failure&reservationId=${reservation.id}`,
-        pending: `${process.env.NGROK_URL}/api/payment/redirect?status=pending&reservationId=${reservation.id}`,
+        success: `${process.env.CLOUDFLARED_URL}/api/payment/redirect?status=approved&reservationId=${reservation.id}`,
+        failure: `${process.env.CLOUDFLARED_URL}/api/payment/redirect?status=failure&reservationId=${reservation.id}`,
+        pending: `${process.env.CLOUDFLARED_URL}/api/payment/redirect?status=pending&reservationId=${reservation.id}`,
       },
       auto_return: "approved", // Redirige automáticamente al success si el pago es aprobado
       external_reference: String(reservation.id), // ID de la reserva para identificarla en el webhook
-      notification_url: `${process.env.NGROK_URL}/api/webhooks/mercadopago`, // URL del webhook
+      notification_url: `${process.env.CLOUDFLARED_URL}/api/webhooks/mercadopago`, // URL del webhook
       payer: {
         email: "test_user_2026113555@testuser.com",
         identification: {

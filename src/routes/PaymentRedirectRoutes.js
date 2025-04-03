@@ -4,31 +4,25 @@ const router = express.Router();
 router.get('/redirect', (req, res) => {
     console.log("Solicitud recibida en /redirect");
 
-    // Log para depurar todos los parámetros recibidos
-    console.log("Todos los parámetros recibidos:", req.query);
-
-    let { status, reservationId } = req.query;
+    // Extraer y filtrar los parámetros relevantes
+    const { status, reservationId } = req.query;
 
     // Si status es un array, toma el primer valor
-    if (Array.isArray(status)) {
-        status = status[0];
-    }
+    const normalizedStatus = Array.isArray(status) ? status[0] : status;
 
-    // Log para depurar los parámetros principales
-    console.log("Parámetros principales normalizados:", { status, reservationId });
+    console.log("Parámetros principales normalizados:", { status: normalizedStatus, reservationId });
 
     // Validar parámetros principales
-    if (!status || !reservationId || !["approved", "pending", "failure", "success"].includes(status)) {
+    if (!normalizedStatus || !reservationId || !["approved", "pending", "failure", "success"].includes(normalizedStatus)) {
         console.error('Parámetros inválidos en la solicitud');
         return res.status(400).send('Parámetros inválidos');
     }
 
     // Construir la URL de redirección al frontend
-    const frontendUrl = `${process.env.FRONTEND_URL}/payment-status?status=${status}&reservationId=${reservationId}`;
+    const frontendUrl = `${process.env.FRONTEND_URL}/home?status=${normalizedStatus}&reservationId=${reservationId}`;
     console.log("Redirigiendo a la URL del frontend:", frontendUrl);
 
     try {
-        res.setHeader('ngrok-skip-browser-warning', 'true');
         res.redirect(frontendUrl);
     } catch (error) {
         console.error("Error durante la redirección:", error);
