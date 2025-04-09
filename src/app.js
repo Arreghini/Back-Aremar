@@ -1,13 +1,16 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const adminReservationRoutes = require('./routes/AdminReservationRoutes');
+const adminRoomRoutes = require('./routes/AdminRoomRoutes');
+const adminUserRoutes = require('./routes/AdminUserRoutes');
 const helmet = require('helmet'); // Para gestionar la CSPs
 const userRoutes = require('./routes/UsersRoutes');
 const roomRoutes = require('./routes/RoomRoutes');
 const reservationRoutes = require('./routes/ReservationRoutes');
 const roomTypeRoutes = require('./routes/RoomTypeRoutes');
 const roomDetailsRoutes = require('./routes/RoomsDetailsRoutes');
-const preferencesRoutes = require('./routes/PaymentRoutes');
+//const preferencesRoutes = require('./routes/PaymentRoutes');
 const paymentRedirectRoutes = require('./routes/PaymentRedirectRoutes');
 const webhookHandler = require('./handlers/reservation/webhookHandler');
 const { checkAdmin, jwtCheck } = require('./services/tokenAdministrador');
@@ -22,13 +25,10 @@ const corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
+// Middlewares básicos
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(cookieParser());
-
-app.use((req, res, next) => {
-  next();
-});
 // Configuración de la Content Security Policy (CSP) con helmet
 app.use(helmet({
   contentSecurityPolicy: {
@@ -78,55 +78,40 @@ app.use(helmet({
   }
 }));
 
-// Rutas públicas (no requieren autenticación)
+// Aplicar jwtCheck globalmente para todas las rutas API protegidas
+app.use('/api', jwtCheck);
+
+// Rutas públicas
 app.get('/public', (req, res) => {
   res.send('Esta es una ruta pública.');
 });
 
 // Ruta pública para webhooks
-// Ruta específica para webhooks de MercadoPago
 app.post('/api/webhooks/mercadopago', express.json(), webhookHandler());
 
-// Rutas protegidas por autenticación
-app.use('/api/users', jwtCheck, userRoutes); // Protege las rutas de usuarios con autenticación
-//app.use('/api/reservations',jwtCheck, reservationRoutes); // Protege las rutas de reservas con autenticación 
-app.use('/api/reservations', (req, res, next) => {
-  console.log('Nueva solicitud a /api/reservations:', {
-    método: req.method,
-    ruta: req.path,
-    body: req.body
-  });
-  next();
-}, jwtCheck, reservationRoutes);
+// Mantener las rutas administrativas originales
+app.use('/api/reservations/admin', checkAdmin, adminReservationRoutes);
+app.use('/api/rooms/admin', checkAdmin, adminRoomRoutes);
+app.use('/api/users/admin', checkAdmin, adminUserRoutes);
+app.use('/api/rooms/admin/roomType', checkAdmin, roomTypeRoutes);
+app.use('/api/rooms/admin/roomDetail', checkAdmin, roomDetailsRoutes);
 
-app.use('/api/payment', express.json(), paymentRedirectRoutes);
-
-// Primero las rutas de administración
-app.use('/api/rooms/admin/roomType', roomTypeRoutes );
-app.use('/api/rooms/admin/roomDetail', roomDetailsRoutes);
-
-// Rutas protegidas para administración (requiere autenticación y rol de admin)
-app.use('/api/rooms/admin',jwtCheck, checkAdmin, roomRoutes); // Protege las rutas de administración de habitaciones
-app.use('/api/users/admin',jwtCheck,checkAdmin, userRoutes); // Protege las rutas de administración de usuarios
-app.use('/api/reservations/admin',jwtCheck, checkAdmin, reservationRoutes); // Protege las rutas de administración de reservas
-
+// Rutas regulares protegidas
 app.use('/api/rooms', roomRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/reservations', reservationRoutes);
+app.use('/api/payment', paymentRedirectRoutes);
 
-app.use('/api/reservations', jwtCheck, preferencesRoutes);
-
-// Manejo de rutas no encontradas
+// Manejo de errores y rutas no encontradas (mantener igual)
 app.use((req, res) => {
   res.status(404).json({ message: 'Ruta no encontrada' });
 });
 
-// Manejo de errores
 app.use((err, req, res, next) => {
   console.error('Error en la solicitud:', err);
-  
   if (err.name === 'UnauthorizedError') {
     return res.status(401).json({ message: 'Token inválido o no proporcionado' });
   }
-  
   return res.status(err.status || 500).json({ message: err.message || 'Ocurrió un error en el servidor' });
 });
 

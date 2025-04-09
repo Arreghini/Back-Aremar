@@ -29,34 +29,31 @@ let tokenExpiryTime = 0;
 // Middleware para verificar si el usuario es administrador
 const checkAdmin = async (req, res, next) => {
   try {
-   // console.log('Valor de req.auth en checkAdmin al inicio:', req.auth);
+    console.log('Headers recibidos:', req.headers);
+    console.log('Auth payload:', req.auth?.payload);
     
-    if (!req.auth || !req.auth.payload || !req.auth.payload.sub) {
-   //   console.log('Estructura inesperada de req.auth:', req.auth);
+    if (!req.auth?.payload?.sub) {
       return res.status(401).json({ message: 'Usuario no autenticado' });
     }
 
-    req.user = req.auth.payload;
-
-    console.log('Usuario autenticado con sub:', req.user.sub);
-
     const managementToken = await getManagementApiToken();
-   // console.log('Token de Management API obtenido:', managementToken);
-
-    const isAdmin = await checkUserRole(req.user.sub, managementToken);
-    console.log('¿Es administrador?', isAdmin);
+    const isAdmin = await checkUserRole(req.auth.payload.sub, managementToken);
+    
+    console.log('Resultado verificación admin:', {
+      sub: req.auth.payload.sub,
+      isAdmin: isAdmin
+    });
 
     if (isAdmin) {
-      next();
-    } else {
-      return res.status(403).json({ message: 'Acceso prohibido. Solo administradores.' });
+      return next();
     }
+    
+    return res.status(403).json({ message: 'Acceso prohibido' });
   } catch (error) {
-    console.error('Error al verificar roles del usuario:', error);
-    return res.status(500).json({ message: 'Error al verificar roles del usuario' });
+    console.error('Error en checkAdmin:', error);
+    return res.status(500).json({ message: 'Error al verificar roles' });
   }
 };
-
 module.exports = {
   jwtCheck,
   checkAdmin,
