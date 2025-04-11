@@ -4,12 +4,12 @@ const cors = require('cors');
 const adminReservationRoutes = require('./routes/AdminReservationRoutes');
 const adminRoomRoutes = require('./routes/AdminRoomRoutes');
 const adminUserRoutes = require('./routes/AdminUserRoutes');
+const adminRoomTypeRoutes = require('./routes/AdminRoomTypeRoutes');
+const adminRoomDetailsRoutes = require('./routes/AdminRoomDetailsRoutes');
 const helmet = require('helmet'); // Para gestionar la CSPs
 const userRoutes = require('./routes/UsersRoutes');
 const roomRoutes = require('./routes/RoomRoutes');
 const reservationRoutes = require('./routes/ReservationRoutes');
-const roomTypeRoutes = require('./routes/RoomTypeRoutes');
-const roomDetailsRoutes = require('./routes/RoomsDetailsRoutes');
 //const preferencesRoutes = require('./routes/PaymentRoutes');
 const paymentRedirectRoutes = require('./routes/PaymentRedirectRoutes');
 const webhookHandler = require('./handlers/reservation/webhookHandler');
@@ -91,10 +91,10 @@ app.post('/api/webhooks/mercadopago', express.json(), webhookHandler());
 
 // Mantener las rutas administrativas originales
 app.use('/api/reservations/admin', checkAdmin, adminReservationRoutes);
+app.use('/api/rooms/admin/roomType', checkAdmin, adminRoomTypeRoutes);
+app.use('/api/rooms/admin/roomDetail', checkAdmin, adminRoomDetailsRoutes);
 app.use('/api/rooms/admin', checkAdmin, adminRoomRoutes);
 app.use('/api/users/admin', checkAdmin, adminUserRoutes);
-app.use('/api/rooms/admin/roomType', checkAdmin, roomTypeRoutes);
-app.use('/api/rooms/admin/roomDetail', checkAdmin, roomDetailsRoutes);
 
 // Rutas regulares protegidas
 app.use('/api/rooms', roomRoutes);

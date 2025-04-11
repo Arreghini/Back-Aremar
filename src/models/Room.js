@@ -12,7 +12,7 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
     roomTypeId: {
-      type: DataTypes.UUID, // Cambiar de STRING a UUID
+      type: DataTypes.UUID, 
       allowNull: true,
       references: {
         model: 'RoomType',
@@ -20,7 +20,7 @@ module.exports = (sequelize) => {
       },
     },
     detailRoomId: {
-      type: DataTypes.UUID, // Cambiar de STRING a UUID
+      type: DataTypes.UUID, 
       allowNull: true,
       references: {
         model: 'RoomDetail',
