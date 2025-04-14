@@ -21,7 +21,7 @@ let capsEntries = entries.map(([name, model]) => [name[0].toUpperCase() + name.s
 conn.models = Object.fromEntries(capsEntries);
 
 // Relaciones entre modelos
-const { User, Room, RoomType, RoomDetail, Reservation } = conn.models;
+const { User, Room, RoomType, RoomDetail, Reservation, Refund } = conn.models;
 
 RoomType.hasMany(Room, { foreignKey: 'roomTypeId' });
 Room.belongsTo(RoomType, { foreignKey: 'roomTypeId' });
@@ -34,6 +34,9 @@ Room.hasMany(Reservation, { foreignKey: 'roomId', sourceKey: 'id'});
 
 Reservation.belongsTo(User, { foreignKey: 'userId' });
 User.hasMany(Reservation, { foreignKey: 'userId' });
+
+Reservation.belongsTo(Refund, { foreignKey: 'refundId' });
+Refund.hasMany(Reservation, { foreignKey: 'refundId' });
 
 // Confirmación de modelos cargados
 console.log('Modelos cargados:', Object.keys(conn.models));

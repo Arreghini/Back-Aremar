@@ -45,6 +45,9 @@ const checkAdmin = async (req, res, next) => {
     });
 
     if (isAdmin) {
+      // Agregamos la información del rol admin al objeto req
+      req.isAdmin = true;
+      req.auth.payload[`${namespace}roles`] = ['admin'];
       return next();
     }
     

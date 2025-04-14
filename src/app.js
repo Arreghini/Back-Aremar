@@ -10,10 +10,10 @@ const helmet = require('helmet'); // Para gestionar la CSPs
 const userRoutes = require('./routes/UsersRoutes');
 const roomRoutes = require('./routes/RoomRoutes');
 const reservationRoutes = require('./routes/ReservationRoutes');
-//const preferencesRoutes = require('./routes/PaymentRoutes');
 const paymentRedirectRoutes = require('./routes/PaymentRedirectRoutes');
 const webhookHandler = require('./handlers/reservation/webhookHandler');
 const { checkAdmin, jwtCheck } = require('./services/tokenAdministrador');
+const createPreferenceHandler = require('./handlers/reservation/createPreferenceHandler');
 require('dotenv').config();
 
 const app = express();
@@ -78,9 +78,6 @@ app.use(helmet({
   }
 }));
 
-// Aplicar jwtCheck globalmente para todas las rutas API protegidas
-app.use('/api', jwtCheck);
-
 // Rutas públicas
 app.get('/public', (req, res) => {
   res.send('Esta es una ruta pública.');
@@ -88,6 +85,12 @@ app.get('/public', (req, res) => {
 
 // Ruta pública para webhooks
 app.post('/api/webhooks/mercadopago', express.json(), webhookHandler());
+
+// Ruta pública para redirección de pagos
+app.use('/api/payment', paymentRedirectRoutes);
+
+// Aplicar jwtCheck globalmente para todas las rutas API protegidas
+app.use('/api', jwtCheck);
 
 // Mantener las rutas administrativas originales
 app.use('/api/reservations/admin', checkAdmin, adminReservationRoutes);
@@ -100,6 +103,7 @@ app.use('/api/users/admin', checkAdmin, adminUserRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/reservations', reservationRoutes);
+app.use('/api/reservations/:reservationId/payment', createPreferenceHandler);
 app.use('/api/payment', paymentRedirectRoutes);
 
 // Manejo de errores y rutas no encontradas (mantener igual)
