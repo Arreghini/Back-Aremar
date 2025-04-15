@@ -17,7 +17,7 @@ const deleteReservationByIdController = async (reservationId, isAdmin) => {
     }
 
     // Validación para administradores
-    if (isAdmin && !['pending', 'confirmed'].includes(status)) {
+    if (isAdmin && !['pending', 'confirmed','cancelled'].includes(status)) {
       throw new Error('Como administrador solo puedes eliminar reservas pendientes o confirmadas');
     }
 

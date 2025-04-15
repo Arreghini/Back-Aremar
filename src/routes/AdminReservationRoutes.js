@@ -4,8 +4,9 @@ const createReservationHandler = require('../handlers/reservation/createReservat
 const getReservationHandler = require('../handlers/reservation/getReservationHandler');
 const updateReservationHandler = require('../handlers/reservation/updateReservationHandler');
 const deleteReservationByIdHandler = require('../handlers/reservation/deleteReservationByIdHandler');
-const cancelReservationHandler = require('../handlers/reservation/cancelReservationHandler');
+const cancelReservationByAdminHandler = require('../handlers/reservation/cancelReservationHandlerByAdmin');
 const cancelReservationWithRefundHandler = require('../handlers/reservation/cancelReservationWithRefundHandler');
+const confirmedReservationByAdminHandler = require('../handlers/reservation/confirmedReservationByAdminHandler');
 const createPreferenceHandler = require('../handlers/reservation/createPreferenceHandler');
 
 // Rutas exclusivas para administradores
@@ -20,7 +21,9 @@ router.get('/:reservationId', getReservationHandler.getReservationByIdHandler);
 
 router.patch('/:reservationId/cancel-with-refund', cancelReservationWithRefundHandler);
 
-router.patch('/:reservationId/cancel', cancelReservationHandler);
+router.patch('/:reservationId/cancel', cancelReservationByAdminHandler);
+
+router.patch('/:reservationId/status', confirmedReservationByAdminHandler);
 
 // Actualizar una reserva como administrador
 router.patch('/:reservationId', updateReservationHandler);

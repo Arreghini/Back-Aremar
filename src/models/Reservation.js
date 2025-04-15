@@ -42,6 +42,10 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    refundAmount: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
     status: {
       type: DataTypes.ENUM('pending', 'confirmed', 'cancelled'),
       defaultValue: 'pending',

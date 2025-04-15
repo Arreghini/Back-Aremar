@@ -2,7 +2,7 @@ const cancelReservationWithRefundController = require('../../controllers/reserva
 
 const cancelReservationWithRefundHandler = async (req, res) => {
   const { reservationId } = req.params;
-  const userId = req.user?.id; // Asumimos que el middleware de auth agrega `user` al req
+  const userId = req.user?.id;
   const isAdmin = req.isAdmin || false;
 
   try {
@@ -11,7 +11,7 @@ const cancelReservationWithRefundHandler = async (req, res) => {
       userId,
       isAdmin
     });
-
+console.log('Reembolso de la reserva cancelada', refundInfo.refundAmount);
     res.status(200).json({
       message: 'Reserva cancelada con reembolso exitosamente',
       refund: refundInfo

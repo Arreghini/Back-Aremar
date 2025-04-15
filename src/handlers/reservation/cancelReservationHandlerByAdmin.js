@@ -1,14 +1,11 @@
-const cancelReservationController = require('../../controllers/reservation/cancelReservationController.js');
+const cancelReservationControllerByAdmin = require('../../controllers/reservation/cancelReservationControllerByAdmin.js');
 
-const cancelReservationHandler = async (req, res) => {
+const cancelReservationByAdminHandler = async (req, res) => {
   const { reservationId } = req.params;
-  const userId = req.user?.id; 
   const isAdmin = req.isAdmin || false;
-
   try {
-    const reserva = await cancelReservationController({
+    const reserva = await cancelReservationControllerByAdmin({
       reservationId,
-      userId,
       isAdmin
     });
 
@@ -21,4 +18,4 @@ const cancelReservationHandler = async (req, res) => {
   }
 };
 
-module.exports = cancelReservationHandler;
+module.exports = cancelReservationByAdminHandler;
