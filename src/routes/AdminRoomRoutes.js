@@ -9,7 +9,7 @@ const updateRoomHandler = require('../handlers/room/updateRoomHandler');
 const router = express.Router();
 
 router.get('/all', getRooms.getAllRooms);
-router.get('/available', (req, res, next) => {
+router.get('/', (req, res, next) => {
   console.log('Datos recibidos desde el cliente para verificar disponibilidad:', req.query); // Registrar query params
   next(); 
 }, getRooms.getAvailableRooms);

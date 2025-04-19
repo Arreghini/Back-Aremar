@@ -21,7 +21,7 @@ app.name = 'API';
 
 const corsOptions = {
   origin: ['http://localhost:5173', 'http://localhost:4000'],
-  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'HEAD'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT','HEAD'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
@@ -94,16 +94,17 @@ app.use('/api', jwtCheck);
 
 // Mantener las rutas administrativas originales
 app.use('/api/reservations/admin', checkAdmin, adminReservationRoutes);
-app.use('/api/rooms/admin/roomType', checkAdmin, adminRoomTypeRoutes);
+app.use('/api/rooms/admin/types', checkAdmin, adminRoomTypeRoutes);
 app.use('/api/rooms/admin/roomDetail', checkAdmin, adminRoomDetailsRoutes);
+app.use('/api/rooms/admin/available', checkAdmin, adminRoomRoutes);
 app.use('/api/rooms/admin', checkAdmin, adminRoomRoutes);
 app.use('/api/users/admin', checkAdmin, adminUserRoutes);
 
 // Rutas regulares protegidas
 app.use('/api/rooms', roomRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/reservations', reservationRoutes);
 app.use('/api/reservations/:reservationId/payment', createPreferenceHandler);
+app.use('/api/reservations', reservationRoutes);
 app.use('/api/payment', paymentRedirectRoutes);
 
 // Manejo de errores y rutas no encontradas (mantener igual)

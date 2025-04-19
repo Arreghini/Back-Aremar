@@ -17,7 +17,6 @@ router.get('/available', (req, res, next) => {
   next(); // Pasar al siguiente middleware o controlador
 }, getRooms.getAvailableRooms);
 
-
 // Ruta pública para consulta de habitaciones por query
 router.get('/', getRoomByQuery);
 
