@@ -34,10 +34,11 @@ const webhookController = async (req, res) => {
       if (orderData.payments && orderData.payments.length > 0) {
         const payment = orderData.payments.find((p) => p.status === "approved");
         if (payment) {
-          const reservationId = orderData.external_reference; // Asegúrate de que external_reference sea el ID de la reserva
+          const reservationId = orderData.external_reference; 
+          const amountPaid = payment.transaction_amount; // Obtén el monto pagado
           console.log("Pago aprobado. Actualizando reserva con ID:", reservationId);
 
-          await actualizarReserva(reservationId);
+          await actualizarReserva(reservationId, amountPaid); // Pasa el monto pagado
           processedOrders.add(orderData.id);
         } else {
           console.log("No se encontraron pagos aprobados en la orden.");
@@ -59,10 +60,11 @@ const webhookController = async (req, res) => {
       console.log("Información del pago:", paymentData);
 
       if (paymentData.status === "approved") {
-        const reservationId = paymentData.external_reference; // Asegúrate de que external_reference sea el ID de la reserva
+        const reservationId = paymentData.external_reference; // ID de la reserva
+        const amountPaid = paymentData.transaction_amount; // Monto pagado
         console.log("Pago aprobado. Actualizando reserva con ID:", reservationId);
 
-        await actualizarReserva(reservationId);
+        await actualizarReserva(reservationId, amountPaid); // Pasa el monto pagado
       }
     } else {
       console.log(`Topic no manejado: ${topic}`);
@@ -79,13 +81,14 @@ const webhookController = async (req, res) => {
   }
 };
 
-async function actualizarReserva(reservationId) {
+async function actualizarReserva(reservationId, amountPaid) {
   console.log("Actualizando estado de reserva:", reservationId);
 
   const [filasActualizadas] = await Reservation.update(
     {
       status: "confirmed",
       mensaje: "Reserva Confirmada",
+      amountPaid: amountPaid, // Actualiza el campo con el monto pagado
     },
     { where: { id: reservationId } }
   );
@@ -94,6 +97,7 @@ async function actualizarReserva(reservationId) {
     reservaId: reservationId,
     filasModificadas: filasActualizadas,
     mensaje: "Reserva Confirmada",
+    amountPaid: amountPaid,
   });
 }
 
