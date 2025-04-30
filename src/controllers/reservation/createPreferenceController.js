@@ -77,7 +77,12 @@ const createPreference = async (req, res) => {
     const response = await preference.create({ body: preferenceData });
 
     // Enviamos el preferenceId al cliente para procesar el pago
-    return res.json({ preferenceId: response.id });
+    return res.json({
+      preferenceId: response.id,
+      price: unitPrice,
+      reservationId: reservation.id,
+      title: `Reserva habitación ${reservation.roomId}`, 
+    });      
 
   } catch (error) {
     console.error("Error al crear preferencia de pago:", error);

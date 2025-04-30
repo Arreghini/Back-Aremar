@@ -27,22 +27,22 @@ async function actualizarReserva(reservationId, paymentType, totalPaid) {
       throw new Error(`Tipo de pago desconocido: ${paymentType}`);
   }
 
-  // 🛡️ Seguridad extra: que no puedan mandar menos o más plata de lo esperado
-  const tolerancia = 5; // pesos de tolerancia para redondeos o diferencias chicas
-
+  // 🛡️ Seguridad extra
+  const tolerancia = 5;
   if (Math.abs(totalPaid - montoAAgregar) > tolerancia) {
     throw new Error(`Monto pagado (${totalPaid}) no coincide con el esperado (${montoAAgregar})`);
   }
 
-  // ✅ Sumamos el monto real pagado (totalPaid) para registrar exactamente lo pagado
+  // ✅ Sumamos el monto real pagado
   nuevoMontoPagado += totalPaid;
 
-  const estadoReserva = nuevoMontoPagado >= totalReserva ? "confirmed" : "partial";
+  const estadoReserva = "confirmed";
+  const mensaje = paymentType === "deposit" ? "Pago de seña recibido" : "Pago total recibido";
 
   await Reservation.update(
     {
       status: estadoReserva,
-      mensaje: estadoReserva === "confirmed" ? "Reserva Confirmada" : "Pago Parcial Recibido",
+      mensaje,
       amountPaid: nuevoMontoPagado,
     },
     { where: { id: reservationId } }
@@ -68,7 +68,6 @@ const webhookController = async (req, res) => {
       const approvedPayments = orderData.payments.filter((p) => p.status === "approved");
       const totalPaid = approvedPayments.reduce((sum, p) => sum + p.transaction_amount, 0);
 
-      // 🚨 Parsear el external_reference (JSON)
       let reservationId;
       let paymentType;
       try {
@@ -81,10 +80,13 @@ const webhookController = async (req, res) => {
       }
 
       console.log(`Procesando webhook para reserva ${reservationId}, tipo de pago: ${paymentType}`);
+      console.log("Webhook recibido");
+      console.log("Topic:", topic);
+      console.log("Resource:", resource);
+      console.log("OrderData.external_reference:", orderData.external_reference);
+      console.log("Total pagado:", totalPaid);
 
-      // ✨ Actualizar con la lógica reforzada
       await actualizarReserva(reservationId, paymentType, totalPaid);
-
       processedOrders.add(orderData.id);
     } else {
       console.log(`Topic no manejado: ${topic}`);
