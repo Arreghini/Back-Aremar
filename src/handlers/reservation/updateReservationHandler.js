@@ -3,7 +3,7 @@ const updateReservationController = require('../../controllers/reservation/updat
 const updateReservationHandler = async (req, res) => {
   try {
     const reservationId = Number(req.url.match(/\/(\d+)$/)[1]);
-    const updatedData = req.body.body;
+    const updatedData = req.body;
     
     console.log('Datos recibidos del front:', {
       id: reservationId,

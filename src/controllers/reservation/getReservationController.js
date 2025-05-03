@@ -31,7 +31,6 @@ const getAllReservationController = async () => {
 
 // Controlador para obtener reservas de un usuario por su ID
 const getReservationByUserIdController = async (userId) => {
-    // Agregar el prefijo si no está presente
     const formattedUserId = userId.includes('google-oauth2|') 
         ? userId 
         : `google-oauth2|${userId}`;
@@ -43,7 +42,7 @@ const getReservationByUserIdController = async (userId) => {
             where: { 
                 userId: formattedUserId
             },
-            attributes: ['id', 'checkIn', 'checkOut', 'totalPrice', 'numberOfGuests','amountPaid' , 'status'],
+            attributes: ['id', 'checkIn', 'checkOut', 'totalPrice', 'numberOfGuests', 'amountPaid', 'status'],
             include: [
                 {
                     model: Room,
@@ -59,41 +58,59 @@ const getReservationByUserIdController = async (userId) => {
                 }
             ],
         });
-        
+
         console.log('Reservas encontradas:', reservations.length);
-        return reservations;
+
+        // Mapea el atributo Room.id como roomId
+        const formattedReservations = reservations.map((reservation) => ({
+            ...reservation.toJSON(),
+            roomId: reservation.Room?.id || null, // Agrega roomId directamente
+        }));
+
+        return formattedReservations;
     } catch (error) {
         console.error('Error en la búsqueda:', error);
         throw error;
     }
 };
-
 // Controlador para obtener una reserva por su ID
 const getReservationByIdController = async (reservationId) => {
     try {
-      const reservation = await Reservation.findOne({
-        where: { id: reservationId },
-        attributes: ['id', 'checkIn', 'checkOut', 'totalPrice', 'status','amountPaid', 'type'], 
-        include: [
-          {
-            model: Room,
-            attributes: ['id', 'description', 'status'],
-            include: [{
-              model: RoomType,
-              attributes: ['name']
-            }]
-          },
-          {
-            model: User,
-            attributes: ['id', 'name', 'email']
-          }
-        ]
-      });
-      return reservation;
+        const reservation = await Reservation.findOne({
+            where: { id: reservationId },
+            attributes: ['id', 'checkIn', 'checkOut', 'totalPrice', 'status', 'amountPaid', 'type'], 
+            include: [
+                {
+                    model: Room,
+                    attributes: ['id', 'description', 'status'],
+                    include: [{
+                        model: RoomType,
+                        attributes: ['name']
+                    }]
+                },
+                {
+                    model: User,
+                    attributes: ['id', 'name', 'email']
+                }
+            ]
+        });
+
+        if (!reservation) {
+            throw new Error('Reserva no encontrada');
+        }
+
+        // Agrega roomId directamente
+        const formattedReservation = {
+            ...reservation.toJSON(),
+            roomId: reservation.Room?.id || null,
+        };
+
+        return formattedReservation;
     } catch (error) {
-      throw error;
+        console.error('Error al obtener la reserva:', error.message);
+        throw error;
     }
-  };  
+};
 
 // Exportar los controladores
 const getReservationController = {
