@@ -2,7 +2,7 @@ const express = require('express');
 const getRoomTypeHandler = require('../handlers/room/roomType/getRoomTypeHandler');
 const createRoomTypeHandler = require('../handlers/room/roomType/createRoomTypeHandler');
 const updateRoomTypeHandler = require('../handlers/room/roomType/updateRoomTypeHandler');
-const deleteRoomTypeHandler = require('../handlers/room/deleteRoomHandler');
+const deleteRoomTypeHandler = require('../handlers/room/roomType/deleteRoomTypeHandler');
 
 const router = express.Router();
 

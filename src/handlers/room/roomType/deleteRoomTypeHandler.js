@@ -1,10 +1,10 @@
-const deleteTypeController = require('../../../controllers/room/roomType/deleteRoomTypeController');
+const deleteRoomTypeController = require('../../../controllers/room/roomType/deleteRoomTypeController');
 
-const deleteTypeHandler = async (req, res) => {
+const deleteRoomTypeHandler = async (req, res) => {
   const { id } = req.params;
   
   try {
-    await deleteTypeController(id);
+    await deleteRoomTypeController(id);
     
     // Enviamos solo la confirmación de eliminación
     res.status(200).json({
@@ -20,4 +20,4 @@ const deleteTypeHandler = async (req, res) => {
   }
 };
 
-module.exports = deleteTypeHandler;
+module.exports = deleteRoomTypeHandler;
