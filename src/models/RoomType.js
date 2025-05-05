@@ -8,7 +8,7 @@ module.exports = (sequelize) => {
       primaryKey: true,
       allowNull: false
     },
-    name: {
+    roomType: {
       type: DataTypes.STRING,
       allowNull: false,
     },

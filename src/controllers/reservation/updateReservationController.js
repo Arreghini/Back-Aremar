@@ -1,7 +1,11 @@
 const { Reservation, Room } = require('../../models');
+const { Op } = require('sequelize');
 
 const updateReservationController = async (id, data) => {
   console.log('Datos recibidos en el backend:', data);
+  console.log("Tipo de ID:", typeof id);
+  console.log("Tipo de numberOfGuests:", typeof data.numberOfGuests);
+
   try {
     if (!data.roomId) {
       throw new Error('El campo roomId es obligatorio.');
@@ -14,10 +18,7 @@ const updateReservationController = async (id, data) => {
     }
 
     // Buscar la reserva existente
-    const reservation = await Reservation.findOne({
-      where: { id: id },
-    });
-
+    const reservation = await Reservation.findOne({ where: { id } });
     if (!reservation) {
       throw new Error(`No se encontró la reserva con id ${id}`);
     }
@@ -26,9 +27,9 @@ const updateReservationController = async (id, data) => {
     const overlappingReservations = await Reservation.findAll({
       where: {
         roomId: data.roomId,
-        id: { $ne: id },
-        checkIn: { $lt: new Date(data.checkOut) },
-        checkOut: { $gt: new Date(data.checkIn) },
+        id: { [Op.ne]: id },
+        checkIn: { [Op.lt]: new Date(data.checkOut) },
+        checkOut: { [Op.gt]: new Date(data.checkIn) },
       },
     });
 
@@ -42,14 +43,14 @@ const updateReservationController = async (id, data) => {
     const days = Math.max((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24), 0);
     const totalPrice = days * room.price;
 
-    // Asegúrate de que los datos sean del tipo correcto
+    // Actualizar la reserva
     const updated = await reservation.update({
       checkIn: data.checkIn,
       checkOut: data.checkOut,
-      numberOfGuests: parseInt(data.numberOfGuests, 10), // Asegúrate de que sea un número
+      numberOfGuests: parseInt(data.numberOfGuests, 10),
       roomId: data.roomId,
       status: data.status.toLowerCase(),
-      totalPrice: totalPrice, // Asegúrate de que sea un número
+      totalPrice,
     });
 
     return {

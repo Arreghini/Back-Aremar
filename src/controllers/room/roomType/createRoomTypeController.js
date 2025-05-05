@@ -4,7 +4,7 @@ const createTypeController = async (data) => {
   try {
     const {
       id,
-      name,
+      roomType,
       photos,
       simpleBeds,
       trundleBeds,
@@ -15,7 +15,7 @@ const createTypeController = async (data) => {
 
     const newType = await RoomType.create({
       id,
-      name,
+      roomType,
       photos,
       simpleBeds,
       trundleBeds,

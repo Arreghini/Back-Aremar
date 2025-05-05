@@ -94,7 +94,7 @@ app.use('/api', jwtCheck);
 
 // Mantener las rutas administrativas originales
 app.use('/api/reservations/admin', checkAdmin, adminReservationRoutes);
-app.use('/api/rooms/admin/types', checkAdmin, adminRoomTypeRoutes);
+app.use('/api/rooms/admin/roomType', checkAdmin, adminRoomTypeRoutes);
 app.use('/api/rooms/admin/roomDetail', checkAdmin, adminRoomDetailsRoutes);
 app.use('/api/rooms/admin/available', checkAdmin, adminRoomRoutes);
 app.use('/api/rooms/admin', checkAdmin, adminRoomRoutes);

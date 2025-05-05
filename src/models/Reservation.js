@@ -16,7 +16,7 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    type: {
+    roomType: {
       type: DataTypes.STRING,
       allowNull: false,
     },
