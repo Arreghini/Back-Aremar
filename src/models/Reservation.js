@@ -16,10 +16,6 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    roomType: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
     checkIn: {
       type: DataTypes.DATE,
       allowNull: false,

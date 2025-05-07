@@ -1,11 +1,11 @@
-const updateTypeController = require('../../../controllers/room/roomType/updateRoomTypeController');
+const updateRoomTypeController = require('../../../controllers/room/roomType/updateRoomTypeController');
 
-const updateTypeHandler = async (req, res) => {
+const updateRoomTypeHandler = async (req, res) => {
   try {
-    const { id } = req.params; // Extraer el ID desde req.params
+    const { roomTypeId } = req.params; // Extraer el ID desde req.params
     const updateData = req.body; // Obtener los datos de actualización desde req.body
 
-    const updatedType = await updateTypeController(id, updateData); // Pasar ID y datos al controlador
+    const updatedType = await updateRoomTypeController(roomTypeId, updateData); // Pasar ID y datos al controlador
 
     if (!updatedType) {
       return res.status(404).json({ error: 'RoomType no encontrado' });
@@ -18,4 +18,4 @@ const updateTypeHandler = async (req, res) => {
   }
 };
 
-module.exports = updateTypeHandler;
+module.exports = updateRoomTypeHandler;

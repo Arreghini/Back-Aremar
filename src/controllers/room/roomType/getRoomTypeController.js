@@ -1,10 +1,9 @@
 const { RoomType } = require('../../../models');
 
-const getTypesController = async () => {
+const getRoomTypeController = async () => {
   try {
     // Obtener todos los tipos de habitación
     const roomType = await RoomType.findAll();
-
     return roomType; // Retornar todos los tipos encontrados
   } catch (error) {
     console.error('Error al obtener los tipos de habitación:', error); 
@@ -12,4 +11,4 @@ const getTypesController = async () => {
   }
 };
 
-module.exports = getTypesController;
+module.exports = getRoomTypeController;

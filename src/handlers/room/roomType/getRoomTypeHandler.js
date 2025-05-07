@@ -1,8 +1,8 @@
-const getTypeController = require('../../../controllers/room/roomType/getRoomTypeController');
+const getRoomTypeController = require('../../../controllers/room/roomType/getRoomTypeController');
 
-const getTypeHandler = async (req, res) => {
+const getRoomTypeHandler = async (req, res) => {
   try {
-    const roomTypes = await getTypeController(); 
+    const roomTypes = await getRoomTypeController(); 
 
     return res.status(200).json(roomTypes); 
   } catch (error) {
@@ -11,4 +11,4 @@ const getTypeHandler = async (req, res) => {
   }
 };
 
-module.exports = getTypeHandler;
+module.exports = getRoomTypeHandler;

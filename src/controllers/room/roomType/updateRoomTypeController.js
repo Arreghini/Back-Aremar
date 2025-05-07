@@ -1,9 +1,9 @@
 const { RoomType } = require('../../../models');
 
-const updateTypeController = async (id, data) => {
+const updateRoomTypeController = async (roomTypeId, data) => {
   try {
     // Buscar el tipo de habitación por ID
-    const roomType = await RoomType.findByPk(id);
+    const roomType = await RoomType.findByPk(roomTypeId);
     
     // Si no se encuentra, lanzar un error
     if (!roomType) {
@@ -20,4 +20,4 @@ const updateTypeController = async (id, data) => {
   }
 };
 
-module.exports = updateTypeController;
+module.exports = updateRoomTypeController;
