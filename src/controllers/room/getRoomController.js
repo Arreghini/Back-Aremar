@@ -51,6 +51,7 @@ const getAvailableRoomsController = async (roomType, checkInDate, checkOutDate, 
       },
       include: [{
         model: RoomType,
+        as: 'roomType',
         required: true,
         attributes:['price'],
       }]

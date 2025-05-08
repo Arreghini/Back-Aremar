@@ -12,6 +12,8 @@ const createReservationController = async (reservationData) => {
       },
       include: {
         model: RoomType,
+        as: 'roomType', // Alias definido en la relación
+        required: true, // Asegura que la habitación tenga un tipo de habitación asociado
         attributes: ["name", "price"],
       },
     });
@@ -27,7 +29,8 @@ const createReservationController = async (reservationData) => {
       },
       include: {
         model: RoomType,
-        attributes: ["name"],
+        as: 'roomType', // Alias definido en la relación
+        attributes: ['name', 'price'],
       },
     });
 
@@ -39,12 +42,12 @@ const createReservationController = async (reservationData) => {
     const checkOut = new Date(reservationData.checkOut);
     const numberOfDays = Math.max(1, Math.floor((checkOut - checkIn) / (1000 * 60 * 60 * 24)));
 
-    const pricePerNight = room.RoomType?.price || 100;
+    const pricePerNight = room.roomType?.price;  
+
     const totalPrice = numberOfDays * pricePerNight;
 
     const newReservation = await Reservation.create({
       roomId: room.id,
-      type: room.RoomType?.name || "Desconocido",
       checkIn: reservationData.checkIn,
       checkOut: reservationData.checkOut,
       userId: reservationData.userId, 
