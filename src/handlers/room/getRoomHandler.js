@@ -12,7 +12,7 @@ const getAllRooms = async (req, res) => {
   }
 };
 const getAvailableRooms = async (req, res) => {
-  const { roomType, checkInDate, checkOutDate, numberOfGuests } = req.query;
+  const { reservationId, roomType, checkInDate, checkOutDate, numberOfGuests } = req.query;
 
   if (!roomType || !checkInDate || !checkOutDate || !numberOfGuests) {
     return res.status(400).json({
@@ -23,11 +23,13 @@ const getAvailableRooms = async (req, res) => {
 
   try {
     const rooms = await getRoomController.getAvailableRoomsController(
+      reservationId || null,
       roomType,
       checkInDate,
       checkOutDate,
       numberOfGuests
     );
+    
     return res.status(200).json({
       success: true,
       totalRooms: rooms.length,
@@ -42,7 +44,6 @@ const getAvailableRooms = async (req, res) => {
     });
   }
 };
-
 const getAvailableRoomById = async (req, res) => {
   const { checkInDate, checkOutDate, numberOfGuests } = req.query;
   const { roomId } = req.params;

@@ -44,7 +44,7 @@ const getReservationByUserIdController = async (userId) => {
             where: { 
                 userId: formattedUserId
             },
-            attributes: ['id', 'checkIn', 'checkOut', 'totalPrice', 'numberOfGuests', 'amountPaid', 'status'],
+            attributes: ['id','roomId','checkIn', 'checkOut', 'totalPrice', 'numberOfGuests', 'amountPaid', 'status'],
             include: [
                 {
                     model: Room,
@@ -68,7 +68,7 @@ const getReservationByUserIdController = async (userId) => {
         // Mapea el atributo Room.id como roomId
         const formattedReservations = reservations.map((reservation) => ({
             ...reservation.toJSON(),
-            roomId: reservation.Room?.id || null, // Agrega roomId directamente
+            roomId: reservation.room?.id || null, 
         }));
 
         return formattedReservations;
@@ -108,7 +108,7 @@ const getReservationByIdController = async (reservationId) => {
         // Agrega roomId directamente
         const formattedReservation = {
             ...reservation.toJSON(),
-            roomId: reservation.Room?.id || null,
+            roomId: reservation.room?.id || null,
         };
 
         return formattedReservation;

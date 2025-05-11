@@ -2,10 +2,15 @@ const { Room, RoomType, Reservation } = require('../../models');
 const { Op } = require('sequelize');
 
 // Utilidad para buscar reservas solapadas
-const findOverlappingReservations = async (roomId, checkInDate, checkOutDate) => {
+const findOverlappingReservations = async (roomId, checkInDate, checkOutDate, excludeReservationId) => {
   return await Reservation.findAll({
     where: {
-      ...(roomId && { roomId }), // Agrega el filtro por roomId solo si existe
+      ...(roomId && { roomId }),
+      ...(excludeReservationId && {
+        id: {
+          [Op.ne]: Number(excludeReservationId)
+        }
+      }),
       status: {
         [Op.in]: ['confirmed', 'pending']
       },
@@ -31,13 +36,16 @@ const findOverlappingReservations = async (roomId, checkInDate, checkOutDate) =>
   });
 };
 
+module.exports = {
+  findOverlappingReservations
+};
 // Controlador para obtener habitaciones disponibles por tipo
-const getAvailableRoomsController = async (roomType, checkInDate, checkOutDate, numberOfGuests) => {
+const getAvailableRoomsController = async (reservationId, roomType, checkInDate, checkOutDate, numberOfGuests) => {
   try {
     console.log('Iniciando búsqueda de habitaciones...');
 
     // Verificar reservas solapadas
-    const overlappingReservations = await findOverlappingReservations(null, checkInDate, checkOutDate);
+    const overlappingReservations = await findOverlappingReservations(null, checkInDate, checkOutDate, reservationId);
     const reservedRoomIds = overlappingReservations.map(res => res.roomId);
 
     // Buscar habitaciones disponibles

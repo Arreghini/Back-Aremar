@@ -14,10 +14,6 @@ router.get('/', (req, res, next) => {
   next(); 
 }, getRoomHandler.getAvailableRooms);
 
-
-// Ruta pública para consulta de habitaciones por query
-router.get('/', getRoomByQuery);
-
 // Ruta para obtener una habitación específica por ID
 router.get('/:id', getRoomById);
 

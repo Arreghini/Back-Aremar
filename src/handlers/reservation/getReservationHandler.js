@@ -23,10 +23,10 @@ const getReservationByUserIdHandler = async (req, res) => {
     }
 
     console.log('ID de usuario recibido:', userId);
-    console.log('ID de usuario en auth:', req.auth?.payload?.sub);
-
+    console.log('ID de usuario en auth:', req.auth?.payload?.sub);  
+    
     const userReservations = await getReservationController.getReservationByUserIdController(userId);
-
+    
     return res.status(200).json({
       success: true,
       data: userReservations,
@@ -46,7 +46,7 @@ const getReservationByUserIdHandler = async (req, res) => {
 
 // Handler para obtener una reserva específica por su ID
 const getReservationByIdHandler = async (req, res) => {
-  const { reservationId } = req.params; // Cambiado de req.query a req.params
+  const { reservationId } = req.params;
   try {
     if (!reservationId) {
       return res.status(400).json({ message: 'El ID de la reserva es obligatorio' });
