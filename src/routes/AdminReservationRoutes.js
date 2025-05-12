@@ -23,7 +23,7 @@ router.patch('/:reservationId/cancel-with-refund', cancelReservationWithRefundHa
 
 router.patch('/:reservationId/cancel', cancelReservationByAdminHandler);
 
-router.patch('/:reservationId/status', confirmedReservationByAdminHandler);
+router.patch('/:reservationId/confirm', confirmedReservationByAdminHandler);
 
 // Actualizar una reserva como administrador
 router.patch('/:reservationId', updateReservationHandler);

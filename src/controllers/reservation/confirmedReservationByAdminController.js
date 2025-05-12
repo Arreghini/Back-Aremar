@@ -1,27 +1,24 @@
 const { Reservation } = require("../../models");
 
-const confirmedReservationByAdminController = async (reservationId) => {
+const updateReservationByAdminController = async (reservationId, updatedData) => {
   try {
     const reservation = await Reservation.findByPk(reservationId);
     if (!reservation) {
       throw new Error("Reserva no encontrada");
     }
 
-    if (reservation.status === 'confirmed') {
-      throw new Error("La reserva ya está confirmada");
-    }
-
-    reservation.status = 'confirmed';
+    // Permitir la edición incluso si está confirmada
+    Object.assign(reservation, updatedData);
     const updatedReservation = await reservation.save();
 
     return {
       success: true,
       data: updatedReservation,
-      message: 'Reserva confirmada exitosamente'
+      message: "Reserva actualizada exitosamente",
     };
   } catch (error) {
-    throw new Error(`Error al confirmar la reserva: ${error.message}`);
+    throw new Error(`Error al actualizar la reserva: ${error.message}`);
   }
 };
 
-module.exports = confirmedReservationByAdminController;
+module.exports = updateReservationByAdminController;

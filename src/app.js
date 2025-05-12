@@ -26,8 +26,8 @@ const corsOptions = {
   credentials: true,
 };
 // Middlewares básicos
-app.use(express.json());
 app.use(cors(corsOptions));
+app.use(express.json());
 app.use(cookieParser());
 // Configuración de la Content Security Policy (CSP) con helmet
 app.use(helmet({
@@ -92,7 +92,7 @@ app.use('/api/payment', paymentRedirectRoutes);
 // Aplicar jwtCheck globalmente para todas las rutas API protegidas
 app.use('/api', jwtCheck);
 
-// Mantener las rutas administrativas originales
+// Rutas administrativas 
 app.use('/api/reservations/admin', checkAdmin, adminReservationRoutes);
 app.use('/api/rooms/admin/roomType', checkAdmin, adminRoomTypeRoutes);
 app.use('/api/rooms/admin/roomDetail', checkAdmin, adminRoomDetailsRoutes);
