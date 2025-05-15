@@ -41,6 +41,7 @@ async function actualizarReserva(reservationId, paymentType, totalPaid) {
 
   await Reservation.update(
     {
+      paymentId,
       status: estadoReserva,
       mensaje,
       amountPaid: nuevoMontoPagado,
@@ -67,7 +68,8 @@ const webhookController = async (req, res) => {
 
       const approvedPayments = orderData.payments.filter((p) => p.status === "approved");
       const totalPaid = approvedPayments.reduce((sum, p) => sum + p.transaction_amount, 0);
-
+      const paymentId = approvedPayments[0]?.id; // Captura el primer pago aprobado
+      
       let reservationId;
       let paymentType;
       try {

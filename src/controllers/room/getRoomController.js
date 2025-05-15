@@ -40,7 +40,7 @@ module.exports = {
   findOverlappingReservations
 };
 // Controlador para obtener habitaciones disponibles por tipo
-const getAvailableRoomsController = async (reservationId, roomType, checkInDate, checkOutDate, numberOfGuests) => {
+const getAvailableRoomsController = async (reservationId, roomTypeId, checkInDate, checkOutDate, numberOfGuests) => {
   try {
     console.log('Iniciando búsqueda de habitaciones...');
 
@@ -51,7 +51,7 @@ const getAvailableRoomsController = async (reservationId, roomType, checkInDate,
     // Buscar habitaciones disponibles
     const rooms = await Room.findAll({
       where: {
-        roomTypeId: roomType,
+        roomTypeId,
         id: {
           [Op.notIn]: reservedRoomIds
         },

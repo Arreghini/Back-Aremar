@@ -2,7 +2,7 @@ const express = require('express');
 const createRoomHandler = require('../handlers/room/createRoomHandler');
 const deleteRoomHandler = require('../handlers/room/deleteRoomHandler');
 const getRoomById = require('../handlers/room/getRoomByIdHandler');
-const getRoomByQuery = require('../handlers/room/getRoomByQueryHandler');
+const getRoomTypeById = require('../handlers/room/roomType/getRoomTypeByRoomIdHandler');
 const getRoomHandler = require('../handlers/room/getRoomHandler');
 const updateRoomHandler = require('../handlers/room/updateRoomHandler');
 
@@ -16,6 +16,8 @@ router.get('/', (req, res, next) => {
 
 // Ruta para obtener una habitación específica por ID
 router.get('/:id', getRoomById);
+
+router.get('/types', getRoomTypeById);
 
 router.post('/', createRoomHandler);
 

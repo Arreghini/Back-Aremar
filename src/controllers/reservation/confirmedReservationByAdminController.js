@@ -7,8 +7,10 @@ const updateReservationByAdminController = async (reservationId, updatedData) =>
       throw new Error("Reserva no encontrada");
     }
 
-    // Permitir la edición incluso si está confirmada
+    // Actualizar los campos permitidos
     Object.assign(reservation, updatedData);
+
+    // Guardar los cambios
     const updatedReservation = await reservation.save();
 
     return {
@@ -17,6 +19,7 @@ const updateReservationByAdminController = async (reservationId, updatedData) =>
       message: "Reserva actualizada exitosamente",
     };
   } catch (error) {
+    console.error("Error al actualizar la reserva:", error.message);
     throw new Error(`Error al actualizar la reserva: ${error.message}`);
   }
 };
