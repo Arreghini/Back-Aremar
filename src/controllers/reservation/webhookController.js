@@ -3,7 +3,7 @@ const { Reservation } = require("../../models");
 
 const processedOrders = new Set();
 
-async function actualizarReserva(reservationId, paymentType, totalPaid) {
+async function actualizarReserva(reservationId, paymentType, totalPaid, paymentId) {
   const reservation = await Reservation.findByPk(reservationId);
   if (!reservation) return;
 
@@ -88,7 +88,7 @@ const webhookController = async (req, res) => {
       console.log("OrderData.external_reference:", orderData.external_reference);
       console.log("Total pagado:", totalPaid);
 
-      await actualizarReserva(reservationId, paymentType, totalPaid);
+      await actualizarReserva(reservationId, paymentType, totalPaid, paymentId);
       processedOrders.add(orderData.id);
     } else {
       console.log(`Topic no manejado: ${topic}`);

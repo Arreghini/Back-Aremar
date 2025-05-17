@@ -6,7 +6,7 @@ const updateReservationHandler = async (req, res) => {
     const updatedData = req.body;
 
     // Validar ID
-    console.log('req.params.reservationId recibido por el handler:', req.params.reservationId);
+    console.log('req.params.reservationId recibido por el handler:', reservationId);
 
     if (isNaN(reservationId)) {
       return res.status(400).json({ error: 'ID de reserva inválido' });

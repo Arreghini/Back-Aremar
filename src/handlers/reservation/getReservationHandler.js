@@ -4,7 +4,6 @@ const getReservationController = require('../../controllers/reservation/getReser
 const getAllReservationHandler = async (req, res) => {
   try {
     const reservations = await getReservationController.getAllReservationController(); 
-    console.log('Obtención de todas las reservas:', reservations);
     res.status(200).json(reservations);
   } catch (error) {
     console.error('Error al obtener las reservas:', error.message);

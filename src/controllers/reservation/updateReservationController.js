@@ -56,15 +56,22 @@ const updateReservationController = async (id, data) => {
     console.log('Días nuevos:', newDays);
     console.log('Diferencia de días:', daysDifference);
 
-    // Recalcular el precio total de la reserva
-    const totalPrice = newDays * room.price;
+    let mensaje = 'Reserva actualizada exitosamente';
+    let seGeneroReembolso = false;
+    let dailyRate;
+    if (originalDays > 0) {
+      dailyRate = reservation.totalPrice / originalDays;
+    } else {
+      dailyRate = room.price;
+    }
+
+    const totalPrice = newDays * dailyRate;
     console.log('Precio total recalculado:', totalPrice);
     data.totalPrice = totalPrice;
 
     if (daysDifference < 0) {
       // Caso: Reembolso
       const daysToRefund = Math.abs(daysDifference);
-      const dailyRate = reservation.totalPrice / originalDays;
       const refundAmount = dailyRate * daysToRefund;
 
       console.log('Monto a reembolsar:', refundAmount);
@@ -75,10 +82,13 @@ const updateReservationController = async (id, data) => {
         amount: refundAmount.toFixed(2),
         reason: 'Reembolso parcial por cambio de fechas',
       });
+      
+  mensaje = `Reserva actualizada exitosamente con reembolso de $${refundAmount.toFixed(2)}`;
+  seGeneroReembolso = true;
+
     } else if (daysDifference > 0) {
       // Caso: Incremento en el saldo a pagar
       const daysToCharge = daysDifference;
-      const dailyRate = room.price;
       const additionalAmount = dailyRate * daysToCharge;
 
       console.log('Monto adicional a cobrar:', additionalAmount);
@@ -124,33 +134,37 @@ const updateReservationController = async (id, data) => {
             throw new Error('La respuesta de MercadoPago no contiene el ID de la preferencia.');
           }
 
-          console.log('Preferencia de pago creada:', response);
+   //       console.log('Preferencia de pago creada:', response);
 
-          return {
+          return res.json({
             success: true,
             mensaje: 'Reserva actualizada exitosamente. Se requiere un pago adicional.',
             data: {
               reservation: reservation,
               paymentLink: response.init_point,
             },
-          };
+          });
         } catch (error) {
           console.error('Error al crear la preferencia de pago:', error.message);
-          throw new Error('No se pudo crear la preferencia de pago en MercadoPago.');
         }
       }
     }
 
     // Actualizar la reserva
-    const updated = await reservation.update({
-      paymentId,
-      checkIn: data.checkIn,
-      checkOut: data.checkOut,
-      numberOfGuests: parseInt(data.numberOfGuests, 10),
-      roomId: data.roomId,
-      status: data.status.toLowerCase(),
-      totalPrice,
-    });
+    const updated = await reservation.update(
+      {
+        paymentId: data.paymentId,
+        checkIn: data.checkIn,
+        checkOut: data.checkOut,
+        numberOfGuests: parseInt(data.numberOfGuests, 10),
+        roomId: data.roomId,
+        status: data.status.toLowerCase(),
+        totalPrice: data.totalPrice,
+      },
+      { fields: ['paymentId', 'checkIn', 'checkOut', 'numberOfGuests', 'roomId', 'status', 'totalPrice'] }
+    );
+
+    console.log('Resultado de la actualización forzada:', updated.dataValues);
 
     return {
       success: true,
