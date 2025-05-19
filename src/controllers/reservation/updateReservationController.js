@@ -1,10 +1,13 @@
-const { Reservation, Room, Refund } = require('../../models');
+const { Reservation, Room } = require('../../models');
 const { Op } = require('sequelize');
+const { processRefund } = require('../../services/refundService');
 const { MercadoPagoConfig, Preference } = require('mercadopago');
 
-const updateReservationController = async (id, data) => {
-  console.log('Datos recibidos en el backend:', data);
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN,
+});
 
+const updateReservationController = async (id, data) => {
   try {
     const paymentId = data.paymentId;
 
@@ -12,24 +15,12 @@ const updateReservationController = async (id, data) => {
       throw new Error('El campo roomId es obligatorio.');
     }
 
-    // Verificar que la habitación exista
     const room = await Room.findOne({ where: { id: data.roomId } });
-    console.log('Room encontrado:', room);
-    if (!room) {
-      throw new Error(`No se encontró la habitación con id ${data.roomId}`);
-    }
+    if (!room) throw new Error(`No se encontró la habitación con id ${data.roomId}`);
 
-    // Buscar la reserva existente
     const reservation = await Reservation.findOne({ where: { id } });
-    console.log('Reservation encontrada:', reservation);
-    if (!reservation) {
-      throw new Error(`No se encontró la reserva con id ${id}`);
-    }
+    if (!reservation) throw new Error(`No se encontró la reserva con id ${id}`);
 
-    console.log('Datos de la reserva actual:', reservation);
-    console.log('Datos enviados para la actualización:', data);
-
-    // Verificar disponibilidad de la habitación
     const overlappingReservations = await Reservation.findAll({
       where: {
         roomId: data.roomId,
@@ -41,116 +32,84 @@ const updateReservationController = async (id, data) => {
       },
     });
 
-    console.log('Reservas superpuestas encontradas:', overlappingReservations);
-
     if (overlappingReservations.length > 0) {
-      throw new Error('La habitación no está disponible para las nuevas fechas.');
+      return {
+        success: false,
+        mensaje: 'La habitación ya está reservada en esas fechas.',
+        data: null,
+      };
     }
 
-    // Calcular días originales y nuevos
-    const originalDays = Math.max((new Date(reservation.checkOut) - new Date(reservation.checkIn)) / (1000 * 60 * 60 * 24), 0);
-    const newDays = Math.max((new Date(data.checkOut) - new Date(data.checkIn)) / (1000 * 60 * 60 * 24), 0);
+    const originalDays = (new Date(reservation.checkOut) - new Date(reservation.checkIn)) / (1000 * 60 * 60 * 24);
+    const newDays = (new Date(data.checkOut) - new Date(data.checkIn)) / (1000 * 60 * 60 * 24);
     const daysDifference = newDays - originalDays;
 
-    console.log('Días originales:', originalDays);
-    console.log('Días nuevos:', newDays);
-    console.log('Diferencia de días:', daysDifference);
-
-    let mensaje = 'Reserva actualizada exitosamente';
-    let seGeneroReembolso = false;
-    let dailyRate;
-    if (originalDays > 0) {
-      dailyRate = reservation.totalPrice / originalDays;
-    } else {
-      dailyRate = room.price;
-    }
-
+    const dailyRate = originalDays > 0 ? reservation.totalPrice / originalDays : room.price;
     const totalPrice = newDays * dailyRate;
-    console.log('Precio total recalculado:', totalPrice);
     data.totalPrice = totalPrice;
 
+    let mensaje = 'Reserva actualizada exitosamente';
+
+    // ▶️ Reembolso parcial
     if (daysDifference < 0) {
-      // Caso: Reembolso
-      const daysToRefund = Math.abs(daysDifference);
-      const refundAmount = dailyRate * daysToRefund;
+      const refundAmount = Math.abs(daysDifference) * dailyRate;
 
-      console.log('Monto a reembolsar:', refundAmount);
-
-      // Crear un nuevo registro de reembolso
-      await Refund.create({
+      const refundResult = await processRefund({
         reservationId: reservation.id,
-        amount: refundAmount.toFixed(2),
+        paymentId: reservation.paymentId,
+        amount: refundAmount,
         reason: 'Reembolso parcial por cambio de fechas',
       });
-      
-  mensaje = `Reserva actualizada exitosamente con reembolso de $${refundAmount.toFixed(2)}`;
-  seGeneroReembolso = true;
 
-    } else if (daysDifference > 0) {
-      // Caso: Incremento en el saldo a pagar
-      const daysToCharge = daysDifference;
-      const additionalAmount = dailyRate * daysToCharge;
+      if (!refundResult.success) {
+        throw new Error(refundResult.mensaje);
+      }
 
-      console.log('Monto adicional a cobrar:', additionalAmount);
+      mensaje += ` con reembolso de $${refundAmount.toFixed(2)}`;
+    }
 
+    // ▶️ Pago adicional
+    let paymentLink = null;
+    if (daysDifference > 0) {
+      const additionalAmount = daysDifference * dailyRate;
       reservation.amountPaid = reservation.amountPaid || 0;
       const newBalance = totalPrice - reservation.amountPaid;
 
       if (newBalance > 0) {
-        console.log('Nuevo saldo pendiente:', newBalance);
-
-        // Crear preferencia de pago en MercadoPago
-        const client = new MercadoPagoConfig({
-          accessToken: process.env.MP_ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN,
-        });
-
         const preference = new Preference(client);
-
         const preferenceData = {
-          items: [
-            {
-              title: `Reserva en habitación ${room.id}`,
-              description: `Días adicionales: ${daysToCharge}`,
-              quantity: 1,
-              currency_id: 'ARS',
-              unit_price: parseFloat(newBalance.toFixed(2)),
+          body: {
+            items: [
+              {
+                title: `Reserva en habitación ${room.id}`,
+                description: `Días adicionales: ${daysDifference}`,
+                quantity: 1,
+                currency_id: 'ARS',
+                unit_price: Number(newBalance.toFixed(2)),
+              },
+            ],
+            back_urls: {
+              success: `${process.env.CLOUDFLARED_URL}/api/payment/redirect?status=approved&reservationId=${reservation.id}`,
+              failure: `${process.env.CLOUDFLARED_URL}/api/payment/redirect?status=failure&reservationId=${reservation.id}`,
+              pending: `${process.env.CLOUDFLARED_URL}/api/payment/redirect?status=pending&reservationId=${reservation.id}`,
             },
-          ],
-          back_urls: {
-            success: `${process.env.CLOUDFLARED_URL}/api/payment/redirect?status=approved&reservationId=${reservation.id}`,
-            failure: `${process.env.CLOUDFLARED_URL}/api/payment/redirect?status=failure&reservationId=${reservation.id}`,
-            pending: `${process.env.CLOUDFLARED_URL}/api/payment/redirect?status=pending&reservationId=${reservation.id}`,
+            auto_return: 'approved',
           },
-          auto_return: 'approved',
         };
 
-        try {
-          console.log('Datos enviados a MercadoPago:', preferenceData);
+        const response = await preference.create(preferenceData);
+        console.log('Respuesta de mercadopago.preferences.create:', response);
 
-          const response = await preference.create({ body: preferenceData });
-          console.log('Respuesta de MercadoPago:', response);
-
-          if (!response.id) {
-            throw new Error('La respuesta de MercadoPago no contiene el ID de la preferencia.');
-          }
-
-   //       console.log('Preferencia de pago creada:', response);
-
-          return res.json({
-            success: true,
-            mensaje: 'Reserva actualizada exitosamente. Se requiere un pago adicional.',
-            data: {
-              reservation: reservation,
-              paymentLink: response.init_point,
-            },
-          });
-        } catch (error) {
-          console.error('Error al crear la preferencia de pago:', error.message);
+        if (!response?.id && !response?.init_point) {
+          throw new Error('No se recibió un ID de preferencia de pago');
         }
+
+        paymentLink = response.init_point;
+        mensaje += `. Se requiere un pago adicional de $${newBalance.toFixed(2)}`;
       }
     }
 
-    // Actualizar la reserva
+    // ▶️ Actualizar reserva
     const updated = await reservation.update(
       {
         paymentId: data.paymentId,
@@ -161,15 +120,19 @@ const updateReservationController = async (id, data) => {
         status: data.status.toLowerCase(),
         totalPrice: data.totalPrice,
       },
-      { fields: ['paymentId', 'checkIn', 'checkOut', 'numberOfGuests', 'roomId', 'status', 'totalPrice'] }
+      {
+        fields: ['paymentId', 'checkIn', 'checkOut', 'numberOfGuests', 'roomId', 'status', 'totalPrice'],
+      }
     );
 
-    console.log('Resultado de la actualización forzada:', updated.dataValues);
-
+    // ▶️ Respuesta final
     return {
       success: true,
-      mensaje: 'Reserva actualizada exitosamente',
-      data: updated,
+      mensaje,
+      data: {
+        reservation: updated,
+        ...(paymentLink && { paymentLink }),
+      },
     };
   } catch (error) {
     console.error('Error al actualizar la reserva:', error.message);
