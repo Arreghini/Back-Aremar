@@ -51,7 +51,7 @@ const updateReservationController = async (id, data) => {
     let mensaje = 'Reserva actualizada exitosamente';
 
     // ▶️ Reembolso parcial
-    if (daysDifference < 0) {
+    if (daysDifference < 0 && data.totalPrice < reservation.amountPaid) {
       const refundAmount = Math.abs(daysDifference) * dailyRate;
 
       const refundResult = await processRefund({
