@@ -14,7 +14,7 @@ const processRefund = async ({ reservationId, paymentId, amount, reason = 'Reemb
     }
 
     // Usar el mismo token que funciona para las preferencias
-    const accessToken = process.env.MP_ACCESS_TOKEN_2 || process.env.MERCADOPAGO_ACCESS_TOKEN;
+    const accessToken = process.env.MP_ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN;
     
     console.log('Intentando reembolso con token:', accessToken.substring(0, 10) + '...');
     console.log('Para el pago ID:', paymentId);
