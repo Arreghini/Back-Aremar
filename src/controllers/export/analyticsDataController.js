@@ -21,7 +21,7 @@ const getAnalyticsData = async (startDate, endDate) => {
       const income = await Reservation.sum('totalPrice', {
         where: {
           roomId: room.id,
-          checkInDate: { [Op.between]: [startDate, endDate] },
+          checkIn: { [Op.between]: [startDate, endDate] },
         },
       });
 
@@ -29,11 +29,11 @@ const getAnalyticsData = async (startDate, endDate) => {
         where: {
           roomId: room.id,
           [Op.or]: [
-            { checkInDate: { [Op.between]: [startDate, endDate] } },
-            { checkOutDate: { [Op.between]: [startDate, endDate] } },
+            { checkIn: { [Op.between]: [startDate, endDate] } },
+            { checkOut: { [Op.between]: [startDate, endDate] } },
             {
-              checkInDate: { [Op.lte]: startDate },
-              checkOutDate: { [Op.gte]: endDate },
+              checkIn: { [Op.lte]: startDate },
+              checkOut: { [Op.gte]: endDate },
             },
           ],
         },
@@ -41,12 +41,12 @@ const getAnalyticsData = async (startDate, endDate) => {
 
       let occupiedDays = 0;
       for (const reservation of reservations) {
-        const checkIn = new Date(reservation.checkInDate) < new Date(startDate)
+        const checkIn = new Date(reservation.checkIn) < new Date(startDate)
           ? new Date(startDate)
-          : new Date(reservation.checkInDate);
-        const checkOut = new Date(reservation.checkOutDate) > new Date(endDate)
+          : new Date(reservation.checkIn);
+        const checkOut = new Date(reservation.checkOut) > new Date(endDate)
           ? new Date(endDate)
-          : new Date(reservation.checkOutDate);
+          : new Date(reservation.checkOut);
         const days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
         occupiedDays += days;
       }
@@ -56,7 +56,7 @@ const getAnalyticsData = async (startDate, endDate) => {
       const sumReservations = await Reservation.count({
         where: {
           roomId: room.id,
-          checkInDate: { [Op.between]: [startDate, endDate] },
+          checkIn: { [Op.between]: [startDate, endDate] },
         },
       });
 
@@ -90,7 +90,7 @@ const getMonthlyOccupancy = async (year, month) => {
     const income = await Reservation.sum('totalPrice', {
       where: {
         roomId: room.id,
-        checkInDate: { [Op.between]: [startDate, endDate] },
+        checkIn: { [Op.between]: [startDate, endDate] },
       },
     });
 
@@ -98,11 +98,11 @@ const getMonthlyOccupancy = async (year, month) => {
       where: {
         roomId: room.id,
         [Op.or]: [
-          { checkInDate: { [Op.between]: [startDate, endDate] } },
-          { checkOutDate: { [Op.between]: [startDate, endDate] } },
+          { checkIn: { [Op.between]: [startDate, endDate] } },
+          { checkOut: { [Op.between]: [startDate, endDate] } },
           {
-            checkInDate: { [Op.lte]: startDate },
-            checkOutDate: { [Op.gte]: endDate },
+            checkIn: { [Op.lte]: startDate },
+            checkOut: { [Op.gte]: endDate },
           },
         ],
       },
@@ -110,12 +110,12 @@ const getMonthlyOccupancy = async (year, month) => {
 
     let occupiedDays = 0;
     for (const reservation of reservations) {
-      const checkIn = new Date(reservation.checkInDate) < new Date(startDate)
+      const checkIn = new Date(reservation.checkIn) < new Date(startDate)
         ? new Date(startDate)
-        : new Date(reservation.checkInDate);
-      const checkOut = new Date(reservation.checkOutDate) > new Date(endDate)
+        : new Date(reservation.checkIn);
+      const checkOut = new Date(reservation.checkOut) > new Date(endDate)
         ? new Date(endDate)
-        : new Date(reservation.checkOutDate);
+        : new Date(reservation.checkOut);
       const days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
       occupiedDays += days;
     }
@@ -125,7 +125,7 @@ const getMonthlyOccupancy = async (year, month) => {
     const sumReservations = await Reservation.count({
       where: {
         roomId: room.id,
-        checkInDate: { [Op.between]: [startDate, endDate] },
+        checkIn: { [Op.between]: [startDate, endDate] },
       },
     });
 
@@ -171,7 +171,7 @@ const getRevenueByRoomType = async (startDate, endDate) => {
     const income = await Reservation.sum('totalPrice', {
       where: {
         roomId: { [Op.in]: roomIds },
-        checkInDate: { [Op.between]: [startDate, endDate] },
+        checkIn: { [Op.between]: [startDate, endDate] },
       },
     });
 
@@ -179,11 +179,11 @@ const getRevenueByRoomType = async (startDate, endDate) => {
       where: {
         roomId: { [Op.in]: roomIds },
         [Op.or]: [
-          { checkInDate: { [Op.between]: [startDate, endDate] } },
-          { checkOutDate: { [Op.between]: [startDate, endDate] } },
+          { checkIn: { [Op.between]: [startDate, endDate] } },
+          { checkOut: { [Op.between]: [startDate, endDate] } },
           {
-            checkInDate: { [Op.lte]: startDate },
-            checkOutDate: { [Op.gte]: endDate },
+            checkIn: { [Op.lte]: startDate },
+            checkOut: { [Op.gte]: endDate },
           },
         ],
       },
@@ -191,12 +191,12 @@ const getRevenueByRoomType = async (startDate, endDate) => {
 
     let occupiedDays = 0;
     for (const reservation of reservations) {
-      const checkIn = new Date(reservation.checkInDate) < new Date(startDate)
+      const checkIn = new Date(reservation.checkIn) < new Date(startDate)
         ? new Date(startDate)
-        : new Date(reservation.checkInDate);
-      const checkOut = new Date(reservation.checkOutDate) > new Date(endDate)
+        : new Date(reservation.checkIn);
+      const checkOut = new Date(reservation.checkOut) > new Date(endDate)
         ? new Date(endDate)
-        : new Date(reservation.checkOutDate);
+        : new Date(reservation.checkOut);
       const days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
       occupiedDays += days;
     }
@@ -206,7 +206,7 @@ const getRevenueByRoomType = async (startDate, endDate) => {
     const sumReservations = await Reservation.count({
       where: {
         roomId: { [Op.in]: roomIds },
-        checkInDate: { [Op.between]: [startDate, endDate] },
+        checkIn: { [Op.between]: [startDate, endDate] },
       },
     });
 
@@ -220,11 +220,12 @@ const getRevenueByRoomType = async (startDate, endDate) => {
 
   return analyticsData;
 };
+
 // Análisis de clientes frecuentes
 const getFrequentCustomers = async (startDate, endDate, limit = 10) => {
   const reservations = await Reservation.findAll({
     where: {
-      checkInDate: { [Op.between]: [startDate, endDate] },
+      checkIn: { [Op.between]: [startDate, endDate] },
     },
     include: [
       {
@@ -234,6 +235,7 @@ const getFrequentCustomers = async (startDate, endDate, limit = 10) => {
       },
     ]
   });
+
   const customerAnalytics = {};
   reservations.forEach((reservation) => {
     const customerId = reservation.user.id;
@@ -248,12 +250,13 @@ const getFrequentCustomers = async (startDate, endDate, limit = 10) => {
       customerAnalytics[customerId].totalReservations++;
     }
   });
-  const sortedAnalytics = Object.
-  values(customerAnalytics).sort((a, b) => b.totalReservations - a.totalReservations);
+
+  const sortedAnalytics = Object
+    .values(customerAnalytics)
+    .sort((a, b) => b.totalReservations - a.totalReservations);
+
   return sortedAnalytics.slice(0, limit);
 };
-
-
 
 module.exports = {
   getAnalyticsData,

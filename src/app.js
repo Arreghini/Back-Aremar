@@ -14,7 +14,7 @@ const paymentRedirectRoutes = require('./routes/PaymentRedirectRoutes');
 const webhookHandler = require('./handlers/reservation/webhookHandler');
 const { checkAdmin, jwtCheck } = require('./services/tokenAdministrador');
 const createPreferenceHandler = require('./handlers/reservation/createPreferenceHandler');
-const exportRoutes = require('./routes/exportRoute');
+const exportRoutes = require('./routes/exportRoutes');
 require('dotenv').config();
 
 const app = express();
@@ -87,9 +87,6 @@ app.get('/public', (req, res) => {
 // Ruta pública para webhooks
 app.post('/api/webhooks/mercadopago', express.json(), webhookHandler());
 
-// Ruta pública para redirección de pagos
-app.use('/api/payment', paymentRedirectRoutes);
-
 // Aplicar jwtCheck globalmente para todas las rutas API protegidas
 app.use('/api', jwtCheck);
 
@@ -100,7 +97,7 @@ app.use('/api/rooms/admin/roomDetail', checkAdmin, adminRoomDetailsRoutes);
 app.use('/api/rooms/admin/available', checkAdmin, adminRoomRoutes);
 app.use('/api/rooms/admin', checkAdmin, adminRoomRoutes);
 app.use('/api/users/admin', checkAdmin, adminUserRoutes);
-app.use('/export', checkAdmin, exportRoutes);
+app.use('/api/admin/export', checkAdmin, exportRoutes);
 
 // Rutas regulares protegidas
 app.use('/api/rooms', roomRoutes);

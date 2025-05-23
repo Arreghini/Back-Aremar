@@ -3,6 +3,7 @@ const analyticsDataController = require('../../controllers/export/analyticsDataC
 const analyticsDataHandler = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
+    console.log('Parámetros recibidos:', { startDate, endDate });
     const analyticsData = await analyticsDataController.getAnalyticsData(startDate, endDate);
     res.status(200).json(analyticsData);
   } catch (error) {
@@ -23,7 +24,7 @@ const getMonthlyOccupancyHandler = async (req, res) => {
 const getRevenueByRoomTypeHandler = async (req, res) => {
   try {
     const { startDate, endDate } = req.query; 
-    const revenueData = await analyticsDataController.getRevenueByRoomType(year, month);
+    const revenueData = await analyticsDataController.getRevenueByRoomType(startDate, endDate);
     res.status(200).json(revenueData);
   } catch (error) {
     console.error('Error en getRevenueByRoomTypeHandler:', error);

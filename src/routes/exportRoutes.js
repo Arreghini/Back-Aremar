@@ -8,11 +8,12 @@ const {
   getFrequentCustomersHandler 
 } = require('../handlers/export/analyticsDataHandler');
 
-router.get('/export/excel', async (req, res) => {
+router.get('/excel/analytics', async (req, res) => {
   try {
+     console.log('Query completo:', req.query);
     const { startDate, endDate } = req.query;
     const data = await require('../controllers/export/analyticsDataController').getAnalyticsData(startDate, endDate);
-
+console.log('Rango de fechas extraído:', { startDate, endDate });
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Resumen');
 
