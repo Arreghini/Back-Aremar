@@ -32,11 +32,11 @@ Room.belongsTo(RoomDetail, { foreignKey: 'roomDetailId' });
 Room.hasMany(Reservation, { foreignKey: 'roomId', sourceKey: 'id', as: 'reservations' });
 Reservation.belongsTo(Room, { foreignKey: 'roomId', targetKey: 'id', as: 'room' });
 
-Reservation.belongsTo(User, { foreignKey: 'userId' });
-User.hasMany(Reservation, { foreignKey: 'userId' });
+Reservation.belongsTo(User, { foreignKey: 'userId', sourceKey: 'id', as: 'user' });
+User.hasMany(Reservation, { foreignKey: 'userId', sourceKey: 'id', as: 'reservations' });
 
-Reservation.belongsTo(Refund, { foreignKey: 'refundId' });
-Refund.hasMany(Reservation, { foreignKey: 'refundId' });
+Reservation.belongsTo(Refund, { foreignKey: 'refundId', sourceKey: 'id', as: 'refund' });
+Refund.hasMany(Reservation, { foreignKey: 'refundId', sourceKey: 'id', as: 'reservations' }); 
 
 // Confirmación de modelos cargados
 console.log('Modelos cargados:', Object.keys(conn.models));

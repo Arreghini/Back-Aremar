@@ -62,8 +62,11 @@ const getAnalyticsData = async (startDate, endDate) => {
 
       analyticsData.push({
         roomId: room.id,
-        income: income || 0,
+        income: "$" +' '+ income || 0,
         freeDays,
+        occupiedDays,
+        totalDays,
+        occupancy: ((occupiedDays / totalDays) * 100).toFixed(1) + "%" ,
         sumReservations,
       });
     }
@@ -233,27 +236,30 @@ const getFrequentCustomers = async (startDate, endDate, limit = 10) => {
         as: 'user',
         attributes: ['id', 'name', 'email'],
       },
-    ]
+    ],
   });
 
   const customerAnalytics = {};
   reservations.forEach((reservation) => {
     const customerId = reservation.user.id;
+    const price = reservation.totalPrice || 0;
+
     if (!customerAnalytics[customerId]) {
       customerAnalytics[customerId] = {
-        customerId,
         name: reservation.user.name,
         email: reservation.user.email,
-        totalReservations: 1,
+        reservationCount: 1,
+        totalPrice: price,
       };
     } else {
-      customerAnalytics[customerId].totalReservations++;
+      customerAnalytics[customerId].reservationCount++;
+      customerAnalytics[customerId].totalPrice += price;
     }
   });
 
   const sortedAnalytics = Object
     .values(customerAnalytics)
-    .sort((a, b) => b.totalReservations - a.totalReservations);
+    .sort((a, b) => b.reservationCount - a.reservationCount);
 
   return sortedAnalytics.slice(0, limit);
 };

@@ -14,6 +14,7 @@ const paymentRedirectRoutes = require('./routes/PaymentRedirectRoutes');
 const webhookHandler = require('./handlers/reservation/webhookHandler');
 const { checkAdmin, jwtCheck } = require('./services/tokenAdministrador');
 const createPreferenceHandler = require('./handlers/reservation/createPreferenceHandler');
+const adminUploadRoutes = require('./routes/AdminUpload');
 const exportRoutes = require('./routes/exportRoutes');
 require('dotenv').config();
 
@@ -97,6 +98,7 @@ app.use('/api/rooms/admin/roomDetail', checkAdmin, adminRoomDetailsRoutes);
 app.use('/api/rooms/admin/available', checkAdmin, adminRoomRoutes);
 app.use('/api/rooms/admin', checkAdmin, adminRoomRoutes);
 app.use('/api/users/admin', checkAdmin, adminUserRoutes);
+app.use('/api/upload/admin', checkAdmin, adminUploadRoutes);
 app.use('/api/admin/export', checkAdmin, exportRoutes);
 
 // Rutas regulares protegidas

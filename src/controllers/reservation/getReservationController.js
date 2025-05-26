@@ -20,6 +20,7 @@ const getAllReservationController = async () => {
                   },                  
                 {
                     model: User,
+                    as: 'user',
                     attributes: ['id', 'name', 'email'], // Atributos relevantes de User
                 },
             ],
@@ -48,16 +49,17 @@ const getReservationByUserIdController = async (userId) => {
             include: [
                 {
                     model: Room,
-                    as: 'room', // Este "as" es obligatorio por tu definición en las relaciones
+                    as: 'room', 
                     attributes: ['id', 'status'],
                     include: [{
                         model: RoomType,
-                        as: 'roomType', // También tenés "as" definido en esta relación
+                        as: 'roomType', 
                         attributes: ['name']
                     }]
                 },
                 {
                     model: User,
+                    as: 'user',
                     attributes: ['id', 'name', 'email']
                 }
             ]
@@ -96,6 +98,7 @@ const getReservationByIdController = async (reservationId) => {
                       },                      
                 {
                     model: User,
+                    as: 'user',
                     attributes: ['id', 'name', 'email']
                 }
             ]

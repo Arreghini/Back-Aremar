@@ -12,7 +12,7 @@ const createReservationController = async (reservationData) => {
       },
       include: {
         model: RoomType,
-        as: 'roomType', // Alias definido en la relación
+        as: 'roomType', 
         required: true, // Asegura que la habitación tenga un tipo de habitación asociado
         attributes: ["name", "price"],
       },
@@ -29,7 +29,7 @@ const createReservationController = async (reservationData) => {
       },
       include: {
         model: RoomType,
-        as: 'roomType', // Alias definido en la relación
+        as: 'roomType', 
         attributes: ['name', 'price'],
       },
     });
