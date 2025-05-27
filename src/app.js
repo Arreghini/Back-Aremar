@@ -98,7 +98,7 @@ app.use('/api/rooms/admin/roomDetail', checkAdmin, adminRoomDetailsRoutes);
 app.use('/api/rooms/admin/available', checkAdmin, adminRoomRoutes);
 app.use('/api/rooms/admin', checkAdmin, adminRoomRoutes);
 app.use('/api/users/admin', checkAdmin, adminUserRoutes);
-app.use('/api/upload/admin', checkAdmin, adminUploadRoutes);
+app.use('/api/upload', checkAdmin, adminUploadRoutes);
 app.use('/api/admin/export', checkAdmin, exportRoutes);
 
 // Rutas regulares protegidas

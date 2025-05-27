@@ -1,21 +1,50 @@
-const createTypeController = require('../../../controllers/room/roomType/createRoomTypeController');
+const uploadImageController = require('../../../controllers/image/uploadImageController');
+const createRoomTypeController = require('../../../controllers/roomType/createRoomTypeController');
 
-const createTypeHandler = async (req, res) => {
+const createRoomTypeHandler = async (req, res) => {
   try {
-    console.log('Datos recibidos para crear el tipo de habitación:', req.body);
-    const newRoomType = await createTypeController(req.body);
-
-    return res.status(201).json({ message: 'RoomType creado con éxito', data: newRoomType });
-  } catch (error) {
-    // Si el error es por un ID duplicado, devolver un 400
-    if (error.message === 'RoomType con este ID ya existe') {
-      return res.status(400).json({ error: error.message });
+    const { name, simpleBeds, trundleBeds, kingBeds, windows, price } = req.body;
+    
+    // Subir imágenes a Cloudinary si existen
+    let photoUrls = [];
+    if (req.files && req.files.length > 0) {
+      console.log(`Subiendo ${req.files.length} imágenes a Cloudinary...`);
+      
+      const uploadPromises = req.files.map(file => 
+        uploadImageController(file, 'aremar/roomtypes')
+      );
+      
+      const uploadResults = await Promise.all(uploadPromises);
+      photoUrls = uploadResults.map(result => result.secure_url);
     }
-
-    // Registrar solo errores inesperados
-    console.error('Error inesperado al manejar la solicitud:', error); 
-    return res.status(500).send('Error al manejar la solicitud');
+    
+    // Crear roomType con las URLs
+    const roomTypeData = {
+      name,
+      simpleBeds: parseInt(simpleBeds) || 0,
+      trundleBeds: parseInt(trundleBeds) || 0,
+      kingBeds: parseInt(kingBeds) || 0,
+      windows: parseInt(windows) || 0,
+      price: parseFloat(price) || 0,
+      photos: photoUrls
+    };
+    
+    const newRoomType = await createRoomTypeController(roomTypeData);
+    
+    res.status(201).json({
+      success: true,
+      data: newRoomType,
+      message: 'Tipo de habitación creado exitosamente'
+    });
+    
+  } catch (error) {
+    console.error('Error al crear roomType:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Error al crear el tipo de habitación',
+      details: error.message
+    });
   }
 };
 
-module.exports = createTypeHandler;
+module.exports = createRoomTypeHandler;

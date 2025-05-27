@@ -7,16 +7,25 @@ const deleteRoomTypeHandler = require('../handlers/room/roomType/deleteRoomTypeH
 
 const router = express.Router();
 
-// Multer en memoria
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+// Configuración unificada de multer
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+    files: 10
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Solo se permiten archivos de imagen'), false);
+    }
+  }
+});
 
-router.get('/', getRoomTypeHandler); // GET /api/rooms/admin/roomType
-
-// POST /api/rooms/admin/roomType con fotos
+router.get('/', getRoomTypeHandler);
 router.post('/', upload.array('photos', 10), createRoomTypeHandler);
-
-router.patch('/:id', updateRoomTypeHandler);   // PATCH
-router.delete('/:id', deleteRoomTypeHandler);  // DELETE
+router.patch('/:id', upload.array('photos', 10), updateRoomTypeHandler);
+router.delete('/:id', deleteRoomTypeHandler);
 
 module.exports = router;
