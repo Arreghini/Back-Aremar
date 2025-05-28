@@ -24,7 +24,7 @@ const upload = multer({
 });
 
 router.get('/', getRoomTypeHandler);
-router.post('/', upload.array('photos', 10), createRoomTypeHandler);
+router.post('/upload/multiple', upload.array('photos', 10), createRoomTypeHandler);
 router.patch('/:id', upload.array('photos', 10), updateRoomTypeHandler);
 router.delete('/:id', deleteRoomTypeHandler);
 

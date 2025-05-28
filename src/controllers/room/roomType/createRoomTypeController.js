@@ -1,6 +1,6 @@
 const { RoomType, Room } = require('../../../models');
 
-const createTypeController = async (data) => {
+const createRoomTypeController = async (data) => {
   try {
     const {
       id,
@@ -58,4 +58,4 @@ const createRoomController = async (data) => {
   }
 };
 
-module.exports = { createTypeController, createRoomController };
+module.exports = { createRoomTypeController, createRoomController };
