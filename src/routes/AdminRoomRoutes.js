@@ -1,4 +1,5 @@
 const express = require('express');
+const multer = require('multer');
 const createRoomHandler = require('../handlers/room/createRoomHandler');
 const deleteRoomHandler = require('../handlers/room/deleteRoomHandler');
 const getRoomById = require('../handlers/room/getRoomByIdHandler');
@@ -7,6 +8,9 @@ const getRoomHandler = require('../handlers/room/getRoomHandler');
 const updateRoomHandler = require('../handlers/room/updateRoomHandler');
 
 const router = express.Router();
+
+// Configurar multer para manejar FormData
+const upload = multer();
 
 router.get('/all', getRoomHandler.getAllRooms);
 router.get('/', (req, res, next) => {
@@ -19,7 +23,8 @@ router.get('/:id', getRoomById);
 
 router.get('/types', getRoomTypeById);
 
-router.post('/', createRoomHandler);
+// Usar multer.none() para FormData sin archivos
+router.post('/', upload.none(), createRoomHandler);
 
 router.delete('/:id', deleteRoomHandler);
 
