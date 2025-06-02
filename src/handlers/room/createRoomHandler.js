@@ -1,10 +1,12 @@
-    const CreateRoomController = require('../../controllers/room/createRoomController');
+const CreateRoomController = require('../../controllers/room/createRoomController');
+const uploadImageController = require('../../controllers/image/uploadImageController'); // Asegúrate de tener este import
 
 const CreateRoomHandler = async (req, res) => {
     try {
       console.log('=== DEBUG HANDLER ===');
       console.log('Body recibido:', JSON.stringify(req.body, null, 2));
-    
+      console.log('Archivos recibidos:', req.files);
+
       // Verificar si los datos están presentes
       if (!req.body || Object.keys(req.body).length === 0) {
         return res.status(400).json({ 
@@ -12,8 +14,24 @@ const CreateRoomHandler = async (req, res) => {
         });
       }
 
+      // Procesar fotos si existen
+      let photoRoom = [];
+      if (req.files && req.files.length > 0) {
+        const uploadPromises = req.files.map(file =>
+          uploadImageController(file, 'aremar/rooms')
+        );
+        const uploadResults = await Promise.all(uploadPromises);
+        photoRoom = uploadResults.map(result => result.secure_url);
+      }
+
+      // Pasar las URLs de las fotos al controlador
+      const roomData = {
+        ...req.body,
+        photoRoom
+      };
+
       // Llamar al controlador
-      const room = await CreateRoomController(req.body);
+      const room = await CreateRoomController(roomData);
 
       console.log('✅ Habitación creada exitosamente en handler');
     

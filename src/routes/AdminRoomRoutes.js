@@ -9,7 +9,7 @@ const updateRoomHandler = require('../handlers/room/updateRoomHandler');
 
 const router = express.Router();
 
-// Configurar multer para manejar FormData
+// Configurar multer para aceptar archivos en el campo 'photoRoom'
 const upload = multer();
 
 router.get('/all', getRoomHandler.getAllRooms);
@@ -23,11 +23,11 @@ router.get('/:id', getRoomById);
 
 router.get('/types', getRoomTypeById);
 
-// Usar multer.none() para FormData sin archivos
-router.post('/', upload.none(), createRoomHandler);
+// Usar multer.array() para aceptar hasta 5 archivos en el campo 'photoRoom'
+router.post('/', upload.array('photoRoom', 5), createRoomHandler);
 
 router.delete('/:id', deleteRoomHandler);
 
-router.patch('/:id', updateRoomHandler);
+router.patch('/:id', upload.array('newPhotos', 5), updateRoomHandler);
 
 module.exports = router;

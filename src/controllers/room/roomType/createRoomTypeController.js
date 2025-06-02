@@ -2,10 +2,6 @@ const { RoomType, Room } = require('../../../models');
 
 const createRoomTypeController = async (data) => {
   try {
-    console.log('=== DEBUG CREATE ROOM TYPE CONTROLLER ===');
-    console.log('Datos recibidos:', data);
-    console.log('Fotos a guardar:', data.photos);
-    console.log('Tipo de fotos:', typeof data.photos);
     
     const {
       id,

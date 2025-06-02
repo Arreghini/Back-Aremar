@@ -3,7 +3,7 @@ const { Room, RoomType, RoomDetail } = require('../../models');
 const createRoomController = async (data) => {
   try {
     console.log('=== DEBUG CONTROLLER COMPLETO ===');
-    console.log('Datos recibidos:', JSON.stringify(data, null, 2));
+    console.log('Datos recibidos en el controlador de habitación:', JSON.stringify(data, null, 2));
     
     const { 
       id, 
