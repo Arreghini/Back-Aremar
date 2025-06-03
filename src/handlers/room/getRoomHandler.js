@@ -12,9 +12,9 @@ const getAllRooms = async (req, res) => {
   }
 };
 const getAvailableRooms = async (req, res) => {
-  const { reservationId, roomTypeId, checkInDate, checkOutDate, numberOfGuests } = req.query;
+  const { reservationId, roomTypeId, checkIn, checkOut, numberOfGuests } = req.query;
 
-  if (!roomTypeId || !checkInDate || !checkOutDate || !numberOfGuests) {
+  if (!roomTypeId || !checkIn || !checkOut || !numberOfGuests) {
     return res.status(400).json({
       success: false,
       message: 'Faltan parámetros necesarios: roomType, checkInDate, checkOutDate, numberOfGuests',
@@ -25,8 +25,8 @@ const getAvailableRooms = async (req, res) => {
     const rooms = await getRoomController.getAvailableRoomsController(
       reservationId || null,
       roomTypeId,
-      checkInDate,
-      checkOutDate,
+      checkIn,
+      checkOut,
       numberOfGuests
     );
     
@@ -45,10 +45,10 @@ const getAvailableRooms = async (req, res) => {
   }
 };
 const getAvailableRoomById = async (req, res) => {
-  const { checkInDate, checkOutDate, numberOfGuests } = req.query;
+  const { checkIn, checkOut, numberOfGuests } = req.query;
   const { roomId } = req.params;
 
-  if (!roomId || !checkInDate || !checkOutDate || !numberOfGuests) {
+  if (!roomId || !checkIn || !checkOut || !numberOfGuests) {
     return res.status(400).json({
       success: false,
       message: 'Faltan parámetros necesarios: roomId, checkInDate, checkOutDate, numberOfGuests',
@@ -56,10 +56,10 @@ const getAvailableRoomById = async (req, res) => {
   }
 
   try {
-    const room = await getRoomController.getAvailableRoomsByIdController(
+    const room = await getRoomController.getAvailableRoomByIdController(
       roomId,
-      checkInDate,
-      checkOutDate,
+      checkIn,
+      checkOut,
       numberOfGuests
     );
     return res.status(200).json({
