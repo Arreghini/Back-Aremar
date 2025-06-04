@@ -9,6 +9,7 @@ const updateReservationByAdminController = async (reservationId, updatedData) =>
 
     // Actualizar los campos permitidos
     Object.assign(reservation, updatedData);
+    reservation.status = "confirmed"; // Cambiar el estado a confirmado
 
     // Guardar los cambios
     const updatedReservation = await reservation.save();
@@ -23,5 +24,4 @@ const updateReservationByAdminController = async (reservationId, updatedData) =>
     throw new Error(`Error al actualizar la reserva: ${error.message}`);
   }
 };
-
 module.exports = updateReservationByAdminController;
