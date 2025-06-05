@@ -2,7 +2,7 @@ const { Room, RoomType, Reservation } = require('../../models');
 const { Op } = require('sequelize');
 
 // Utilidad para buscar reservas solapadas
-const findOverlappingReservations = async (roomId, checkInDate, checkOutDate, excludeReservationId) => {
+const findOverlappingReservations = async (roomId, checkIn, checkOut, excludeReservationId) => {
   return await Reservation.findAll({
     where: {
       ...(roomId && { roomId }),
@@ -17,18 +17,18 @@ const findOverlappingReservations = async (roomId, checkInDate, checkOutDate, ex
       [Op.or]: [
         {
           checkIn: {
-            [Op.between]: [checkInDate, checkOutDate]
+            [Op.between]: [checkIn, checkOut]
           }
         },
         {
           checkOut: {
-            [Op.between]: [checkInDate, checkOutDate]
+            [Op.between]: [checkIn, checkOut]
           }
         },
         {
           [Op.and]: [
-            { checkIn: { [Op.lte]: checkInDate } },
-            { checkOut: { [Op.gte]: checkOutDate } }
+            { checkIn: { [Op.lte]: checkIn } },
+            { checkOut: { [Op.gte]: checkOut } }
           ]
         }
       ]
@@ -40,12 +40,12 @@ module.exports = {
   findOverlappingReservations
 };
 // Controlador para obtener habitaciones disponibles por tipo
-const getAvailableRoomsController = async (reservationId, roomTypeId, checkInDate, checkOutDate, numberOfGuests) => {
+const getAvailableRoomsController = async (reservationId, roomTypeId, checkIn, checkOut, numberOfGuests) => {
   try {
     console.log('Iniciando búsqueda de habitaciones...');
 
     // Verificar reservas solapadas
-    const overlappingReservations = await findOverlappingReservations(null, checkInDate, checkOutDate, reservationId);
+    const overlappingReservations = await findOverlappingReservations(null, checkIn, checkOut, reservationId);
     const reservedRoomIds = overlappingReservations.map(res => res.roomId);
 
     // Buscar habitaciones disponibles
@@ -74,12 +74,12 @@ const getAvailableRoomsController = async (reservationId, roomTypeId, checkInDat
 };
 
 // Controlador para verificar disponibilidad de una habitación específica
-const getAvailableRoomByIdController = async (roomId, checkInDate, checkOutDate, numberOfGuests) => {
+const getAvailableRoomByIdController = async (roomId, checkIn, checkOut, numberOfGuests) => {
   try {
     console.log('Verificando disponibilidad para la habitación:', roomId);
 
     // Verificar reservas solapadas
-    const overlappingReservations = await findOverlappingReservations(roomId, checkInDate, checkOutDate);
+    const overlappingReservations = await findOverlappingReservations(roomId, checkIn, checkOut);
 
     if (overlappingReservations.length > 0) {
       console.log('La habitación está reservada en el rango de fechas dado.');
