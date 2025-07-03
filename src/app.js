@@ -87,24 +87,29 @@ app.get('/public', (req, res) => {
 // Ruta pública para webhooks
 app.post('/api/webhooks/mercadopago', express.json(), webhookHandler());
 
-// Aplicar jwtCheck globalmente para todas las rutas API protegidas
-app.use('/api', jwtCheck);
-
 // Rutas administrativas 
-app.use('/api/reservations/admin', checkAdmin, adminReservationRoutes);
-app.use('/api/rooms/admin/roomType', checkAdmin, adminRoomTypeRoutes);
-app.use('/api/rooms/admin/roomDetail', checkAdmin, adminRoomDetailsRoutes);
-app.use('/api/rooms/admin/available', checkAdmin, adminRoomRoutes);
-app.use('/api/rooms/admin', checkAdmin, adminRoomRoutes);
-app.use('/api/users/admin', checkAdmin, adminUserRoutes);
-app.use('/api/admin/export', checkAdmin, exportRoutes);
+app.use('/api/reservations/admin', jwtCheck, checkAdmin, adminReservationRoutes);
+app.use('/api/rooms/admin/roomType', jwtCheck, checkAdmin, adminRoomTypeRoutes);
+app.use('/api/rooms/admin/roomDetail',jwtCheck, checkAdmin, adminRoomDetailsRoutes);
+app.use('/api/rooms/admin/available',jwtCheck, checkAdmin, adminRoomRoutes);
+app.use('/api/rooms/admin',jwtCheck, checkAdmin, adminRoomRoutes);
+
+const logAuthMiddleware = (req, res, next) => {
+  console.log('👉 Authorization header:', req.headers.authorization); // ¿Llega el token?
+  console.log('👉 req.auth:', req.auth); // ¿Se procesó correctamente?
+  next();
+};
+
+app.use('/api/users/admin', jwtCheck, logAuthMiddleware, checkAdmin, adminUserRoutes);
+
+app.use('/api/admin/export',jwtCheck, checkAdmin, exportRoutes);
 
 // Rutas regulares protegidas
 app.use('/api/rooms', roomRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/reservations/:reservationId/payment', createPreferenceHandler);
-app.use('/api/reservations', reservationRoutes);
-app.use('/api/payment', paymentRedirectRoutes);
+app.use('/api/users', jwtCheck, userRoutes);
+app.use('/api/reservations/:reservationId/payment', jwtCheck, createPreferenceHandler);
+app.use('/api/reservations',jwtCheck, reservationRoutes);
+app.use('/api/payment', jwtCheck, paymentRedirectRoutes);
 
 // Manejo de errores y rutas no encontradas (mantener igual)
 app.use((req, res) => {

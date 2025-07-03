@@ -27,36 +27,28 @@ let cachedManagementToken = null;
 let tokenExpiryTime = 0;
 
 // Middleware para verificar si el usuario es administrador
-const checkAdmin = async (req, res, next) => {
+// ...existing code...
+const checkAdmin = (req, res, next) => {
   try {
-    console.log('Headers recibidos:', req.headers);
-    console.log('Auth payload:', req.auth?.payload);
-    
-    if (!req.auth?.payload?.sub) {
+    const roles = req.auth?.payload?.[`${namespace}roles`] || [];
+    const sub = req.auth?.payload?.sub;
+
+    if (!sub) {
       return res.status(401).json({ message: 'Usuario no autenticado' });
     }
 
-    const managementToken = await getManagementApiToken();
-    const isAdmin = await checkUserRole(req.auth.payload.sub, managementToken);
-    
-    console.log('Resultado verificación admin:', {
-      sub: req.auth.payload.sub,
-      isAdmin: isAdmin
-    });
-
-    if (isAdmin) {
-      // Agregamos la información del rol admin al objeto req
+    if (roles.includes('admin')) {
       req.isAdmin = true;
-      req.auth.payload[`${namespace}roles`] = ['admin'];
       return next();
     }
-    
-    return res.status(403).json({ message: 'Acceso prohibido' });
+
+    return res.status(403).json({ message: 'Acceso prohibido: No es admin' });
   } catch (error) {
     console.error('Error en checkAdmin:', error);
     return res.status(500).json({ message: 'Error al verificar roles' });
   }
 };
+
 module.exports = {
   jwtCheck,
   checkAdmin,
