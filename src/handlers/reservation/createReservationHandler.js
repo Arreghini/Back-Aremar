@@ -1,7 +1,7 @@
 const createReservationController = require('../../controllers/reservation/createReservationController');
 const createReservationHandler = async (req, res) => {
   console.log('Headers recibidos:', req.headers);
-  console.log('Body completo:', req.body); 
+  console.log('Body completo:', req.body);
   try {
     const reservationData = req.body;
     console.log('Datos de la reserva recibidos:', reservationData);

@@ -11,9 +11,14 @@ const updateDetailHandler = async (req, res) => {
       return res.status(404).json({ error: 'RoomDetail no encontrado' });
     }
 
-    return res.status(200).json({ message: 'RoomDetail actualizado con éxito', data: updatedDetail });
+    return res
+      .status(200)
+      .json({
+        message: 'RoomDetail actualizado con éxito',
+        data: updatedDetail,
+      });
   } catch (error) {
-    console.error('Error inesperado al manejar la solicitud:', error); 
+    console.error('Error inesperado al manejar la solicitud:', error);
     return res.status(500).send('Error al manejar la solicitud');
   }
 };

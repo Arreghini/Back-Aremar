@@ -11,7 +11,7 @@ const deleteDetailHandler = async (req, res) => {
 
     return res.status(200).json({ message: 'RoomDetail eliminado con éxito' });
   } catch (error) {
-    console.error('Error inesperado al manejar la solicitud:', error); 
+    console.error('Error inesperado al manejar la solicitud:', error);
     return res.status(500).send('Error al manejar la solicitud');
   }
 };

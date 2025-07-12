@@ -1,7 +1,17 @@
 const { Room } = require('../../models');
 
 const getRoomsController = async (req, res) => {
-  const { price, beds, search, page = 1, limit = 10, sort = 'id', order = 'asc', startDate, endDate } = req.query;
+  const {
+    price,
+    beds,
+    search,
+    page = 1,
+    limit = 10,
+    sort = 'id',
+    order = 'asc',
+    startDate,
+    endDate,
+  } = req.query;
 
   let query = {
     where: {},
@@ -18,8 +28,8 @@ const getRoomsController = async (req, res) => {
       ...query.where,
       [Op.and]: [
         { startDate: { [Op.lte]: startDate } },
-        { endDate: { [Op.gte]: endDate } }
-      ]
+        { endDate: { [Op.gte]: endDate } },
+      ],
     };
   }
 

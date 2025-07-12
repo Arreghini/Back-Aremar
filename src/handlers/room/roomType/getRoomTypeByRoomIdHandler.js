@@ -14,9 +14,11 @@ const getRoomTypeByRoomIdHandler = async (req, res) => {
 
     console.log('[Handler] Tipo de habitación encontrado:', roomType);
     return res.status(200).json(roomType);
-
   } catch (error) {
-    console.error('[Handler] Error al obtener tipo de habitación:', error.message);
+    console.error(
+      '[Handler] Error al obtener tipo de habitación:',
+      error.message
+    );
     return res.status(500).json({ message: error.message });
   }
 };

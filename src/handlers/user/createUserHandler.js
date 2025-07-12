@@ -18,7 +18,7 @@ const createUserHandler = async (req, res) => {
     return res.status(201).json({
       message: 'Cliente creado exitosamente', // Mensaje personalizado
       user, // Incluye los detalles del usuario creado
-    })
+    });
   } catch (error) {
     // Si el error es por un ID duplicado, devolver un 400 sin loguear como error grave
     if (error.message === 'User with this ID already exists') {
@@ -30,6 +30,5 @@ const createUserHandler = async (req, res) => {
     return res.status(500).send('Error al manejar la solicitud');
   }
 };
-
 
 module.exports = createUserHandler;

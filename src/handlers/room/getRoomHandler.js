@@ -2,9 +2,9 @@ const getRoomController = require('../../controllers/room/getRoomController');
 
 const getAllRooms = async (req, res) => {
   try {
-    console.log('Solicitud GET /api/rooms/all recibida'); 
+    console.log('Solicitud GET /api/rooms/all recibida');
     const rooms = await getRoomController.getAllRoomController();
-   // console.log('Rooms sent to client:', rooms);
+    // console.log('Rooms sent to client:', rooms);
     res.status(200).json(rooms);
   } catch (error) {
     console.error('Error in getRoom handler:', error);
@@ -12,12 +12,14 @@ const getAllRooms = async (req, res) => {
   }
 };
 const getAvailableRooms = async (req, res) => {
-  const { reservationId, roomTypeId, checkIn, checkOut, numberOfGuests } = req.query;
+  const { reservationId, roomTypeId, checkIn, checkOut, numberOfGuests } =
+    req.query;
 
   if (!roomTypeId || !checkIn || !checkOut || !numberOfGuests) {
     return res.status(400).json({
       success: false,
-      message: 'Faltan parámetros necesarios: roomType, checkInDate, checkOutDate, numberOfGuests',
+      message:
+        'Faltan parámetros necesarios: roomType, checkInDate, checkOutDate, numberOfGuests',
     });
   }
 
@@ -29,7 +31,7 @@ const getAvailableRooms = async (req, res) => {
       checkOut,
       numberOfGuests
     );
-    
+
     return res.status(200).json({
       success: true,
       totalRooms: rooms.length,
@@ -51,7 +53,8 @@ const getAvailableRoomById = async (req, res) => {
   if (!roomId || !checkIn || !checkOut || !numberOfGuests) {
     return res.status(400).json({
       success: false,
-      message: 'Faltan parámetros necesarios: roomId, checkInDate, checkOutDate, numberOfGuests',
+      message:
+        'Faltan parámetros necesarios: roomId, checkInDate, checkOutDate, numberOfGuests',
     });
   }
 
@@ -76,7 +79,7 @@ const getAvailableRoomById = async (req, res) => {
   }
 };
 
-const getRoom  = {
+const getRoom = {
   getAllRooms,
   getAvailableRooms,
   getAvailableRoomById,

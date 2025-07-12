@@ -7,7 +7,7 @@ const getDetailsController = async () => {
 
     return roomDetails; // Retornar todos los detalles encontrados
   } catch (error) {
-    console.error('Error al obtener los detalles de la habitación:', error); 
+    console.error('Error al obtener los detalles de la habitación:', error);
     throw error; // Lanza el error para que sea manejado en el handler
   }
 };

@@ -5,9 +5,9 @@ const getUserController = async () => {
     const users = await User.findAll(); // Obtener todos los usuarios
     return users; // Retornar la lista de usuarios
   } catch (error) {
-    console.error('Error fetching users:', error); 
+    console.error('Error fetching users:', error);
     throw error; // Lanzar el error para que sea manejado en el handler
   }
-}
+};
 
 module.exports = getUserController;

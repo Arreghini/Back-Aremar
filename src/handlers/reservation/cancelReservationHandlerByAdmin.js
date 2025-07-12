@@ -6,7 +6,7 @@ const cancelReservationByAdminHandler = async (req, res) => {
   try {
     const reserva = await cancelReservationControllerByAdmin({
       reservationId,
-      isAdmin
+      isAdmin,
     });
 
     res.status(200).json({

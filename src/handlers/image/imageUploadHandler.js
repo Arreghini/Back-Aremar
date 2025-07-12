@@ -8,12 +8,12 @@ const uploadMultipleImagesHandler = async (req, res) => {
     }
 
     const folder = req.body.folder || 'aremar/roomtypes';
-    
+
     // Usa el mismo controlador para cada imagen
-    const uploadPromises = req.files.map(file => 
+    const uploadPromises = req.files.map((file) =>
       uploadImageController(file, folder)
     );
-    
+
     const results = await Promise.all(uploadPromises);
     res.status(200).json(results);
   } catch (error) {
@@ -30,7 +30,7 @@ const uploadSingleImageHandler = async (req, res) => {
     }
 
     const folder = req.body.folder || 'aremar/roomtypes';
-    
+
     // Usa el mismo controlador
     const result = await uploadImageController(req.file, folder);
     res.status(200).json(result);
@@ -40,7 +40,7 @@ const uploadSingleImageHandler = async (req, res) => {
   }
 };
 
-module.exports = { 
-  uploadMultipleImagesHandler, 
-  uploadSingleImageHandler 
+module.exports = {
+  uploadMultipleImagesHandler,
+  uploadSingleImageHandler,
 };

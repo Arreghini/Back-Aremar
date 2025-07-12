@@ -9,7 +9,7 @@ const deleteReservationByIdController = async (reservationId, isAdmin) => {
     }
 
     const { status } = reservation;
-    console.log('Estado de la reserva y es Administrador?:', status, isAdmin)
+    console.log('Estado de la reserva y es Administrador?:', status, isAdmin);
 
     // Validación para usuarios comunes
     if (!isAdmin && status !== 'pending') {
@@ -17,8 +17,10 @@ const deleteReservationByIdController = async (reservationId, isAdmin) => {
     }
 
     // Validación para administradores
-    if (isAdmin && !['pending', 'confirmed','cancelled'].includes(status)) {
-      throw new Error('Como administrador solo puedes eliminar reservas pendientes o confirmadas');
+    if (isAdmin && !['pending', 'confirmed', 'cancelled'].includes(status)) {
+      throw new Error(
+        'Como administrador solo puedes eliminar reservas pendientes o confirmadas'
+      );
     }
 
     await reservation.destroy();

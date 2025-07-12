@@ -6,7 +6,13 @@ const updateReservationHandler = async (req, res) => {
     const updatedData = req.body;
 
     if (isNaN(reservationId)) {
-      return res.status(400).json({ success: false, mensaje: 'ID de reserva inválido', data: null });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          mensaje: 'ID de reserva inválido',
+          data: null,
+        });
     }
 
     console.log('Datos recibidos del front:', {
@@ -14,7 +20,10 @@ const updateReservationHandler = async (req, res) => {
       datos: updatedData,
     });
 
-    const updatedReservation = await updateReservationController(reservationId, updatedData);
+    const updatedReservation = await updateReservationController(
+      reservationId,
+      updatedData
+    );
 
     if (!updatedReservation.success) {
       // Si el controlador devuelve success: false, responde con el mensaje y detén el proceso

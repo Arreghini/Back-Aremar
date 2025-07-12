@@ -9,12 +9,12 @@ const cancelReservationWithRefundHandler = async (req, res) => {
     const refundInfo = await cancelReservationWithRefundController({
       reservationId,
       userId,
-      isAdmin
+      isAdmin,
     });
-console.log('Reembolso de la reserva cancelada', refundInfo.refundAmount);
+    console.log('Reembolso de la reserva cancelada', refundInfo.refundAmount);
     res.status(200).json({
       message: 'Reserva cancelada con reembolso exitosamente',
-      refund: refundInfo
+      refund: refundInfo,
     });
   } catch (error) {
     console.error('Error al cancelar la reserva con reembolso:', error.message);

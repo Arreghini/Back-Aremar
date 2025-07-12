@@ -12,7 +12,7 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
     roomTypeId: {
-      type: DataTypes.UUID, 
+      type: DataTypes.UUID,
       allowNull: true,
       references: {
         model: 'RoomType',
@@ -20,15 +20,15 @@ module.exports = (sequelize) => {
       },
     },
     detailRoomId: {
-      type: DataTypes.UUID, 
+      type: DataTypes.UUID,
       allowNull: true,
       references: {
         model: 'RoomDetail',
         key: 'id',
-      }
-    },    
+      },
+    },
     photoRoom: {
-      type: DataTypes.JSONB, 
+      type: DataTypes.JSONB,
       allowNull: true,
     },
     price: {

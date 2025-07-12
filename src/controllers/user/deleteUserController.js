@@ -4,7 +4,7 @@ const deleteUserController = async (id) => {
   try {
     const user = await User.findByPk(id);
     if (!user) {
-      return null; 
+      return null;
     }
     await User.destroy({ where: { id } });
     return user;

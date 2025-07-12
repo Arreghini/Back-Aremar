@@ -4,7 +4,10 @@ const analyticsDataHandler = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     console.log('Parámetros recibidos:', { startDate, endDate });
-    const analyticsData = await analyticsDataController.getAnalyticsData(startDate, endDate);
+    const analyticsData = await analyticsDataController.getAnalyticsData(
+      startDate,
+      endDate
+    );
     res.status(200).json(analyticsData);
   } catch (error) {
     console.error('Error en analyticsDataHandler:', error);
@@ -14,7 +17,10 @@ const analyticsDataHandler = async (req, res) => {
 const getMonthlyOccupancyHandler = async (req, res) => {
   try {
     const { year, month } = req.query;
-    const occupancyData = await analyticsDataController.getMonthlyOccupancy(year, month);
+    const occupancyData = await analyticsDataController.getMonthlyOccupancy(
+      year,
+      month
+    );
     res.status(200).json(occupancyData);
   } catch (error) {
     console.error('Error en getMonthlyOccupancyHandler:', error);
@@ -23,8 +29,11 @@ const getMonthlyOccupancyHandler = async (req, res) => {
 };
 const getRevenueByRoomTypeHandler = async (req, res) => {
   try {
-    const { startDate, endDate } = req.query; 
-    const revenueData = await analyticsDataController.getRevenueByRoomType(startDate, endDate);
+    const { startDate, endDate } = req.query;
+    const revenueData = await analyticsDataController.getRevenueByRoomType(
+      startDate,
+      endDate
+    );
     res.status(200).json(revenueData);
   } catch (error) {
     console.error('Error en getRevenueByRoomTypeHandler:', error);
@@ -34,7 +43,8 @@ const getRevenueByRoomTypeHandler = async (req, res) => {
 const getFrequentCustomersHandler = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    const frequentCustomers = await analyticsDataController.getFrequentCustomers(startDate, endDate);
+    const frequentCustomers =
+      await analyticsDataController.getFrequentCustomers(startDate, endDate);
     res.status(200).json(frequentCustomers);
   } catch (error) {
     console.error('Error en getFrequentCustomersHandler:', error);
@@ -42,8 +52,9 @@ const getFrequentCustomersHandler = async (req, res) => {
   }
 };
 
-
-module.exports = { analyticsDataHandler, 
-    getMonthlyOccupancyHandler, 
-    getRevenueByRoomTypeHandler, 
-    getFrequentCustomersHandler };
+module.exports = {
+  analyticsDataHandler,
+  getMonthlyOccupancyHandler,
+  getRevenueByRoomTypeHandler,
+  getFrequentCustomersHandler,
+};

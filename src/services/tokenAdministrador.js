@@ -1,6 +1,9 @@
 require('dotenv').config();
 const { auth } = require('express-oauth2-jwt-bearer');
-const { getManagementApiToken, checkUserRole } = require('../services/roleService');
+const {
+  getManagementApiToken,
+  checkUserRole,
+} = require('../services/roleService');
 
 const { AUTH0_DOMAIN, AUTH0_AUDIENCE } = process.env;
 
@@ -9,8 +12,8 @@ const namespace = 'https://aremar.com/';
 // Función para verificar el token JWT
 const jwtCheck = (req, res, next) => {
   // Imprime el encabezado de autorización
- // console.log('Encabezado de autorización:', req.headers.authorization);
-  
+  // console.log('Encabezado de autorización:', req.headers.authorization);
+
   // Llama a auth() para la verificación del token JWT
   const jwtValidator = auth({
     audience: 'https://clientearemar-api',

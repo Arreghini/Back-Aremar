@@ -1,6 +1,5 @@
 const { Room } = require('../../models');
 
-const getRoomByIdController = async (id) => { 
-}
+const getRoomByIdController = async (id) => {};
 
 module.exports = getRoomByIdController;

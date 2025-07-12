@@ -7,13 +7,23 @@ const deleteReservationByIdHandler = async (req, res) => {
 
   console.log('isAdmin:', isAdmin);
   if (!reservationId) {
-    return res.status(400).json({ error: 'El ID de la reserva es obligatorio' });
+    return res
+      .status(400)
+      .json({ error: 'El ID de la reserva es obligatorio' });
   }
 
   try {
-    const deletedReservation = await deleteReservationByIdController(reservationId, isAdmin);
+    const deletedReservation = await deleteReservationByIdController(
+      reservationId,
+      isAdmin
+    );
     console.log('Reserva cancelada exitosamente:', deletedReservation);
-    res.status(200).json({ message: 'Reserva cancelada con éxito', data: deletedReservation });
+    res
+      .status(200)
+      .json({
+        message: 'Reserva cancelada con éxito',
+        data: deletedReservation,
+      });
   } catch (error) {
     console.error('Error en la cancelación de la reserva:', error.message);
     res.status(400).json({ error: error.message });

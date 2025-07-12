@@ -9,7 +9,7 @@ const getRoomTypeByRoomIdController = async (roomId) => {
       include: {
         model: RoomType,
         as: 'roomType',
-        attributes: ['id','name', 'price'],
+        attributes: ['id', 'name', 'price'],
       },
     });
 
@@ -20,9 +20,11 @@ const getRoomTypeByRoomIdController = async (roomId) => {
 
     console.log('[Controller] Tipo de habitación encontrado:', room.roomType);
     return room.roomType;
-
   } catch (error) {
-    console.error('[Controller] Error al buscar tipo de habitación:', error.message);
+    console.error(
+      '[Controller] Error al buscar tipo de habitación:',
+      error.message
+    );
     throw new Error('Error al obtener tipo de habitación');
   }
 };

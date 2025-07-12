@@ -6,11 +6,11 @@ const {
   getAnalyticsData,
   getMonthlyOccupancy,
   getRevenueByRoomType,
-  getFrequentCustomers
+  getFrequentCustomers,
 } = require('../controllers/export/analyticsDataController');
 
 function styleHeader(row) {
-  row.eachCell(cell => {
+  row.eachCell((cell) => {
     cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
     cell.fill = {
       type: 'pattern',
@@ -19,10 +19,10 @@ function styleHeader(row) {
     };
     cell.alignment = { vertical: 'middle', horizontal: 'center' };
     cell.border = {
-      top:    { style: 'thin' },
-      left:   { style: 'thin' },
+      top: { style: 'thin' },
+      left: { style: 'thin' },
       bottom: { style: 'thin' },
-      right:  { style: 'thin' },
+      right: { style: 'thin' },
     };
   });
 }
@@ -38,10 +38,10 @@ function styleDataRows(sheet, formatMap = {}) {
       }
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
       cell.border = {
-        top:    { style: 'thin' },
-        left:   { style: 'thin' },
+        top: { style: 'thin' },
+        left: { style: 'thin' },
         bottom: { style: 'thin' },
-        right:  { style: 'thin' },
+        right: { style: 'thin' },
       };
     });
   });
@@ -65,7 +65,7 @@ router.get('/excel/analytics', async (req, res) => {
       { header: 'Ocupación (%)', key: 'occupancy', width: 18 },
       { header: 'Reservas', key: 'sumReservations', width: 15 },
     ];
-    summaryData.forEach(row => resumenSheet.addRow(row));
+    summaryData.forEach((row) => resumenSheet.addRow(row));
     styleHeader(resumenSheet.getRow(1));
     styleDataRows(resumenSheet, {
       income: '"$"#,##0.00;[Red]\\-"$"#,##0.00',
@@ -81,7 +81,7 @@ router.get('/excel/analytics', async (req, res) => {
       { header: 'Ingreso Promedio', key: 'averageRevenue', width: 20 },
       { header: 'Ingreso Total', key: 'totalRevenue', width: 20 },
     ];
-    revenueData.forEach(row => revenueSheet.addRow(row));
+    revenueData.forEach((row) => revenueSheet.addRow(row));
     styleHeader(revenueSheet.getRow(1));
     styleDataRows(revenueSheet, {
       averageRevenue: '"$"#,##0.00',
@@ -97,14 +97,17 @@ router.get('/excel/analytics', async (req, res) => {
       { header: 'Cantidad de Reservas', key: 'reservationCount', width: 22 },
       { header: 'Monto Total', key: 'totaPrice', width: 20 },
     ];
-    frequentData.forEach(row => customersSheet.addRow(row));
+    frequentData.forEach((row) => customersSheet.addRow(row));
     styleHeader(customersSheet.getRow(1));
     styleDataRows(customersSheet, {
       totaPrice: '"$"#,##0.00',
     });
 
     // Configuración de headers
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
     res.setHeader('Content-Disposition', 'attachment; filename=analytics.xlsx');
     await workbook.xlsx.write(res);
     res.end();
@@ -130,14 +133,20 @@ router.get('/excel/analytics/monthly-occupancy', async (req, res) => {
       { header: 'Mes', key: 'month', width: 15 },
       { header: 'Ocupación (%)', key: 'occupancy', width: 18 },
     ];
-    occupancyData.forEach(row => occupancySheet.addRow(row));
+    occupancyData.forEach((row) => occupancySheet.addRow(row));
     styleHeader(occupancySheet.getRow(1));
     styleDataRows(occupancySheet, {
       occupancy: '0.00%',
     });
 
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=monthly_occupancy.xlsx');
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename=monthly_occupancy.xlsx'
+    );
     await workbook.xlsx.write(res);
     res.end();
   } catch (err) {

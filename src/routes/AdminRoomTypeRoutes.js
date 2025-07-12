@@ -16,7 +16,7 @@ router.get('/', getRoomTypeHandler); // GET /api/rooms/admin/roomType
 // POST /api/rooms/admin/roomType con fotos
 router.post('/upload', upload.array('photos', 10), createRoomTypeHandler);
 router.post('/', upload.array('photos', 10), createRoomTypeHandler);
-router.patch('/:id', upload.array('photos', 10), updateRoomTypeHandler);   // PATCH
-router.delete('/:id', deleteRoomTypeHandler);  // DELETE
+router.patch('/:id', upload.array('photos', 10), updateRoomTypeHandler); // PATCH
+router.delete('/:id', deleteRoomTypeHandler); // DELETE
 
 module.exports = router;

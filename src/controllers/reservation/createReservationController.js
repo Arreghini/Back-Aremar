@@ -3,7 +3,7 @@ const { Room, Reservation, RoomType } = require('../../models');
 const createReservationController = async (reservationData) => {
   try {
     if (!reservationData.userId) {
-      throw new Error("El campo userId es obligatorio para crear una reserva.");
+      throw new Error('El campo userId es obligatorio para crear una reserva.');
     }
 
     const room = await Room.findOne({
@@ -12,37 +12,40 @@ const createReservationController = async (reservationData) => {
       },
       include: {
         model: RoomType,
-        as: 'roomType', 
+        as: 'roomType',
         required: true, // Asegura que la habitación tenga un tipo de habitación asociado
-        attributes: ["name", "price"],
+        attributes: ['name', 'price'],
       },
     });
 
     if (!room) {
-      throw new Error("Habitación no encontrada");
+      throw new Error('Habitación no encontrada');
     }
 
     const availableRooms = await Room.findAll({
       where: {
         id: reservationData.roomId,
-        status: "available",
+        status: 'available',
       },
       include: {
         model: RoomType,
-        as: 'roomType', 
+        as: 'roomType',
         attributes: ['name', 'price'],
       },
     });
 
     if (!availableRooms || availableRooms.length === 0) {
-      throw new Error("La habitación seleccionada no está disponible");
+      throw new Error('La habitación seleccionada no está disponible');
     }
 
     const checkIn = new Date(reservationData.checkIn);
     const checkOut = new Date(reservationData.checkOut);
-    const numberOfDays = Math.max(1, Math.floor((checkOut - checkIn) / (1000 * 60 * 60 * 24)));
+    const numberOfDays = Math.max(
+      1,
+      Math.floor((checkOut - checkIn) / (1000 * 60 * 60 * 24))
+    );
 
-    const pricePerNight = room.roomType?.price;  
+    const pricePerNight = room.roomType?.price;
 
     const totalPrice = numberOfDays * pricePerNight;
 
@@ -50,16 +53,16 @@ const createReservationController = async (reservationData) => {
       roomId: room.id,
       checkIn: reservationData.checkIn,
       checkOut: reservationData.checkOut,
-      userId: reservationData.userId, 
+      userId: reservationData.userId,
       numberOfGuests: reservationData.numberOfGuests,
       totalPrice: Math.round(totalPrice),
-      status: "pending",
+      status: 'pending',
     });
 
     return newReservation;
   } catch (error) {
-    console.error("Error detallado:", error);
-    throw new Error(error.message || "Error al crear la reserva");
+    console.error('Error detallado:', error);
+    throw new Error(error.message || 'Error al crear la reserva');
   }
-}; 
+};
 module.exports = createReservationController;

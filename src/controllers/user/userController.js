@@ -1,7 +1,9 @@
-
 const axios = require('axios');
 const userService = require('../../services/userService');
-const { getManagementApiToken, checkUserRole } = require('../../services/roleService');
+const {
+  getManagementApiToken,
+  checkUserRole,
+} = require('../../services/roleService');
 const { AUTH0_DOMAIN } = process.env;
 
 // Función principal para guardar el usuario
@@ -72,4 +74,3 @@ exports.saveUser = async (userData) => {
     throw error; // Lanzamos el error original para mantener el mensaje específico
   }
 };
-

@@ -1,6 +1,16 @@
-const { User } = require('../models'); 
+const { User } = require('../models');
 
-exports.saveOrUpdateUser = async ({ id, name, email, emailVerified, picture, phone, dni, address, isActive }) => {
+exports.saveOrUpdateUser = async ({
+  id,
+  name,
+  email,
+  emailVerified,
+  picture,
+  phone,
+  dni,
+  address,
+  isActive,
+}) => {
   try {
     // Validar que se proporciona un ID
     if (!id) {
@@ -10,11 +20,11 @@ exports.saveOrUpdateUser = async ({ id, name, email, emailVerified, picture, pho
     // Intentar encontrar o crear el usuario
     let [user, created] = await User.findOrCreate({
       where: { id },
-      defaults: { 
-        email, 
-        name, 
-        picture, 
-        email_verified: emailVerified, 
+      defaults: {
+        email,
+        name,
+        picture,
+        email_verified: emailVerified,
         phone,
         dni,
         address,
@@ -24,10 +34,10 @@ exports.saveOrUpdateUser = async ({ id, name, email, emailVerified, picture, pho
 
     // Si el usuario ya existe, actualiza sus datos
     if (!created) {
-      user = await user.update({ 
-        email, 
-        name, 
-        picture, 
+      user = await user.update({
+        email,
+        name,
+        picture,
         email_verified: emailVerified, // También aquí
         phone,
         dni,

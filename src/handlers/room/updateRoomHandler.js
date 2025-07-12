@@ -15,12 +15,13 @@ const updateRoomHandler = async (req, res) => {
 
     // 1. Leer fotos existentes del body (si vienen)
     let existingPhotos = [];
-  
+
     if (roomData.existingPhotos) {
       try {
-        existingPhotos = typeof roomData.existingPhotos === 'string'
-          ? JSON.parse(roomData.existingPhotos)
-          : roomData.existingPhotos;
+        existingPhotos =
+          typeof roomData.existingPhotos === 'string'
+            ? JSON.parse(roomData.existingPhotos)
+            : roomData.existingPhotos;
       } catch (e) {
         existingPhotos = [];
       }
@@ -33,11 +34,11 @@ const updateRoomHandler = async (req, res) => {
     console.log('Archivos recibidos (req.files):', req.files);
 
     if (req.files && req.files.length > 0) {
-      const uploadPromises = req.files.map(file =>
+      const uploadPromises = req.files.map((file) =>
         uploadImageController(file, 'aremar/rooms')
       );
       const uploadResults = await Promise.all(uploadPromises);
-      newPhotoRoom = uploadResults.map(result => result.secure_url);
+      newPhotoRoom = uploadResults.map((result) => result.secure_url);
     }
 
     // 3. Combinar fotos existentes y nuevas
@@ -66,8 +67,16 @@ const updateRoomHandler = async (req, res) => {
     }
 
     // Validación final de price
-    if (roomData.price === undefined || roomData.price === null || isNaN(roomData.price)) {
-      return res.status(400).json({ message: 'El precio es obligatorio y debe ser un número válido.' });
+    if (
+      roomData.price === undefined ||
+      roomData.price === null ||
+      isNaN(roomData.price)
+    ) {
+      return res
+        .status(400)
+        .json({
+          message: 'El precio es obligatorio y debe ser un número válido.',
+        });
     }
 
     const updatedRoom = await updateRoomController(id, roomData);

@@ -13,10 +13,17 @@ const router = express.Router();
 const upload = multer();
 
 router.get('/all', getRoomHandler.getAllRooms);
-router.get('/', (req, res, next) => {
-  console.log('Datos recibidos desde el cliente para verificar disponibilidad:', req.query); // Registrar query params
-  next(); 
-}, getRoomHandler.getAvailableRooms);
+router.get(
+  '/',
+  (req, res, next) => {
+    console.log(
+      'Datos recibidos desde el cliente para verificar disponibilidad:',
+      req.query
+    ); // Registrar query params
+    next();
+  },
+  getRoomHandler.getAvailableRooms
+);
 
 // Ruta para obtener una habitación específica por ID
 router.get('/:id', getRoomById);

@@ -1,7 +1,11 @@
 const { Reservation, Refund } = require('../../models');
 const { Op } = require('sequelize');
 
-const cancelReservationWithRefundController = async ({ reservationId, userId, isAdmin }) => {
+const cancelReservationWithRefundController = async ({
+  reservationId,
+  userId,
+  isAdmin,
+}) => {
   const reservation = await Reservation.findByPk(reservationId);
 
   if (!reservation) throw new Error('Reserva no encontrada');
@@ -14,7 +18,9 @@ const cancelReservationWithRefundController = async ({ reservationId, userId, is
 
   const today = new Date();
   const checkInDate = new Date(reservation.checkInDate);
-  const daysBeforeCheckIn = Math.floor((checkInDate - today) / (1000 * 60 * 60 * 24));
+  const daysBeforeCheckIn = Math.floor(
+    (checkInDate - today) / (1000 * 60 * 60 * 24)
+  );
 
   let refundAmount = 0;
 
@@ -29,7 +35,9 @@ const cancelReservationWithRefundController = async ({ reservationId, userId, is
 
   const refund = await Refund.create({
     amount: refundAmount.toFixed(2),
-    reason: isAdmin ? 'Cancelación por administrador' : 'Cancelación por usuario',
+    reason: isAdmin
+      ? 'Cancelación por administrador'
+      : 'Cancelación por usuario',
   });
 
   reservation.status = 'cancelled';

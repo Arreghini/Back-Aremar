@@ -22,7 +22,7 @@ app.name = 'API';
 
 const corsOptions = {
   origin: ['http://localhost:5173', 'http://localhost:4000'],
-  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT','HEAD'],
+  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'HEAD'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
@@ -31,53 +31,55 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 // Configuración de la Content Security Policy (CSP) con helmet
-app.use(helmet({
-  contentSecurityPolicy: {
-    useDefaults: false,
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: [
-        "'self'",
-        "'unsafe-inline'",
-        "'unsafe-eval'",
-        "https://www.gstatic.com",
-        "https://www.google.com",
-        "https://www.recaptcha.net",
-        "https://*.gstatic.com",
-        "https://*.google.com",
-        "https://*.recaptcha.net",
-        "https://*.mercadopago.com",
-        "https://*.mercadopago.com.ar",
-        "https://*.mercadopago.com.br",
-        "https://*.mercadopago.com.co",
-        "https://*.mercadopago.com.mx",
-        "https://*.mercadopago.com.pe",
-        "https://*.mercadopago.com.uy",
-        "https://*.mercadopago.com.ve",
-        "https://*.hotjar.com",
-        "https://*.newrelic.com",
-        "https://js-agent.newrelic.com",
-        "https://http2.mlstatic.com",
-        "https://static.hotjar.com"
-      ],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:", "blob:"],
-      fontSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https:", "wss:"],
-      frameSrc: [
-        "'self'",
-        "https://www.google.com",
-        "https://recaptcha.google.com",
-        "https://www.recaptcha.net",
-        "https://*.mercadopago.com",
-        "https://*.mercadopago.com.ar"
-      ],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      workerSrc: ["'self'", "blob:"]
-    }
-  }
-}));
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: false,
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "'unsafe-eval'",
+          'https://www.gstatic.com',
+          'https://www.google.com',
+          'https://www.recaptcha.net',
+          'https://*.gstatic.com',
+          'https://*.google.com',
+          'https://*.recaptcha.net',
+          'https://*.mercadopago.com',
+          'https://*.mercadopago.com.ar',
+          'https://*.mercadopago.com.br',
+          'https://*.mercadopago.com.co',
+          'https://*.mercadopago.com.mx',
+          'https://*.mercadopago.com.pe',
+          'https://*.mercadopago.com.uy',
+          'https://*.mercadopago.com.ve',
+          'https://*.hotjar.com',
+          'https://*.newrelic.com',
+          'https://js-agent.newrelic.com',
+          'https://http2.mlstatic.com',
+          'https://static.hotjar.com',
+        ],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
+        fontSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'", 'https:', 'wss:'],
+        frameSrc: [
+          "'self'",
+          'https://www.google.com',
+          'https://recaptcha.google.com',
+          'https://www.recaptcha.net',
+          'https://*.mercadopago.com',
+          'https://*.mercadopago.com.ar',
+        ],
+        objectSrc: ["'none'"],
+        mediaSrc: ["'self'"],
+        workerSrc: ["'self'", 'blob:'],
+      },
+    },
+  })
+);
 
 // Rutas públicas
 app.get('/public', (req, res) => {
@@ -87,12 +89,22 @@ app.get('/public', (req, res) => {
 // Ruta pública para webhooks
 app.post('/api/webhooks/mercadopago', express.json(), webhookHandler());
 
-// Rutas administrativas 
-app.use('/api/reservations/admin', jwtCheck, checkAdmin, adminReservationRoutes);
+// Rutas administrativas
+app.use(
+  '/api/reservations/admin',
+  jwtCheck,
+  checkAdmin,
+  adminReservationRoutes
+);
 app.use('/api/rooms/admin/roomType', jwtCheck, checkAdmin, adminRoomTypeRoutes);
-app.use('/api/rooms/admin/roomDetail',jwtCheck, checkAdmin, adminRoomDetailsRoutes);
-app.use('/api/rooms/admin/available',jwtCheck, checkAdmin, adminRoomRoutes);
-app.use('/api/rooms/admin',jwtCheck, checkAdmin, adminRoomRoutes);
+app.use(
+  '/api/rooms/admin/roomDetail',
+  jwtCheck,
+  checkAdmin,
+  adminRoomDetailsRoutes
+);
+app.use('/api/rooms/admin/available', jwtCheck, checkAdmin, adminRoomRoutes);
+app.use('/api/rooms/admin', jwtCheck, checkAdmin, adminRoomRoutes);
 
 const logAuthMiddleware = (req, res, next) => {
   console.log('👉 Authorization header:', req.headers.authorization); // ¿Llega el token?
@@ -100,15 +112,25 @@ const logAuthMiddleware = (req, res, next) => {
   next();
 };
 
-app.use('/api/users/admin', jwtCheck, logAuthMiddleware, checkAdmin, adminUserRoutes);
+app.use(
+  '/api/users/admin',
+  jwtCheck,
+  logAuthMiddleware,
+  checkAdmin,
+  adminUserRoutes
+);
 
-app.use('/api/admin/export',jwtCheck, checkAdmin, exportRoutes);
+app.use('/api/admin/export', jwtCheck, checkAdmin, exportRoutes);
 
 // Rutas regulares protegidas
 app.use('/api/rooms', roomRoutes);
 app.use('/api/users', jwtCheck, userRoutes);
-app.use('/api/reservations/:reservationId/payment', jwtCheck, createPreferenceHandler);
-app.use('/api/reservations',jwtCheck, reservationRoutes);
+app.use(
+  '/api/reservations/:reservationId/payment',
+  jwtCheck,
+  createPreferenceHandler
+);
+app.use('/api/reservations', jwtCheck, reservationRoutes);
 app.use('/api/payment', jwtCheck, paymentRedirectRoutes);
 
 // Manejo de errores y rutas no encontradas (mantener igual)
@@ -119,9 +141,13 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error('Error en la solicitud:', err);
   if (err.name === 'UnauthorizedError') {
-    return res.status(401).json({ message: 'Token inválido o no proporcionado' });
+    return res
+      .status(401)
+      .json({ message: 'Token inválido o no proporcionado' });
   }
-  return res.status(err.status || 500).json({ message: err.message || 'Ocurrió un error en el servidor' });
+  return res
+    .status(err.status || 500)
+    .json({ message: err.message || 'Ocurrió un error en el servidor' });
 });
 
 module.exports = app;

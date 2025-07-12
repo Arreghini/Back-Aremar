@@ -6,7 +6,7 @@ const updateRoomTypeHandler = async (req, res) => {
     console.log('req.params:', req.params);
     console.log('req.body:', req.body);
     console.log('req.files:', req.files);
-    
+
     const { id } = req.params;
     let updateData = req.body;
 
@@ -14,9 +14,9 @@ const updateRoomTypeHandler = async (req, res) => {
     console.log('Datos de actualización:', updateData);
 
     if (!id) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        error: 'ID del tipo de habitación es requerido' 
+        error: 'ID del tipo de habitación es requerido',
       });
     }
 
@@ -24,14 +24,14 @@ const updateRoomTypeHandler = async (req, res) => {
     if (req.files && req.files.length > 0) {
       // Si hay archivos nuevos, procesarlos
       const uploadImageController = require('../../../controllers/image/uploadImageController');
-      
-      const uploadPromises = req.files.map(file => 
+
+      const uploadPromises = req.files.map((file) =>
         uploadImageController(file, 'aremar/roomtypes')
       );
-      
+
       const uploadResults = await Promise.all(uploadPromises);
-      const newPhotoUrls = uploadResults.map(result => result.secure_url);
-      
+      const newPhotoUrls = uploadResults.map((result) => result.secure_url);
+
       // Combinar fotos existentes con nuevas
       let existingPhotos = [];
       if (updateData.existingPhotos) {
@@ -41,39 +41,38 @@ const updateRoomTypeHandler = async (req, res) => {
           console.log('Error parsing existingPhotos:', e);
         }
       }
-      
+
       updateData.photos = [...existingPhotos, ...newPhotoUrls];
     }
 
     const updatedType = await updateRoomTypeController(id, updateData);
 
     if (!updatedType) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        error: 'RoomType no encontrado' 
+        error: 'RoomType no encontrado',
       });
     }
 
-    return res.status(200).json({ 
+    return res.status(200).json({
       success: true,
-      message: 'RoomType actualizado con éxito', 
-      data: updatedType 
+      message: 'RoomType actualizado con éxito',
+      data: updatedType,
     });
-    
   } catch (error) {
     console.error('Error al actualizar el tipo de habitación:', error);
-    
+
     if (error.message === 'RoomType no encontrado') {
       return res.status(404).json({
         success: false,
-        error: 'El tipo de habitación no existe'
+        error: 'El tipo de habitación no existe',
       });
     }
-    
+
     return res.status(500).json({
       success: false,
       error: 'Error interno del servidor',
-      details: error.message
+      details: error.message,
     });
   }
 };

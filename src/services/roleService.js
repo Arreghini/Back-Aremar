@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 const axios = require('axios');
 const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET } = process.env;
@@ -10,7 +9,7 @@ const getManagementApiToken = async () => {
       client_id: AUTH0_CLIENT_ID,
       client_secret: AUTH0_CLIENT_SECRET,
       audience: `https://${AUTH0_DOMAIN}/api/v2/`,
-      grant_type: 'client_credentials'
+      grant_type: 'client_credentials',
     });
 
     return response.data.access_token;
@@ -23,17 +22,19 @@ const getManagementApiToken = async () => {
 // Función para verificar los roles del usuario
 const checkUserRole = async (user_id, token) => {
   try {
-    const rolesResponse = await axios.get(`https://${AUTH0_DOMAIN}/api/v2/users/${user_id}/roles`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const rolesResponse = await axios.get(
+      `https://${AUTH0_DOMAIN}/api/v2/users/${user_id}/roles`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-    const roles = rolesResponse.data.map(role => role.name);
+    const roles = rolesResponse.data.map((role) => role.name);
     console.log('Roles del usuario:', roles);
-    
+
     return roles.includes('admin'); // Verifica si el usuario tiene el rol de administrador
-    
   } catch (error) {
     console.error('Error al obtener los roles del usuario:', error);
     throw new Error('Error al obtener los roles del usuario');
@@ -42,6 +43,5 @@ const checkUserRole = async (user_id, token) => {
 
 module.exports = {
   getManagementApiToken,
-  checkUserRole
+  checkUserRole,
 };
-

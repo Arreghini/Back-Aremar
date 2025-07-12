@@ -18,7 +18,7 @@ const uploadImageController = async (file, folder) => {
           folder: folder,
           resource_type: 'image',
           // Opcional: usar el nombre original del archivo
-          public_id: file.originalname.split('.')[0] + '_' + Date.now()
+          public_id: file.originalname.split('.')[0] + '_' + Date.now(),
         },
         (error, result) => {
           if (error) {
@@ -29,16 +29,15 @@ const uploadImageController = async (file, folder) => {
             resolve({
               public_id: result.public_id,
               secure_url: result.secure_url,
-              folder: folder
+              folder: folder,
             });
           }
         }
       );
-      
+
       // ✅ Enviar el buffer al stream
       stream.end(file.buffer);
     });
-
   } catch (error) {
     console.error('Error en uploadImageController:', error);
     throw error;

@@ -2,16 +2,15 @@ const { RoomType, Room } = require('../../../models');
 
 const createRoomTypeController = async (data) => {
   try {
-    
     const {
       id,
       name,
       photos,
       simpleBeds,
       trundleBeds,
-      kingBeds, 
+      kingBeds,
       windows,
-      price, 
+      price,
     } = data;
 
     const newType = await RoomType.create({
@@ -22,20 +21,20 @@ const createRoomTypeController = async (data) => {
       trundleBeds,
       kingBeds,
       windows,
-      price, 
+      price,
     });
 
     console.log('RoomType creado:', {
       id: newType.id,
       name: newType.name,
       photos: newType.photos,
-      photosCount: newType.photos ? newType.photos.length : 0
+      photosCount: newType.photos ? newType.photos.length : 0,
     });
 
-    return newType; 
+    return newType;
   } catch (error) {
-    console.error('Error al crear el tipo de habitación:', error); 
-    throw error; 
+    console.error('Error al crear el tipo de habitación:', error);
+    throw error;
   }
 };
 

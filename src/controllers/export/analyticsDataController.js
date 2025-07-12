@@ -41,12 +41,14 @@ const getAnalyticsData = async (startDate, endDate) => {
 
       let occupiedDays = 0;
       for (const reservation of reservations) {
-        const checkIn = new Date(reservation.checkIn) < new Date(startDate)
-          ? new Date(startDate)
-          : new Date(reservation.checkIn);
-        const checkOut = new Date(reservation.checkOut) > new Date(endDate)
-          ? new Date(endDate)
-          : new Date(reservation.checkOut);
+        const checkIn =
+          new Date(reservation.checkIn) < new Date(startDate)
+            ? new Date(startDate)
+            : new Date(reservation.checkIn);
+        const checkOut =
+          new Date(reservation.checkOut) > new Date(endDate)
+            ? new Date(endDate)
+            : new Date(reservation.checkOut);
         const days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
         occupiedDays += days;
       }
@@ -62,11 +64,11 @@ const getAnalyticsData = async (startDate, endDate) => {
 
       analyticsData.push({
         roomId: room.id,
-        income: "$" +' '+ income || 0,
+        income: '$' + ' ' + income || 0,
         freeDays,
         occupiedDays,
         totalDays,
-        occupancy: ((occupiedDays / totalDays) * 100).toFixed(1) + "%" ,
+        occupancy: ((occupiedDays / totalDays) * 100).toFixed(1) + '%',
         sumReservations,
       });
     }
@@ -113,12 +115,14 @@ const getMonthlyOccupancy = async (year, month) => {
 
     let occupiedDays = 0;
     for (const reservation of reservations) {
-      const checkIn = new Date(reservation.checkIn) < new Date(startDate)
-        ? new Date(startDate)
-        : new Date(reservation.checkIn);
-      const checkOut = new Date(reservation.checkOut) > new Date(endDate)
-        ? new Date(endDate)
-        : new Date(reservation.checkOut);
+      const checkIn =
+        new Date(reservation.checkIn) < new Date(startDate)
+          ? new Date(startDate)
+          : new Date(reservation.checkIn);
+      const checkOut =
+        new Date(reservation.checkOut) > new Date(endDate)
+          ? new Date(endDate)
+          : new Date(reservation.checkOut);
       const days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
       occupiedDays += days;
     }
@@ -194,12 +198,14 @@ const getRevenueByRoomType = async (startDate, endDate) => {
 
     let occupiedDays = 0;
     for (const reservation of reservations) {
-      const checkIn = new Date(reservation.checkIn) < new Date(startDate)
-        ? new Date(startDate)
-        : new Date(reservation.checkIn);
-      const checkOut = new Date(reservation.checkOut) > new Date(endDate)
-        ? new Date(endDate)
-        : new Date(reservation.checkOut);
+      const checkIn =
+        new Date(reservation.checkIn) < new Date(startDate)
+          ? new Date(startDate)
+          : new Date(reservation.checkIn);
+      const checkOut =
+        new Date(reservation.checkOut) > new Date(endDate)
+          ? new Date(endDate)
+          : new Date(reservation.checkOut);
       const days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
       occupiedDays += days;
     }
@@ -257,9 +263,9 @@ const getFrequentCustomers = async (startDate, endDate, limit = 10) => {
     }
   });
 
-  const sortedAnalytics = Object
-    .values(customerAnalytics)
-    .sort((a, b) => b.reservationCount - a.reservationCount);
+  const sortedAnalytics = Object.values(customerAnalytics).sort(
+    (a, b) => b.reservationCount - a.reservationCount
+  );
 
   return sortedAnalytics.slice(0, limit);
 };
@@ -268,5 +274,5 @@ module.exports = {
   getAnalyticsData,
   getMonthlyOccupancy,
   getRevenueByRoomType,
-  getFrequentCustomers
+  getFrequentCustomers,
 };

@@ -1,11 +1,18 @@
 const axios = require('axios');
 const { Refund: RefundModel } = require('../models');
 
-const processRefund = async ({ reservationId, paymentId, amount, reason = 'Reembolso parcial' }) => {
+const processRefund = async ({
+  reservationId,
+  paymentId,
+  amount,
+  reason = 'Reembolso parcial',
+}) => {
   try {
     // Validar paymentId
     if (!paymentId) {
-      throw new Error('No se puede procesar el reembolso porque el paymentId es nulo o no está disponible.');
+      throw new Error(
+        'No se puede procesar el reembolso porque el paymentId es nulo o no está disponible.'
+      );
     }
 
     // Validar monto
@@ -14,9 +21,13 @@ const processRefund = async ({ reservationId, paymentId, amount, reason = 'Reemb
     }
 
     // Usar el mismo token que funciona para las preferencias
-    const accessToken = process.env.MP_ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN;
-    
-    console.log('Intentando reembolso con token:', accessToken.substring(0, 10) + '...');
+    const accessToken =
+      process.env.MP_ACCESS_TOKEN || process.env.MERCADOPAGO_ACCESS_TOKEN;
+
+    console.log(
+      'Intentando reembolso con token:',
+      accessToken.substring(0, 10) + '...'
+    );
     console.log('Para el pago ID:', paymentId);
     console.log('Monto a reembolsar:', amount);
 
@@ -27,7 +38,7 @@ const processRefund = async ({ reservationId, paymentId, amount, reason = 'Reemb
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         timeout: 15000, // 15 segundos de timeout
       }
@@ -42,7 +53,7 @@ const processRefund = async ({ reservationId, paymentId, amount, reason = 'Reemb
       amount: amount.toFixed(2),
       reason,
       paymentId,
-      mercadopagoRefundId: refundResponse.data.id
+      mercadopagoRefundId: refundResponse.data.id,
     });
 
     return {
@@ -52,16 +63,16 @@ const processRefund = async ({ reservationId, paymentId, amount, reason = 'Reemb
     };
   } catch (error) {
     console.error('Error en proceso de reembolso:', error.message);
-    
+
     // Mejorar el registro de errores para depuración
     if (error.response) {
       console.error('Detalles del error:', {
         status: error.response.status,
         data: error.response.data,
-        headers: error.response.headers
+        headers: error.response.headers,
       });
     }
-    
+
     return {
       success: false,
       mensaje: 'Hubo un error al procesar el reembolso.',

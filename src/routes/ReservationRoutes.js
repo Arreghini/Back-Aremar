@@ -18,7 +18,10 @@ router.post('/', createReservationHandler);
 router.get('/', getReservationHandler.getAllReservationHandler);
 
 // Obtener todas las reservas de un usuario específico (por `userId`)
-router.get('/user/:userId', getReservationHandler.getReservationByUserIdHandler);
+router.get(
+  '/user/:userId',
+  getReservationHandler.getReservationByUserIdHandler
+);
 
 // Obtener una reserva específica por su ID
 router.get('/:reservationId', getReservationHandler.getReservationByIdHandler);
@@ -29,7 +32,7 @@ router.patch('/:reservationId', updateReservationHandler);
 // Eliminar una reserva
 router.delete('/:reservationId', deleteReservationByIdHandler);
 
-// Definir preferencia de pago 
+// Definir preferencia de pago
 router.post('/:reservationId/create-preference', createPreferenceHandler);
 
 module.exports = router;

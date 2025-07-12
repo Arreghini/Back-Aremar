@@ -16,7 +16,8 @@ const updateReservationController = async (id, data) => {
     }
 
     const room = await Room.findOne({ where: { id: data.roomId } });
-    if (!room) throw new Error(`No se encontró la habitación con id ${data.roomId}`);
+    if (!room)
+      throw new Error(`No se encontró la habitación con id ${data.roomId}`);
 
     const reservation = await Reservation.findOne({ where: { id } });
     if (!reservation) throw new Error(`No se encontró la reserva con id ${id}`);
@@ -40,11 +41,16 @@ const updateReservationController = async (id, data) => {
       };
     }
 
-    const originalDays = (new Date(reservation.checkOut) - new Date(reservation.checkIn)) / (1000 * 60 * 60 * 24);
-    const newDays = (new Date(data.checkOut) - new Date(data.checkIn)) / (1000 * 60 * 60 * 24);
+    const originalDays =
+      (new Date(reservation.checkOut) - new Date(reservation.checkIn)) /
+      (1000 * 60 * 60 * 24);
+    const newDays =
+      (new Date(data.checkOut) - new Date(data.checkIn)) /
+      (1000 * 60 * 60 * 24);
     const daysDifference = newDays - originalDays;
 
-    const dailyRate = originalDays > 0 ? reservation.totalPrice / originalDays : room.price;
+    const dailyRate =
+      originalDays > 0 ? reservation.totalPrice / originalDays : room.price;
     const totalPrice = newDays * dailyRate;
     data.totalPrice = totalPrice;
 
@@ -121,7 +127,15 @@ const updateReservationController = async (id, data) => {
         totalPrice: data.totalPrice,
       },
       {
-        fields: ['paymentId', 'checkIn', 'checkOut', 'numberOfGuests', 'roomId', 'status', 'totalPrice'],
+        fields: [
+          'paymentId',
+          'checkIn',
+          'checkOut',
+          'numberOfGuests',
+          'roomId',
+          'status',
+          'totalPrice',
+        ],
       }
     );
 

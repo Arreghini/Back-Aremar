@@ -1,9 +1,19 @@
-const { User } = require('../../models/index'); 
+const { User } = require('../../models/index');
 
 const userCreateController = async (roomData) => {
-  console.log('Datos recibidos en el controlador:', roomData);  // Verificación de datos de entrada
+  console.log('Datos recibidos en el controlador:', roomData); // Verificación de datos de entrada
   try {
-    const { id, name, email, verifyedEmail, picture, phone, dni, address, isActive  } = roomData;
+    const {
+      id,
+      name,
+      email,
+      verifyedEmail,
+      picture,
+      phone,
+      dni,
+      address,
+      isActive,
+    } = roomData;
 
     // Buscar usuario existente por ID
     const existingUser = await User.findByPk(id);
@@ -24,12 +34,12 @@ const userCreateController = async (roomData) => {
       dni,
       address,
       isActive,
-      });
+    });
 
-    return newUser; 
+    return newUser;
   } catch (error) {
-    console.error('Error al crear el usuario:', error.message); 
-    throw error; 
+    console.error('Error al crear el usuario:', error.message);
+    throw error;
   }
 };
 

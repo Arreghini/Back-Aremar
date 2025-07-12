@@ -3,7 +3,7 @@ const { RoomType } = require('../../../models');
 const deleteTypeController = async (id) => {
   const deleted = await RoomType.destroy({
     where: { id },
-    force: true
+    force: true,
   });
 
   if (!deleted) {

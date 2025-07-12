@@ -3,7 +3,8 @@ const getReservationController = require('../../controllers/reservation/getReser
 // Handler para obtener todas las reservas
 const getAllReservationHandler = async (req, res) => {
   try {
-    const reservations = await getReservationController.getAllReservationController(); 
+    const reservations =
+      await getReservationController.getAllReservationController();
     res.status(200).json(reservations);
   } catch (error) {
     console.error('Error al obtener las reservas:', error.message);
@@ -15,30 +16,30 @@ const getAllReservationHandler = async (req, res) => {
 const getReservationByUserIdHandler = async (req, res) => {
   try {
     const { userId } = req.params;
-    
+
     // Validación del formato
     if (!userId) {
       return res.status(400).json({ message: 'UserId es requerido' });
     }
 
     console.log('ID de usuario recibido:', userId);
-    console.log('ID de usuario en auth:', req.auth?.payload?.sub);  
-    
-    const userReservations = await getReservationController.getReservationByUserIdController(userId);
-    
+    console.log('ID de usuario en auth:', req.auth?.payload?.sub);
+
+    const userReservations =
+      await getReservationController.getReservationByUserIdController(userId);
+
     return res.status(200).json({
       success: true,
       data: userReservations,
       userId: userId,
-      formattedUserId: `google-oauth2|${userId}`
+      formattedUserId: `google-oauth2|${userId}`,
     });
-
   } catch (error) {
     console.error('Error completo:', error);
     return res.status(500).json({
       success: false,
       message: 'Error al obtener las reservas',
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -48,10 +49,15 @@ const getReservationByIdHandler = async (req, res) => {
   const { reservationId } = req.params;
   try {
     if (!reservationId) {
-      return res.status(400).json({ message: 'El ID de la reserva es obligatorio' });
+      return res
+        .status(400)
+        .json({ message: 'El ID de la reserva es obligatorio' });
     }
 
-    const reservation = await getReservationController.getReservationByIdController(reservationId);
+    const reservation =
+      await getReservationController.getReservationByIdController(
+        reservationId
+      );
     if (!reservation) {
       return res.status(404).json({ message: 'Reserva no encontrada' });
     }

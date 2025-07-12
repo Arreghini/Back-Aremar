@@ -1,6 +1,9 @@
 const { Reservation } = require('../../models');
 
-const cancelReservationByAdminController = async ({ reservationId, isAdmin }) => {
+const cancelReservationByAdminController = async ({
+  reservationId,
+  isAdmin,
+}) => {
   const reservation = await Reservation.findByPk(reservationId);
 
   if (!reservation) throw new Error('Reserva no encontrada');

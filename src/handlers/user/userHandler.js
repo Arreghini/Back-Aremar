@@ -28,7 +28,7 @@ const handleSaveUser = async (req) => {
     console.log('Usuario guardado:', savedUser);
 
     // Retorna savedUser incluyendo isAdmin
-    return { ...savedUser, isAdmin }; 
+    return { ...savedUser, isAdmin };
   } catch (error) {
     console.error('Error en handleSaveUser:', error);
     throw error;

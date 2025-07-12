@@ -1,9 +1,8 @@
-
 const updateUserController = require('../../controllers/user/updateProfileController');
 
 const updateUserHandler = async (req, res) => {
-  const { id } = req.params; 
-  const userData = req.body; 
+  const { id } = req.params;
+  const userData = req.body;
 
   try {
     const updatedUser = await updateUserController(id, userData);
