@@ -1,5 +1,6 @@
 const axios = require('axios');
 const userService = require('../../services/userService');
+
 const {
   getManagementApiToken,
   checkUserRole,

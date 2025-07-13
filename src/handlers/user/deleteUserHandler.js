@@ -3,6 +3,9 @@ const deleteUserController = require('../../controllers/user/deleteUserControlle
 const deleteUserHandler = async (req, res) => {
   try {
     const id = req.params.id; // Extrae el ID de los parámetros
+    if (!id) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
     console.log(
       'Datos recibidos desde el dashboard para eliminar el usuario:',
       {

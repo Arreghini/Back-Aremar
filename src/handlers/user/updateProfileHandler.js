@@ -1,18 +1,35 @@
-const updateGuestProfileController = require('../controllers/user/updateProfileController');
+const updateUserController = require('../../controllers/user/updateProfileController');
 
-const updateProfileHandler = async (req, res) => {
-  const { sub: user_id } = req.user;
-  const fieldsToUpdate = req.body;
+const updateUserHandler = async (req, res) => {
+  const { id } = req.params;
+  const updateData = req.body;
+
+  if (!id) {
+    return res.status(400).json({ message: 'User ID is required' });
+  }
+
+  if (!updateData || typeof updateData !== 'object') {
+    return res.status(400).json({ message: 'Update data is required' });
+  }
+
+  const hasValidFields = Object.values(updateData).some(
+    (val) => val !== null && val !== undefined && val !== ''
+  );
+
+  if (!hasValidFields) {
+    return res.status(400).json({ message: 'Update data cannot be empty' });
+  }
 
   try {
-    const updatedGuestProfile = await updateGuestProfileController(
-      user_id,
-      fieldsToUpdate
-    );
-    res.status(200).json(updatedGuestProfile);
+    const updatedUser = await updateUserController(id, updateData);
+    return res.status(200).json({
+      message: 'User updated successfully',
+      user: updatedUser
+    });
   } catch (error) {
-    console.error('Error updating guest profile:', error);
-    res.status(500).json({ message: 'Error updating guest profile' });
+    console.error(error);
+    return res.status(500).json({ message: error.message });
   }
 };
-module.exports = updateProfileHandler;
+
+module.exports = updateUserHandler;
