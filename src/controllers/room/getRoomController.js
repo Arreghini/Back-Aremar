@@ -8,6 +8,22 @@ const findOverlappingReservations = async (
   checkOut,
   excludeReservationId
 ) => {
+  // Validación de fechas
+  if (!checkIn || !checkOut) {
+    throw new Error('Both checkIn and checkOut dates are required');
+  }
+
+  const checkInDate = new Date(checkIn);
+  const checkOutDate = new Date(checkOut);
+
+  if (isNaN(checkInDate) || isNaN(checkOutDate)) {
+    throw new Error('Invalid date format');
+  }
+
+  if (checkOutDate < checkInDate) {
+    throw new Error('checkOut date cannot be before checkIn date');
+  }
+
   return await Reservation.findAll({
     where: {
       ...(roomId && { roomId }),
@@ -41,9 +57,6 @@ const findOverlappingReservations = async (
   });
 };
 
-module.exports = {
-  findOverlappingReservations,
-};
 // Controlador para obtener habitaciones disponibles por tipo
 const getAvailableRoomsController = async (
   reservationId,
@@ -145,6 +158,7 @@ const getAllRoomController = async () => {
 
 // Exportar controladores
 const getRoomController = {
+  findOverlappingReservations,
   getAllRoomController,
   getAvailableRoomsController,
   getAvailableRoomByIdController,

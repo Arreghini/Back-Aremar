@@ -55,16 +55,20 @@ const updateRoomHandler = async (req, res) => {
     }
 
     // Manejo robusto del precio
-    if (roomData.price !== undefined && roomData.price !== '') {
-      const parsedPrice = parseFloat(roomData.price);
-      if (!isNaN(parsedPrice)) {
-        roomData.price = parsedPrice;
-      } else {
-        roomData.price = room.price;
-      }
-    } else {
-      roomData.price = room.price;
-    }
+   if (roomData.price !== undefined && roomData.price !== '') {
+  const parsedPrice = parseFloat(roomData.price);
+  if (!isNaN(parsedPrice)) {
+    roomData.price = parsedPrice;
+  } else {
+    return res.status(400).json({
+      message: 'El precio es obligatorio y debe ser un número válido.'
+    });
+  }
+} else {
+  return res.status(400).json({
+    message: 'El precio es obligatorio y debe ser un número válido.'
+  });
+}
 
     // Validación final de price
     if (

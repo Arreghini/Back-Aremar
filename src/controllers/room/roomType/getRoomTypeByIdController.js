@@ -1,32 +1,20 @@
-const { Room, RoomType } = require('../../../models');
+const { RoomType, Room } = require('../../../models');
 
-const getRoomTypeByRoomIdController = async (roomId) => {
+const getRoomTypeByIdController = async (id) => {
   try {
-    console.log('[Controller] Buscando habitación con ID:', roomId);
-
-    const room = await Room.findOne({
-      where: { id: roomId },
-      include: {
-        model: RoomType,
-        as: 'roomType',
-        attributes: ['id', 'name', 'price'],
-      },
-    });
-
-    if (!room) {
-      console.warn('[Controller] No se encontró habitación con ID:', roomId);
-      return null;
+    if (!id || typeof id !== 'string' || !id.trim()) {
+      throw new Error('Room Type ID is required');
     }
 
-    console.log('[Controller] Tipo de habitación encontrado:', room.roomType);
-    return room.roomType;
+    const roomType = await RoomType.findByPk(id.trim(), {
+      include: Room,
+    });
+
+    return roomType;
   } catch (error) {
-    console.error(
-      '[Controller] Error al buscar tipo de habitación:',
-      error.message
-    );
-    throw new Error('Error al obtener tipo de habitación');
+    console.error('Error al obtener tipo de habitación:', error.message);
+    throw new Error(error.message || 'Unexpected error');
   }
 };
 
-module.exports = getRoomTypeByRoomIdController;
+module.exports = getRoomTypeByIdController;

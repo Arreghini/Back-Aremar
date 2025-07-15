@@ -1,15 +1,24 @@
 const { RoomDetail } = require('../../../models');
 
-const getDetailsController = async () => {
-  try {
-    // Obtener todos los detalles de habitación
-    const roomDetails = await RoomDetail.findAll();
+const getRoomDetailController = async (id) => {
+  if (id === undefined || id === null) {
+    throw new Error('Room detail ID must be provided');
+  }
 
-    return roomDetails; // Retornar todos los detalles encontrados
+  if (typeof id !== 'string') {
+    throw new Error('Room detail ID must be a string');
+  }
+
+  if (id.trim() === '') {
+    throw new Error('Room detail ID cannot be empty');
+  }
+
+  try {
+    const roomDetail = await RoomDetail.findByPk(id);
+    return roomDetail;
   } catch (error) {
-    console.error('Error al obtener los detalles de la habitación:', error);
-    throw error; // Lanza el error para que sea manejado en el handler
+    throw new Error(error.message);
   }
 };
 
-module.exports = getDetailsController;
+module.exports = getRoomDetailController;

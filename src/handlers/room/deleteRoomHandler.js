@@ -2,19 +2,20 @@ const deleteRoomController = require('../../controllers/room/deleteRoomControlle
 
 const deleteRoomHandler = async (req, res) => {
   try {
-    const id = req.params.id; // Extrae el ID de los parámetros
-    console.log(
-      'Datos recibidos desde el dashboard para eliminar la habitación:',
-      {
-        id, // ID de la habitación en los parámetros de la ruta
-        headers: req.headers, // Headers de la solicitud (incluyendo autorización si se envía)
-        user: req.user, // Información del usuario autenticado (si jwtCheck la añade al req)
-      }
-    );
-    const room = await deleteRoomController(id); // Pasa el ID al controlador
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json({ message: 'Missing room id' });
+    }
+
+    if (isNaN(Number(id))) {
+      return res.status(400).json({ message: 'Invalid room ID format' });
+    }
+
+    const room = await deleteRoomController(id);
     if (!room) {
       return res.status(404).json({ message: 'Room not found' });
     }
+
     res.status(200).json({ message: 'Room deleted successfully' });
   } catch (error) {
     console.error('Error in deleteRoom handler:', error);

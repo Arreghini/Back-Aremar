@@ -1,19 +1,13 @@
 const { RoomDetail } = require('../../../models');
 
 const createDetailController = async (data) => {
+  if (!data || Object.keys(data).length === 0) {
+    throw new Error('Missing data to create room detail');
+  }
+
   try {
-    const { id, cableTvService, smart_TV, wifi, microwave, pava_electrica } =
-      data;
-
-    const newDetail = await RoomDetail.create({
-      id,
-      cableTvService,
-      smart_TV,
-      wifi,
-      microwave,
-      pava_electrica,
-    });
-
+    // Directamente pasa todo el objeto data a create
+    const newDetail = await RoomDetail.create(data);
     return newDetail;
   } catch (error) {
     console.error('Error al crear el detalle de la habitación:', error);

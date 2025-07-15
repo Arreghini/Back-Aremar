@@ -12,7 +12,7 @@ const updateRoomTypeController = async (id, updateData) => {
 
     if (!existingRoomType) {
       console.log('RoomType no encontrado con ID:', id);
-      throw new Error('RoomType no encontrado');
+      throw new Error('Room type not found');
     }
 
     // ✅ Preparar datos para actualizar

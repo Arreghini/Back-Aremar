@@ -1,20 +1,29 @@
 const { Room } = require('../../models');
 
 const deleteRoomController = async (id) => {
+  if (!id) {
+    return null;
+  }
+
   try {
-    const room = await Room.findAll({ where: { id } });
-    if (!id) {
-      return null; // No se proporcionó un ID válido
-    } 
-    if (!room) {
-      return null; // La habitación no fue encontrada
+    const rooms = await Room.findAll({ where: { id } });
+
+    if (!rooms || rooms.length === 0) {
+      return null;
     }
-    await Room.destroy({ where: { id } });
-    return room;
+
+    const deletedCount = await Room.destroy({ where: { id } });
+
+    if (deletedCount === 0) {
+      return null;
+    }
+
+    return rooms;
   } catch (error) {
     console.error('Error deleting room:', error);
     throw error;
   }
 };
+
 
 module.exports = deleteRoomController;

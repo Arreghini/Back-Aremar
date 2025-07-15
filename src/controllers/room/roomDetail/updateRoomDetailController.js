@@ -1,23 +1,38 @@
 const { RoomDetail } = require('../../../models');
 
-const updateDetailController = async (id, data) => {
-  try {
-    // Buscar el detalle de habitación por ID
-    const roomDetail = await RoomDetail.findByPk(id);
+const updateRoomDetailController = async (id, updateData) => {
+  if (
+    id === null ||
+    id === undefined ||
+    (typeof id === 'string' && id.trim() === '') ||
+    (typeof id !== 'string' && typeof id !== 'number')
+  ) {
+    throw new Error('Invalid room ID');
+  }
 
-    // Si no se encuentra, lanzar un error
+  if (!updateData || Object.keys(updateData).length === 0) {
+    return true;
+  }
+
+  try {
+    const roomDetail = await RoomDetail.findOne({ where: { id } });
+
     if (!roomDetail) {
-      throw new Error('RoomDetail no encontrado');
+      throw new Error('Room detail not found');
     }
 
-    // Actualizar los campos del detalle de habitación con los nuevos datos
-    await roomDetail.update(data);
+    await roomDetail.update(updateData);
 
-    return roomDetail; // Retornar el detalle actualizado
+    return true;
   } catch (error) {
-    console.error('Error al actualizar el detalle de la habitación:', error);
-    throw error; // Lanza el error para que sea manejado en el handler
+    if (
+      error.message === 'Room detail not found' ||
+      error.message === 'Invalid room ID'
+    ) {
+      throw error;
+    }
+    throw new Error('Database connection failed');
   }
 };
 
-module.exports = updateDetailController;
+module.exports = updateRoomDetailController;
