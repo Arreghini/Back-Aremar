@@ -9,7 +9,7 @@ const cancelReservationWithRefundController = async ({
   const reservation = await Reservation.findByPk(reservationId);
 
   if (!reservation) throw new Error('Reserva no encontrada');
-  if (reservation.status === 'cancelded') {
+  if (reservation.status === 'cancelled') {
     throw new Error('Esta reserva ya ha sido cancelada');
   }
   if (!isAdmin && reservation.userId !== userId) {
@@ -24,7 +24,7 @@ const cancelReservationWithRefundController = async ({
 
   let refundAmount = 0;
 
-  // 💡 Ejemplo de política de reembolso
+  // Política de reembolso
   if (daysBeforeCheckIn >= 7) {
     refundAmount = reservation.totalPrice * 0.9;
   } else if (daysBeforeCheckIn >= 3) {
@@ -33,8 +33,10 @@ const cancelReservationWithRefundController = async ({
     refundAmount = reservation.totalPrice * 0.1;
   }
 
+  refundAmount = Number(refundAmount.toFixed(2));
+
   const refund = await Refund.create({
-    amount: refundAmount.toFixed(2),
+    amount: refundAmount,
     reason: isAdmin
       ? 'Cancelación por administrador'
       : 'Cancelación por usuario',
