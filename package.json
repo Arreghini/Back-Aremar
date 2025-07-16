@@ -56,6 +56,12 @@
     "collectCoverage": true,
     "collectCoverageFrom": [
       "src/controllers/**/*.js",
+      "src/handlers/**/*.jsx",
+      "src/services/**/*.js",
+      "src/utils/**/*.js",
+      "src/middlewares/**/*.js",
+      "src/routes/**/*.js",
+      "src/models/**/*.js",
       "!**/__tests__/**"
     ],
     "coverageDirectory": "coverage",

@@ -2,10 +2,10 @@ const axios = require('axios');
 const { Refund: RefundModel } = require('../models');
 
 const processRefund = async ({
-  reservationId,
   paymentId,
   amount,
   reason = 'Reembolso parcial',
+  reservationId, // ojo, parece que lo usás para guardar en DB, asegurate de pasar este dato
 }) => {
   try {
     // Validar paymentId
@@ -26,7 +26,7 @@ const processRefund = async ({
 
     console.log(
       'Intentando reembolso con token:',
-      accessToken.substring(0, 10) + '...'
+      accessToken ? accessToken.substring(0, 10) + '...' : 'No token disponible'
     );
     console.log('Para el pago ID:', paymentId);
     console.log('Monto a reembolsar:', amount);
@@ -75,7 +75,7 @@ const processRefund = async ({
 
     return {
       success: false,
-      mensaje: 'Hubo un error al procesar el reembolso.',
+      mensaje: error.message || 'Hubo un error al procesar el reembolso.',
       error: error.message,
     };
   }

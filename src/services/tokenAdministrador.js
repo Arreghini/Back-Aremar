@@ -1,58 +1,66 @@
-require('dotenv').config();
-const { auth } = require('express-oauth2-jwt-bearer');
-const {
-  getManagementApiToken,
-  checkUserRole,
-} = require('../services/roleService');
+const dotenv = require('dotenv');
 
-const { AUTH0_DOMAIN, AUTH0_AUDIENCE } = process.env;
+// Función separada para permitir recargar .env en tests o en distintos contextos
+function loadEnv() {
+  const result = dotenv.config();
 
-const namespace = 'https://aremar.com/';
+  if (result && result.parsed) {
+    for (const key in result.parsed) {
+      if (!process.env[key] && result.parsed[key] !== '') {
+        process.env[key] = result.parsed[key];
+      }
+    }
+  }
+}
 
-// Función para verificar el token JWT
-const jwtCheck = (req, res, next) => {
-  // Imprime el encabezado de autorización
-  // console.log('Encabezado de autorización:', req.headers.authorization);
+// Cargar variables de entorno una vez al importar el módulo
+loadEnv();
 
-  // Llama a auth() para la verificación del token JWT
-  const jwtValidator = auth({
-    audience: 'https://clientearemar-api',
-    issuerBaseURL: `https://${AUTH0_DOMAIN}/`,
-    tokenSigningAlg: 'RS256',
-  });
+const axios = require('axios');
+const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET } = process.env;
 
-  // Ejecuta el middleware de auth() y pasa el control a `next()`
-  jwtValidator(req, res, next);
-};
-
-// Cache para el Management API Token
-let cachedManagementToken = null;
-let tokenExpiryTime = 0;
-
-// Middleware para verificar si el usuario es administrador
-// ...existing code...
-const checkAdmin = (req, res, next) => {
+// Función para obtener el token del Management API de Auth0
+const getManagementApiToken = async () => {
   try {
-    const roles = req.auth?.payload?.[`${namespace}roles`] || [];
-    const sub = req.auth?.payload?.sub;
+    const response = await axios.post(`https://${AUTH0_DOMAIN}/oauth/token`, {
+      client_id: AUTH0_CLIENT_ID,
+      client_secret: AUTH0_CLIENT_SECRET,
+      audience: `https://${AUTH0_DOMAIN}/api/v2/`,
+      grant_type: 'client_credentials',
+    });
 
-    if (!sub) {
-      return res.status(401).json({ message: 'Usuario no autenticado' });
-    }
-
-    if (roles.includes('admin')) {
-      req.isAdmin = true;
-      return next();
-    }
-
-    return res.status(403).json({ message: 'Acceso prohibido: No es admin' });
+    return response.data.access_token;
   } catch (error) {
-    console.error('Error en checkAdmin:', error);
-    return res.status(500).json({ message: 'Error al verificar roles' });
+    console.error('Error al obtener el token del Management API:', error);
+    throw new Error('Error al obtener el token del Management API');
   }
 };
 
+// Función para verificar si el usuario tiene el rol de admin
+const checkUserRole = async (user_id, token) => {
+  try {
+    const rolesResponse = await axios.get(
+      `https://${AUTH0_DOMAIN}/api/v2/users/${user_id}/roles`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const roles = rolesResponse.data.map((role) => role.name);
+    console.log('Roles del usuario:', roles);
+
+    return roles.includes('admin');
+  } catch (error) {
+    console.error('Error al obtener los roles del usuario:', error);
+    throw new Error('Error al obtener los roles del usuario');
+  }
+};
+
+// Exporta funciones principales y `loadEnv` para ser usada en tests
 module.exports = {
-  jwtCheck,
-  checkAdmin,
+  loadEnv,
+  getManagementApiToken,
+  checkUserRole,
 };

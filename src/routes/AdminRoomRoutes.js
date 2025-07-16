@@ -10,7 +10,11 @@ const updateRoomHandler = require('../handlers/room/updateRoomHandler');
 const router = express.Router();
 
 // Configurar multer para aceptar archivos en el campo 'photoRoom'
-const upload = multer();
+const upload = multer({
+  limits: {
+    files: 5 // Límite de archivos
+  }
+});
 
 router.get('/all', getRoomHandler.getAllRooms);
 router.get(
@@ -26,9 +30,9 @@ router.get(
 );
 
 // Ruta para obtener una habitación específica por ID
+router.get('/types', getRoomTypeById);
 router.get('/:id', getRoomById);
 
-router.get('/types', getRoomTypeById);
 
 // Usar multer.array() para aceptar hasta 5 archivos en el campo 'photoRoom'
 router.post('/', upload.array('photoRoom', 5), createRoomHandler);
