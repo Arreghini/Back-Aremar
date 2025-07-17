@@ -21,7 +21,7 @@ const jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');
 
 // Ahora las variables ya están disponibles
-const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET } = process.env;
+const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET, AUTH0_AUDIENCE } = process.env;
 
 // Configurar cliente JWKS
 const client = jwksClient({
@@ -43,7 +43,7 @@ const verifyToken = (token) => {
       token,
       getKey,
       {
-        audience: AUTH0_CLIENT_ID,
+        audience: AUTH0_AUDIENCE,
         issuer: `https://${AUTH0_DOMAIN}/`,
         algorithms: ['RS256'],
       },

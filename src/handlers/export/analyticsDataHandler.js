@@ -1,60 +1,50 @@
-const analyticsDataController = require('../../controllers/export/analyticsDataController');
+const ExcelJS = require('exceljs');
 
-const analyticsDataHandler = async (req, res) => {
+const { getAnalyticsData } = require('../../controllers/export/analyticsDataController');
+
+const exportAnalyticsToExcel = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    console.log('Parámetros recibidos:', { startDate, endDate });
-    const analyticsData = await analyticsDataController.getAnalyticsData(
-      startDate,
-      endDate
+
+    const analyticsData = await getAnalyticsData(startDate, endDate);
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Analytics');
+
+    // Definir columnas
+    worksheet.columns = [
+      { header: 'Fecha', key: 'date', width: 7 },
+      { header: 'Reservas', key: 'reservations', width: 7 },
+      { header: 'Ingresos', key: 'revenue', width: 7 },
+    ];
+
+    // Agregar filas
+    analyticsData.forEach((row) => {
+      worksheet.addRow({
+        date: row.date,
+        reservations: row.reservations,
+        revenue: row.revenue,
+      });
+    });
+
+    // Encabezados para descarga
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     );
-    res.status(200).json(analyticsData);
-  } catch (error) {
-    console.error('Error en analyticsDataHandler:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-};
-const getMonthlyOccupancyHandler = async (req, res) => {
-  try {
-    const { year, month } = req.query;
-    const occupancyData = await analyticsDataController.getMonthlyOccupancy(
-      year,
-      month
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=analytics_${startDate}_a_${endDate}.xlsx`
     );
-    res.status(200).json(occupancyData);
+
+    // Escribir en la respuesta
+    await workbook.xlsx.write(res);
+    res.end();
   } catch (error) {
-    console.error('Error en getMonthlyOccupancyHandler:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-};
-const getRevenueByRoomTypeHandler = async (req, res) => {
-  try {
-    const { startDate, endDate } = req.query;
-    const revenueData = await analyticsDataController.getRevenueByRoomType(
-      startDate,
-      endDate
-    );
-    res.status(200).json(revenueData);
-  } catch (error) {
-    console.error('Error en getRevenueByRoomTypeHandler:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-};
-const getFrequentCustomersHandler = async (req, res) => {
-  try {
-    const { startDate, endDate } = req.query;
-    const frequentCustomers =
-      await analyticsDataController.getFrequentCustomers(startDate, endDate);
-    res.status(200).json(frequentCustomers);
-  } catch (error) {
-    console.error('Error en getFrequentCustomersHandler:', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    console.error('Error al generar el Excel:', error);
+    res.status(500).json({ error: 'Error al generar el archivo Excel' });
   }
 };
 
-module.exports = {
-  analyticsDataHandler,
-  getMonthlyOccupancyHandler,
-  getRevenueByRoomTypeHandler,
-  getFrequentCustomersHandler,
-};
+module.exports = { exportAnalyticsToExcel };
+en 

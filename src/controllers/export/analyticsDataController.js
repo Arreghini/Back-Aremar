@@ -1,6 +1,14 @@
 const { Reservation, Room, RoomType, User } = require('../../models');
 const { Op } = require('sequelize');
 
+const dayjs = require('dayjs');
+const isSameOrBefore = require('dayjs/plugin/isSameOrBefore');
+const isSameOrAfter = require('dayjs/plugin/isSameOrAfter');
+
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
+
+
 // Función para obtener datos analíticos por habitación
 const getAnalyticsData = async (startDate, endDate) => {
   try {
@@ -78,6 +86,53 @@ const getAnalyticsData = async (startDate, endDate) => {
     console.error('Error en analyticsDataController:', error);
     throw error;
   }
+};
+
+const getDailyRoomOccupancy = async (startDate, endDate) => {
+  const rooms = await Room.findAll(); 
+  const reservations = await Reservation.findAll({
+    where: {
+      [Op.or]: [
+        { checkIn: { [Op.between]: [startDate, endDate] } },
+        { checkOut: { [Op.between]: [startDate, endDate] } },
+        {
+          checkIn: { [Op.lte]: startDate },
+          checkOut: { [Op.gte]: endDate },
+        },
+      ],
+    },
+  });
+
+  const result = [];
+
+  for (const room of rooms) {
+    const roomReservations = reservations.filter(
+      (r) => r.roomId === room.id
+    );
+
+   let currentDate = dayjs(new Date(startDate));
+const finalDate = dayjs(new Date(endDate));
+
+while (currentDate.isSameOrBefore(finalDate)) {
+  const dateStr = currentDate.format('YYYY-MM-DD');
+
+  const isOccupied = roomReservations.some((res) => {
+    const checkIn = dayjs(new Date(res.checkIn));
+    const checkOut = dayjs(new Date(res.checkOut));
+    return currentDate.isSameOrAfter(checkIn) && currentDate.isBefore(checkOut);
+  });
+
+  result.push({
+    roomId: room.id,
+    date: dateStr,
+    status: isOccupied ? 'ocupado' : 'libre',
+  });
+
+  currentDate = currentDate.add(1, 'day');
+}
+  }
+
+  return result;
 };
 
 // Función para obtener ocupación mensual
@@ -272,6 +327,7 @@ const getFrequentCustomers = async (startDate, endDate, limit = 10) => {
 
 module.exports = {
   getAnalyticsData,
+  getDailyRoomOccupancy,
   getMonthlyOccupancy,
   getRevenueByRoomType,
   getFrequentCustomers,

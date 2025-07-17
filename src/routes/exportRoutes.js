@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const ExcelJS = require('exceljs');
+const dayjs = require('dayjs');
 
 const {
   getAnalyticsData,
   getMonthlyOccupancy,
   getRevenueByRoomType,
   getFrequentCustomers,
+  getDailyRoomOccupancy,
 } = require('../controllers/export/analyticsDataController');
 
 function styleHeader(row) {
@@ -53,7 +55,7 @@ router.get('/excel/analytics', async (req, res) => {
     const { startDate, endDate } = req.query;
     const workbook = new ExcelJS.Workbook();
 
-    // Hoja: Resumen
+    // Hoja 1: Resumen
     const summaryData = await getAnalyticsData(startDate, endDate);
     const resumenSheet = workbook.addWorksheet('Resumen');
     resumenSheet.columns = [
@@ -72,7 +74,7 @@ router.get('/excel/analytics', async (req, res) => {
       occupancy: '0.00%',
     });
 
-    // Hoja: Ingresos por tipo de habitación
+    // Hoja 2: Ingresos por tipo
     const revenueData = await getRevenueByRoomType(startDate, endDate);
     const revenueSheet = workbook.addWorksheet('Ingresos por Tipo');
     revenueSheet.columns = [
@@ -88,70 +90,98 @@ router.get('/excel/analytics', async (req, res) => {
       totalRevenue: '"$"#,##0.00',
     });
 
-    // Hoja: Clientes frecuentes
+    // Hoja 3: Clientes frecuentes
     const frequentData = await getFrequentCustomers(startDate, endDate);
     const customersSheet = workbook.addWorksheet('Clientes Frecuentes');
     customersSheet.columns = [
       { header: 'Cliente', key: 'name', width: 25 },
       { header: 'Correo Electrónico', key: 'email', width: 30 },
       { header: 'Cantidad de Reservas', key: 'reservationCount', width: 22 },
-      { header: 'Monto Total', key: 'totaPrice', width: 20 },
+      { header: 'Monto Total', key: 'totalPrice', width: 20 },
     ];
     frequentData.forEach((row) => customersSheet.addRow(row));
     styleHeader(customersSheet.getRow(1));
     styleDataRows(customersSheet, {
-      totaPrice: '"$"#,##0.00',
+      totalPrice: '"$"#,##0.00',
     });
 
-    // Configuración de headers
-    res.setHeader(
-      'Content-Type',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    );
-    res.setHeader('Content-Disposition', 'attachment; filename=analytics.xlsx');
-    await workbook.xlsx.write(res);
-    res.end();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error al generar Excel');
-  }
+    // Hoja 4: Ocupación diaria con colores
+    const occupancyData = await getDailyRoomOccupancy(startDate, endDate);
+    const occupancySheet = workbook.addWorksheet('Ocupación Diaria');
+
+    const start = dayjs(startDate);
+    const end = dayjs(endDate);
+    const totalDays = end.diff(start, 'day') + 1;
+
+   occupancySheet.columns = [
+  { header: 'Habitación', key: 'roomId', width: 10 },
+  ...Array.from({ length: totalDays }, (_, i) => {
+    const key = start.add(i, 'day').format('YYYY-MM-DD'); 
+    const header = start.add(i, 'day').format('MM-DD');   
+    return { header, key, width: 7 }; 
+  }),
+];
+
+    const groupedData = {};
+    occupancyData.forEach(entry => {
+      if (!groupedData[entry.roomId]) groupedData[entry.roomId] = {};
+      groupedData[entry.roomId][entry.date] = entry.status;
+    });
+
+    for (const roomId in groupedData) {
+      const rowData = { roomId };
+      for (let i = 0; i < totalDays; i++) {
+        const date = start.add(i, 'day').format('YYYY-MM-DD');
+        rowData[date] = groupedData[roomId][date] || 'libre';
+      }
+
+      const row = occupancySheet.addRow(rowData);
+
+      for (let i = 1; i <= totalDays; i++) {
+        const cell = row.getCell(i + 1);
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        if (cell.value === 'ocupado') {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFB6D7A8' }, // verde
+          };
+        } else {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFFFC7CE' }, // rojo
+          };
+        }
+      }
+    }
+occupancySheet.addRows(occupancyData);
+
+// Ahora ajustamos la altura de cada fila
+occupancySheet.eachRow((row, rowNumber) => {
+  row.height = 25;
 });
 
-// Ruta 2: Exportar solo ocupación mensual
-router.get('/excel/analytics/monthly-occupancy', async (req, res) => {
-  try {
-    const { year, month } = req.query;
-    if (!year || !month) {
-      return res.status(400).json({ error: 'Faltan parámetros year o month' });
-    }
-
-    const workbook = new ExcelJS.Workbook();
-    const occupancyData = await getMonthlyOccupancy(year, month);
-
-    const occupancySheet = workbook.addWorksheet('Ocupación Mensual');
-    occupancySheet.columns = [
-      { header: 'Mes', key: 'month', width: 15 },
-      { header: 'Ocupación (%)', key: 'occupancy', width: 18 },
-    ];
-    occupancyData.forEach((row) => occupancySheet.addRow(row));
     styleHeader(occupancySheet.getRow(1));
-    styleDataRows(occupancySheet, {
-      occupancy: '0.00%',
-    });
 
+    // Set filename dinámico
+    const safeStart = new Date(startDate).toISOString().split('T')[0];
+    const safeEnd = new Date(endDate).toISOString().split('T')[0];
     res.setHeader(
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     );
     res.setHeader(
       'Content-Disposition',
-      'attachment; filename=monthly_occupancy.xlsx'
+      `attachment; filename=analytics_${safeStart}_al_${safeEnd}.xlsx`
     );
-    await workbook.xlsx.write(res);
-    res.end();
+
+   await workbook.xlsx.write(res);
+   res.end(); 
+
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error al generar Excel de ocupación mensual');
+    res.status(500).send('Error al generar Excel');
   }
 });
 
