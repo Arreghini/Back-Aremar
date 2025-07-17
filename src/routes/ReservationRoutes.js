@@ -10,6 +10,7 @@ const createPreferenceHandler = require('../handlers/reservation/createPreferenc
 // Middleware para verificar la autenticación en todas las rutas
 router.use(jwtCheck);
 
+
 // Rutas para usuarios
 // Crear una reserva
 router.post('/', createReservationHandler);

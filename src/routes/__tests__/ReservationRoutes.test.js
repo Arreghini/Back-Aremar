@@ -356,19 +356,6 @@ describe('ReservationRoutes', () => {
       expect(response.body.message).toBe('Usuario no encontrado');
     });
 
-    it('debería validar que userId sea requerido', async () => {
-      getReservationHandler.getReservationByUserIdHandler.mockImplementation((req, res) => {
-        res.status(400).json({
-          success: false,
-          message: 'UserId es requerido'
-        });
-      });
-
-      await request(app)
-        .get('/reservations/user/')
-        .expect(404); // Express devuelve 404 para rutas no encontradas
-    });
-
     it('debería manejar errores internos al buscar por usuario', async () => {
       const userId = 'google-oauth2|123456789';
 

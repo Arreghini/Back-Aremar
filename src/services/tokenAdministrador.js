@@ -1,6 +1,6 @@
 const dotenv = require('dotenv');
 
-// Función separada para permitir recargar .env en tests o en distintos contextos
+// Función para cargar variables de entorno desde .env
 function loadEnv() {
   const result = dotenv.config();
 
@@ -13,13 +13,52 @@ function loadEnv() {
   }
 }
 
-// Cargar variables de entorno una vez al importar el módulo
+// Ejecutar antes de usar variables de entorno
 loadEnv();
 
 const axios = require('axios');
+const jwt = require('jsonwebtoken');
+const jwksClient = require('jwks-rsa');
+
+// Ahora las variables ya están disponibles
 const { AUTH0_DOMAIN, AUTH0_CLIENT_ID, AUTH0_CLIENT_SECRET } = process.env;
 
-// Función para obtener el token del Management API de Auth0
+// Configurar cliente JWKS
+const client = jwksClient({
+  jwksUri: `https://${AUTH0_DOMAIN}/.well-known/jwks.json`,
+});
+
+// Obtener la clave pública del token
+function getKey(header, callback) {
+  client.getSigningKey(header.kid, function (err, key) {
+    const signingKey = key.publicKey || key.rsaPublicKey;
+    callback(null, signingKey);
+  });
+}
+
+// Verificar el token y extraer el payload
+const verifyToken = (token) => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(
+      token,
+      getKey,
+      {
+        audience: AUTH0_CLIENT_ID,
+        issuer: `https://${AUTH0_DOMAIN}/`,
+        algorithms: ['RS256'],
+      },
+      (err, decoded) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(decoded);
+        }
+      }
+    );
+  });
+};
+
+// Obtener token del Management API
 const getManagementApiToken = async () => {
   try {
     const response = await axios.post(`https://${AUTH0_DOMAIN}/oauth/token`, {
@@ -31,12 +70,12 @@ const getManagementApiToken = async () => {
 
     return response.data.access_token;
   } catch (error) {
-    console.error('Error al obtener el token del Management API:', error);
-    throw new Error('Error al obtener el token del Management API');
+    console.error('Error al obtener token del Management API:', error);
+    throw new Error('Error al obtener token del Management API');
   }
 };
 
-// Función para verificar si el usuario tiene el rol de admin
+// Verificar si un usuario tiene rol de admin
 const checkUserRole = async (user_id, token) => {
   try {
     const rolesResponse = await axios.get(
@@ -49,18 +88,55 @@ const checkUserRole = async (user_id, token) => {
     );
 
     const roles = rolesResponse.data.map((role) => role.name);
-    console.log('Roles del usuario:', roles);
-
     return roles.includes('admin');
   } catch (error) {
-    console.error('Error al obtener los roles del usuario:', error);
-    throw new Error('Error al obtener los roles del usuario');
+    console.error('Error al obtener roles del usuario:', error);
+    throw new Error('Error al obtener roles del usuario');
   }
 };
 
-// Exporta funciones principales y `loadEnv` para ser usada en tests
+// Middleware para verificar JWT
+const jwtCheck = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Token no proporcionado' });
+    }
+    
+    const token = authHeader.slice(7); // Remover "Bearer "
+    const decoded = await verifyToken(token);
+    
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error('Error al verificar token:', error);
+    return res.status(401).json({ error: 'Token inválido' });
+  }
+};
+
+// Middleware para verificar si el usuario es admin
+const checkAdmin = async (req, res, next) => {
+  try {
+    const managementToken = await getManagementApiToken();
+    const isAdmin = await checkUserRole(req.user.sub, managementToken);
+    
+    if (!isAdmin) {
+      return res.status(403).json({ error: 'Acceso denegado: Se requiere rol de administrador' });
+    }
+    
+    next();
+  } catch (error) {
+    console.error('Error al verificar rol de admin:', error);
+    return res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+
 module.exports = {
   loadEnv,
   getManagementApiToken,
   checkUserRole,
+  verifyToken,
+  jwtCheck,
+  checkAdmin,
 };
