@@ -118,7 +118,7 @@ router.get('/excel/analytics', async (req, res) => {
   ...Array.from({ length: totalDays }, (_, i) => {
     const key = start.add(i, 'day').format('YYYY-MM-DD'); 
     const header = start.add(i, 'day').format('MM-DD');   
-    return { header, key, width: 7 }; 
+    return { header, key, width: 9 }; 
   }),
 ];
 
