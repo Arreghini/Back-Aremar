@@ -131,7 +131,7 @@ app.use(
   createPreferenceHandler
 );
 app.use('/api/reservations', jwtCheck, reservationRoutes);
-app.use('/api/payment', jwtCheck, paymentRedirectRoutes);
+app.use('/api/payment', paymentRedirectRoutes);
 
 // Manejo de errores y rutas no encontradas (mantener igual)
 app.use((req, res) => {
