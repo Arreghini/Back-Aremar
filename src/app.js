@@ -12,7 +12,7 @@ const roomRoutes = require('./routes/RoomRoutes');
 const reservationRoutes = require('./routes/ReservationRoutes');
 const paymentRedirectRoutes = require('./routes/PaymentRedirectRoutes');
 const webhookHandler = require('./handlers/reservation/webhookHandler');
-const { checkAdmin, jwtCheck } = require('./services/tokenAdministrador');
+const { checkAdmin, jwtCheck } = require('./services/middlewares');
 const createPreferenceHandler = require('./handlers/reservation/createPreferenceHandler');
 const exportRoutes = require('./routes/exportRoutes');
 require('dotenv').config();
@@ -90,19 +90,9 @@ app.get('/public', (req, res) => {
 app.post('/api/webhooks/mercadopago', express.json(), webhookHandler());
 
 // Rutas administrativas
-app.use(
-  '/api/reservations/admin',
-  jwtCheck,
-  checkAdmin,
-  adminReservationRoutes
-);
+app.use('/api/reservations/admin',jwtCheck,checkAdmin, adminReservationRoutes);
 app.use('/api/rooms/admin/roomType', jwtCheck, checkAdmin, adminRoomTypeRoutes);
-app.use(
-  '/api/rooms/admin/roomDetail',
-  jwtCheck,
-  checkAdmin,
-  adminRoomDetailsRoutes
-);
+app.use('/api/rooms/admin/roomDetail',jwtCheck,checkAdmin, adminRoomDetailsRoutes);
 app.use('/api/rooms/admin/available', jwtCheck, checkAdmin, adminRoomRoutes);
 app.use('/api/rooms/admin', jwtCheck, checkAdmin, adminRoomRoutes);
 

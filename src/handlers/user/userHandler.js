@@ -4,12 +4,19 @@ const roleService = require('../../services/roleService'); // Importa roleServic
 const handleSaveUser = async (req) => {
   console.log('handleSaveUser iniciado');
   try {
-    if (!req.auth) {
-      console.log('Usuario no autenticado');
-      throw new Error('Usuario no autenticado');
-    }
+   console.log('🔐 req.user recibido por jwtCheck:', req.user);
 
-    const user_id = req.auth.payload.sub || req.body.user_id;
+if (!req.user) {
+  console.log('Usuario no autenticado');
+  throw new Error('Usuario no autenticado');
+}
+
+const user_id = req.user.sub || req.body.auth0Id || req.body.user_id;
+
+if (!user_id) {
+  throw new Error('No se pudo obtener el user_id del usuario');
+}
+
     const userData = {
       user_id,
       authorization: req.headers.authorization,

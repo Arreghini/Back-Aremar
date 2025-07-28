@@ -5,10 +5,6 @@ const {
 
 const createRoomTypeHandler = async (req, res) => {
   try {
-    console.log('=== DEBUG CREAR ROOM TYPE ===');
-    console.log('req.body:', req.body);
-    console.log('req.files:', req.files);
-
     // ✅ Extraer datos del formulario
     const {
       name,
@@ -19,12 +15,6 @@ const createRoomTypeHandler = async (req, res) => {
       price,
       existingPhotos,
     } = req.body;
-
-    console.log('Datos extraídos:');
-    console.log('- name:', name);
-    console.log('- simpleBeds:', simpleBeds);
-    console.log('- price:', price);
-    console.log('- existingPhotos:', existingPhotos);
 
     // Validación
     if (!name || name.trim() === '') {
@@ -68,8 +58,6 @@ const createRoomTypeHandler = async (req, res) => {
       price: parseFloat(price) || 0,
       photos: photoUrls,
     };
-
-    console.log('roomTypeData final:', roomTypeData);
 
     const newRoomType = await createRoomTypeController(roomTypeData);
 

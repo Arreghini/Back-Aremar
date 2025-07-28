@@ -19,10 +19,7 @@ router.get('/', getReservationHandler.getAllReservationHandler);
 // Obtener una reserva específica como administrador
 router.get('/:reservationId', getReservationHandler.getReservationByIdHandler);
 
-router.patch(
-  '/:reservationId/cancel-with-refund',
-  cancelReservationWithRefundHandler
-);
+router.patch('/:reservationId/cancel-with-refund',cancelReservationWithRefundHandler);
 
 router.patch('/:reservationId/cancel', cancelReservationByAdminHandler);
 

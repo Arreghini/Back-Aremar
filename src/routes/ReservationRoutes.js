@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { jwtCheck } = require('../services/tokenAdministrador');
+const { jwtCheck } = require('../services/middlewares');
 const createReservationHandler = require('../handlers/reservation/createReservationHandler');
 const getReservationHandler = require('../handlers/reservation/getReservationHandler');
 const updateReservationHandler = require('../handlers/reservation/updateReservationHandler');
