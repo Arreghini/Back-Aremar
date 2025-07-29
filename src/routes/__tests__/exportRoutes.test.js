@@ -8,6 +8,19 @@ jest.mock('../../controllers/export/analyticsDataController', () => ({
   getMonthlyOccupancy: jest.fn(),
   getRevenueByRoomType: jest.fn(),
   getFrequentCustomers: jest.fn(),
+  getDailyRoomOccupancy: jest.fn(),
+}));
+
+jest.mock('../../controllers/export/analyticsGraphController', () => ({
+  getSoldVsUnsoldByDay: jest.fn(),
+}));
+
+// Mock child_process para evitar ejecutar Python en tests
+jest.mock('child_process', () => ({
+  exec: jest.fn((command, callback) => {
+    // Simular error de Python para que no se ejecute el gráfico
+    callback(new Error('Python not available in test environment'), '', '');
+  }),
 }));
 
 const {
@@ -15,6 +28,7 @@ const {
   getMonthlyOccupancy,
   getRevenueByRoomType,
   getFrequentCustomers,
+  getDailyRoomOccupancy,
 } = require('../../controllers/export/analyticsDataController');
 
 // Configuración de la aplicación de prueba
@@ -68,13 +82,36 @@ describe('Export Routes', () => {
         name: 'Juan Pérez',
         email: 'juan@example.com',
         reservationCount: 3,
-        totaPrice: 4500.00,
+        totalPrice: 4500.00,
       },
       {
         name: 'María García',
         email: 'maria@example.com',
         reservationCount: 2,
-        totaPrice: 3000.00,
+        totalPrice: 3000.00,
+      },
+    ];
+
+    const mockOccupancyData = [
+      {
+        roomId: 1,
+        date: '2024-01-01',
+        status: 'ocupado',
+      },
+      {
+        roomId: 1,
+        date: '2024-01-02',
+        status: 'libre',
+      },
+      {
+        roomId: 2,
+        date: '2024-01-01',
+        status: 'libre',
+      },
+      {
+        roomId: 2,
+        date: '2024-01-02',
+        status: 'ocupado',
       },
     ];
 
@@ -82,6 +119,7 @@ describe('Export Routes', () => {
       getAnalyticsData.mockResolvedValue(mockSummaryData);
       getRevenueByRoomType.mockResolvedValue(mockRevenueData);
       getFrequentCustomers.mockResolvedValue(mockFrequentData);
+      getDailyRoomOccupancy.mockResolvedValue(mockOccupancyData);
     });
 
     it('debería generar un archivo Excel completo con todas las hojas', async () => {
@@ -96,8 +134,8 @@ describe('Export Routes', () => {
       expect(response.headers['content-type']).toBe(
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       );
-      expect(response.headers['content-disposition']).toBe(
-        'attachment; filename=analytics.xlsx'
+      expect(response.headers['content-disposition']).toContain(
+        'attachment; filename=analytics_'
       );
 
       // Verificar que se llamaron todos los controladores
@@ -132,7 +170,7 @@ describe('Export Routes', () => {
         });
 
       expect(response.status).toBe(500);
-      expect(response.text).toBe('Error al generar Excel');
+      expect(response.body.error).toBe('Error al generar el archivo Excel');
     });
 
     it('debería manejar datos vacíos correctamente', async () => {
