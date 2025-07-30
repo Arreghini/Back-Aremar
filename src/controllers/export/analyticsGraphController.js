@@ -1,6 +1,18 @@
 const { Reservation, Room } = require('../../models');
 const { Op } = require('sequelize');
 const dayjs = require('dayjs'); 
+/**
+ * Obtiene un arreglo con los ingresos diarios por habitaciones vendidas y no vendidas entre dos fechas.
+ *
+ * La función consulta las habitaciones y las reservas que coinciden o abarcan el rango dado.
+ * Luego, día a día, calcula el ingreso vendido prorrateando el totalPrice de cada reserva y
+ * estima las habitaciones no vendidas.
+ *
+ * @param {string} startDate - Fecha de inicio en formato 'YYYY-MM-DD'.
+ * @param {string} endDate - Fecha de fin en formato 'YYYY-MM-DD'.
+ * @returns {Promise<Array<{ date: string, sold: number, unsold: number }>>}  
+ *          Un arreglo con objetos que contienen la fecha y los ingresos vendidos y no vendidos.
+ */
 
 // Obtener ingresos vendidos y no vendidos por día
 const getSoldVsUnsoldByDay = async (startDate, endDate) => {
@@ -39,7 +51,10 @@ const getSoldVsUnsoldByDay = async (startDate, endDate) => {
     }
 
     const unsoldRooms = rooms.length - occupiedRooms.size;
-    const unsold = unsoldRooms * 0; // si querés podés estimar un valor por habitación no vendida
+    
+    // Calcular el precio promedio por habitación para estimar ingresos no aprovechados
+    const avgRoomPrice = rooms.reduce((sum, room) => sum + room.price, 0) / rooms.length;
+    const unsold = unsoldRooms * avgRoomPrice;
 
     result.push({
       date: dateStr,
