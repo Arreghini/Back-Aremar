@@ -8,18 +8,18 @@ jest.mock('../../handlers/reservation/getReservationHandler');
 jest.mock('../../handlers/reservation/updateReservationHandler');
 jest.mock('../../handlers/reservation/deleteReservationByIdHandler');
 jest.mock('../../handlers/reservation/createPreferenceHandler');
-jest.mock('../../services/tokenAdministrador');
+jest.mock('../../services/middlewares');
 
 const createReservationHandler = require('../../handlers/reservation/createReservationHandler');
 const getReservationHandler = require('../../handlers/reservation/getReservationHandler');
 const updateReservationHandler = require('../../handlers/reservation/updateReservationHandler');
 const deleteReservationByIdHandler = require('../../handlers/reservation/deleteReservationByIdHandler');
-jest.mock('../../services/tokenAdministrador', () => ({
+jest.mock('../../services/middlewares', () => ({
   jwtCheck: jest.fn((req, res, next) => next())
 }));
 
 
-const { jwtCheck } = require('../../services/tokenAdministrador');
+const { jwtCheck } = require('../../services/middlewares');
 describe('ReservationRoutes', () => {
   let app;
 

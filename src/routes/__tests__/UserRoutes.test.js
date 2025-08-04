@@ -5,7 +5,7 @@ const handleSaveUser = require('../../handlers/user/userHandler');
 
 // Mock del handler
 jest.mock('../../handlers/user/userHandler');
-jest.mock('../../services/tokenAdministrador', () => ({
+jest.mock('../../services/middlewares', () => ({
   jwtCheck: jest.fn((req, res, next) => next())
 }));
 

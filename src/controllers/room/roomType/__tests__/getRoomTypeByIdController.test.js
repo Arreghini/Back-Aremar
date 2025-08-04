@@ -11,6 +11,16 @@ jest.mock('../../../../models', () => ({
   },
 }));
 
+jest.mock('../../../../models', () => ({
+  RoomType: {
+    findByPk: jest.fn(),
+  },
+  Room: {
+    findAll: jest.fn(),
+    findOne: jest.fn(), // 👈 agregá esto
+  },
+}));
+
 describe('getRoomTypeByIdController', () => {
   beforeEach(() => {
     jest.clearAllMocks();
