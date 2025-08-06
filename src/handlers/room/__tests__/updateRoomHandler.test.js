@@ -1,11 +1,15 @@
+jest.mock('../../../controllers/image/uploadImageController', () => ({
+  uploadImageController: jest.fn()
+}));
+
 const updateRoomHandler = require('../updateRoomHandler');
 const { Room } = require('../../../models');
 const updateRoomController = require('../../../controllers/room/updateRoomController');
-const uploadImageController = require('../../../controllers/image/uploadImageController');
+const { uploadImageController } = require('../../../controllers/image/uploadImageController');
 
 jest.mock('../../../models');
 jest.mock('../../../controllers/room/updateRoomController');
-jest.mock('../../../controllers/image/uploadImageController');
+
 
 describe('updateRoomHandler', () => {
   beforeEach(() => {
@@ -54,7 +58,7 @@ describe('updateRoomHandler', () => {
     };
 
     Room.findByPk.mockResolvedValue(mockRoom);
-    uploadImageController.mockResolvedValue({ secure_url: 'new-uploaded-photo.jpg' });
+    uploadImageController.mockResolvedValue({ url: 'new-uploaded-photo.jpg' });
     updateRoomController.mockResolvedValue({ 
       ...mockRoom, 
       price: 150, 

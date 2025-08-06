@@ -1,35 +1,63 @@
+
+// ✅ Importa la implementación real
+const { handleSaveUser } = require('../userHandler');
+
+// Mock de las dependencias que sí se usan internamente
+jest.mock('../../../controllers/user/userController', () => ({
+  saveUser: jest.fn().mockResolvedValue({ id: '123', name: 'Test User' })
+}));
+
+jest.mock('../../../services/roleService', () => ({
+  getManagementApiToken: jest.fn().mockResolvedValue('fake-management-token'),
+  checkUserRole: jest.fn().mockResolvedValue(true)
+}));
+
 const userController = require('../../../controllers/user/userController');
-const userHandler = require('../userHandler');
+const roleService = require('../../../services/roleService');
 
-jest.mock('../../../controllers/user/userController');
+describe('handleSaveUser', () => {
+  it('✅ should call saveUser with correct userData and return result with isAdmin', async () => {
+    const mockReq = {
+      user: { sub: 'auth0|user123' },
+      headers: { authorization: 'Bearer fake-token' }
+    };
 
-describe('userHandler', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+    const result = await handleSaveUser(mockReq);
 
-  test('should properly import userController', () => {
-    expect(userController).toBeDefined();
-  });
-
-  test('should export userController module', () => {
-    expect(userHandler).toBe(userController);
-  });
-
-  test('should maintain reference integrity', () => {
-    const mockFunction = jest.fn();
-    userController.someMethod = mockFunction;
-    
-    expect(userHandler.someMethod).toBe(mockFunction);
-  });
-
-  test('should handle module resolution errors', () => {
-    jest.isolateModules(() => {
-      jest.mock('../../../controllers/user/userController', () => {
-        throw new Error('Module not found');
-      });
-      
-      expect(() => require('../userHandler')).toThrow('Module not found');
+    expect(userController.saveUser).toHaveBeenCalledWith({
+      user_id: 'auth0|user123',
+      authorization: 'Bearer fake-token'
     });
+
+    expect(roleService.getManagementApiToken).toHaveBeenCalled();
+    expect(roleService.checkUserRole).toHaveBeenCalledWith('auth0|user123', 'fake-management-token');
+
+    expect(result).toEqual({
+      id: '123',
+      name: 'Test User',
+      isAdmin: true
+    });
+  });
+
+describe('handleSaveUser', () => {
+  it('❌ should throw an error if user_id is missing', async () => {
+    const mockReq = {
+      user: {}, // no hay 'sub'
+      body: {}, // 👈 necesario para evitar el error de lectura
+      headers: { authorization: 'Bearer fake-token' }
+    };
+
+    // Este test espera que se lance un error con ese mensaje
+    await expect(handleSaveUser(mockReq)).rejects.toThrow('No se pudo obtener el user_id del usuario');
+  });
+});
+
+  it('❌ should throw an error if user_id is missing', async () => {
+    const mockReq = {
+      user: {},
+      headers: { authorization: 'Bearer fake-token' }
+    };
+
+    await expect(handleSaveUser(mockReq)).rejects.toThrow('No se pudo obtener el user_id del usuario');
   });
 });

@@ -1,5 +1,5 @@
 const userController = require('../../controllers/user/userController');
-const roleService = require('../../services/roleService'); // Importa roleService
+const roleService = require('../../services/roleService');
 
 const handleSaveUser = async (req) => {
   console.log('handleSaveUser iniciado');
@@ -42,4 +42,7 @@ if (!user_id) {
   }
 };
 
-module.exports = handleSaveUser;
+module.exports = {
+  ...userController,
+  handleSaveUser,
+};

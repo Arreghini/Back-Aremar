@@ -1,106 +1,47 @@
-const deleteRoomController = require('../deleteRoomController');
-const { Room } = require('../../../models');
+const deleteUserHandler = require('../deleteUserHandler');
+const deleteUserController = require('../../../controllers/user/deleteUserController');
 
-jest.mock('../../../models', () => ({
-  Room: {
-    findAll: jest.fn(),
-    destroy: jest.fn(),
-  },
-}));
+jest.mock('../../../controllers/user/deleteUserController');
 
-const mockRoom = { id: '123', name: 'Test Room' };
+describe('deleteUserHandler', () => {
+  let req, res;
 
-describe('deleteRoomController', () => {
-  afterEach(() => {
-    jest.clearAllMocks(); // Limpiar mocks después de cada test
+  beforeEach(() => {
+    req = { params: { id: '123' }, headers: {}, user: { sub: 'user|1' } };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    jest.clearAllMocks();
   });
 
-  test('should delete room successfully', async () => {
-    Room.findAll.mockResolvedValue([mockRoom]);
-    Room.destroy.mockResolvedValue(1);
-
-    const result = await deleteRoomController('123');
-
-    expect(Room.findAll).toHaveBeenCalledWith({ where: { id: '123' } });
-    expect(Room.destroy).toHaveBeenCalledWith({ where: { id: '123' } });
-    expect(result).toEqual({ message: 'Deleted' });
+  it('devuelve 400 si no se proporciona id', async () => {
+    req.params.id = undefined;
+    await deleteUserHandler(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ message: 'User ID is required' });
   });
 
-  test('should return null when no id is provided', async () => {
-    const result = await deleteRoomController();
-
-    expect(Room.findAll).not.toHaveBeenCalled();
-    expect(Room.destroy).not.toHaveBeenCalled();
-    expect(result).toBeNull();
+  it('devuelve 404 si el usuario no existe', async () => {
+    deleteUserController.mockResolvedValue(null);
+    await deleteUserHandler(req, res);
+    expect(deleteUserController).toHaveBeenCalledWith('123');
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ message: 'User not found' });
   });
 
-  test('should return null when room is not found', async () => {
-    Room.findAll.mockResolvedValue([]);
-
-    const result = await deleteRoomController('999');
-
-    expect(Room.findAll).toHaveBeenCalledWith({ where: { id: '999' } });
-    expect(Room.destroy).not.toHaveBeenCalled();
-    expect(result).toBeNull();
+  it('devuelve 200 si el usuario se elimina correctamente', async () => {
+    deleteUserController.mockResolvedValue({ id: '123' });
+    await deleteUserHandler(req, res);
+    expect(deleteUserController).toHaveBeenCalledWith('123');
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ message: 'User deleted successfully' });
   });
 
-  test('should handle empty room array result', async () => {
-    Room.findAll.mockResolvedValue([]);
-
-    const result = await deleteRoomController('123');
-
-    expect(Room.findAll).toHaveBeenCalledWith({ where: { id: '123' } });
-    expect(Room.destroy).not.toHaveBeenCalled();
-    expect(result).toBeNull();
-  });
-
-  test('should handle undefined id parameter', async () => {
-    const result = await deleteRoomController(undefined);
-
-    expect(Room.findAll).not.toHaveBeenCalled();
-    expect(Room.destroy).not.toHaveBeenCalled();
-    expect(result).toBeNull();
-  });
-
-  test('should handle null id parameter', async () => {
-    const result = await deleteRoomController(null);
-
-    expect(Room.findAll).not.toHaveBeenCalled();
-    expect(Room.destroy).not.toHaveBeenCalled();
-    expect(result).toBeNull();
-  });
-
-  test('should handle destroy operation returning 0 affected rows', async () => {
-    Room.findAll.mockResolvedValue([mockRoom]);
-    Room.destroy.mockResolvedValue(0);
-
-    const result = await deleteRoomController('123');
-
-    expect(Room.findAll).toHaveBeenCalledWith({ where: { id: '123' } });
-    expect(Room.destroy).toHaveBeenCalledWith({ where: { id: '123' } });
-    expect(result).toBeNull();
-  });
-
-  test('should handle database errors during find', async () => {
-    Room.findAll.mockRejectedValue(new Error('DB error'));
-
-    await expect(deleteRoomController('123')).rejects.toThrow('DB error');
-  });
-
-  test('should handle database errors during destroy', async () => {
-    Room.findAll.mockResolvedValue([mockRoom]);
-    Room.destroy.mockRejectedValue(new Error('Destroy error'));
-
-    await expect(deleteRoomController('123')).rejects.toThrow('Destroy error');
-  });
-
-  test('should handle multiple rooms with same id', async () => {
-    Room.findAll.mockResolvedValue([mockRoom, mockRoom]);
-    Room.destroy.mockResolvedValue(2);
-
-    const result = await deleteRoomController('123');
-
-    expect(Room.destroy).toHaveBeenCalledWith({ where: { id: '123' } });
-    expect(result).toEqual({ message: 'Deleted' });
+  it('devuelve 500 si ocurre un error', async () => {
+    deleteUserController.mockRejectedValue(new Error('fail'));
+    await deleteUserHandler(req, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ message: 'fail' });
   });
 });

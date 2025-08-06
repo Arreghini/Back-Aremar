@@ -1,8 +1,8 @@
+jest.mock('../../../controllers/room/getRoomByIdController', () => jest.fn());
+
 const httpMocks = require('node-mocks-http');
 const getRoomByIdHandler = require('../getRoomByIdHandler');
-const getRoomByIdController = require('../../../controllers/room/getRoomByIdController');
-
-jest.mock('../../../controllers/room/getRoomByIdController');
+const getRoomByIdController = require('../../../controllers/room/getRoomByIdController'); // esta vez sí es mock
 
 const mockRoom = {
   id: 1,
@@ -18,9 +18,7 @@ describe('getRoomByIdHandler', () => {
   });
 
   test('should get room by id successfully', async () => {
-    const req = httpMocks.createRequest({
-      params: { id: '1' }
-    });
+    const req = httpMocks.createRequest({ params: { id: '1' } });
     const res = httpMocks.createResponse();
 
     getRoomByIdController.mockResolvedValue(mockRoom);
@@ -32,9 +30,7 @@ describe('getRoomByIdHandler', () => {
   });
 
   test('should return 404 when room not found', async () => {
-    const req = httpMocks.createRequest({
-      params: { id: '999' }
-    });
+    const req = httpMocks.createRequest({ params: { id: '999' } });
     const res = httpMocks.createResponse();
 
     getRoomByIdController.mockResolvedValue(null);
@@ -46,9 +42,7 @@ describe('getRoomByIdHandler', () => {
   });
 
   test('should handle invalid id parameter', async () => {
-    const req = httpMocks.createRequest({
-      params: { id: 'abc' }
-    });
+    const req = httpMocks.createRequest({ params: { id: 'abc' } });
     const res = httpMocks.createResponse();
 
     await getRoomByIdHandler(req, res);
@@ -58,9 +52,7 @@ describe('getRoomByIdHandler', () => {
   });
 
   test('should handle missing id parameter', async () => {
-    const req = httpMocks.createRequest({
-      params: {}
-    });
+    const req = httpMocks.createRequest({ params: {} });
     const res = httpMocks.createResponse();
 
     await getRoomByIdHandler(req, res);
@@ -70,9 +62,7 @@ describe('getRoomByIdHandler', () => {
   });
 
   test('should handle database errors', async () => {
-    const req = httpMocks.createRequest({
-      params: { id: '1' }
-    });
+    const req = httpMocks.createRequest({ params: { id: '1' } });
     const res = httpMocks.createResponse();
 
     getRoomByIdController.mockRejectedValue(new Error('Database error'));

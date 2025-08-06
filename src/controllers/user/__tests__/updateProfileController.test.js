@@ -74,16 +74,21 @@ describe('updateGuestProfileController', () => {
   });
 });
 describe('User model import', () => {
-  test('should throw error when models module is not found', () => {
-    jest.isolateModules(() => {
-      jest.mock('../../../models', () => {
+ test('should throw error when models module is not found', () => {
+  jest.resetModules();
+
+  jest.doMock('../../../models', () => {
+    return {
+      get User() {
         throw new Error('Cannot find module');
-      });
-      
-      expect(() => {
-        require('../updateProfileController');
-      }).toThrow('Cannot find module');
-    });
+      }
+    };
+  });
+
+  expect(() => {
+    require('../updateProfileController');
+  }).toThrow('Cannot find module');
+});
   });
 
   test('should throw error when User model is not defined in models', () => {
@@ -94,7 +99,6 @@ describe('User model import', () => {
         require('../updateProfileController');
       }).toThrow();
     });
-  });
 
   test('should successfully import User model with correct structure', () => {
     const { User } = require('../../../models');

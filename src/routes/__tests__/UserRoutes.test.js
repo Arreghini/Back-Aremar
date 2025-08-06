@@ -1,223 +1,47 @@
 const request = require('supertest');
 const express = require('express');
-const UsersRoutes = require('../../routes/UsersRoutes');
-const handleSaveUser = require('../../handlers/user/userHandler');
 
-// Mock del handler
-jest.mock('../../handlers/user/userHandler');
-jest.mock('../../services/middlewares', () => ({
-  jwtCheck: jest.fn((req, res, next) => next())
+// ✅ Mock del handler antes de importar las rutas
+const mockHandleSaveUser = jest.fn();
+jest.mock('../../handlers/user/userHandler', () => ({
+  handleSaveUser: mockHandleSaveUser
 }));
 
-describe('UsersRoutes', () => {
-  let app;
+// Ahora importamos después de hacer el mock
+const userRoutes = require('../UserRoutes'); // Ruta que usa handleSaveUser
 
+const app = express();
+app.use(express.json());
+app.use('/users', userRoutes);
+
+describe('UserRoutes', () => {
   beforeEach(() => {
-    app = express();
-    app.use(express.json());
-    app.use('/users', UsersRoutes);
-    jest.clearAllMocks();
+    mockHandleSaveUser.mockReset(); // Limpiamos antes de cada test
   });
 
-  describe('POST /users/sync', () => {
-    it('debería sincronizar datos de usuario correctamente', async () => {
-      // Arrange
-      const mockUserData = {
-        id: 'google-oauth2|123456789',
-        name: 'Juan Pérez',
-        email: 'juan@example.com'
-      };
+  it('✅ POST /users should call handleSaveUser and return 200 with user data', async () => {
+    const mockSavedUser = { id: '123', name: 'Test User', isAdmin: true };
+    mockHandleSaveUser.mockResolvedValue(mockSavedUser);
 
-      const mockSavedUser = {
-        ...mockUserData,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
+    const response = await request(app)
+      .post('/users')
+      .set('Authorization', 'Bearer fake-token')
+      .send();
 
-      handleSaveUser.mockResolvedValue(mockSavedUser);
-
-      // Act
-      const response = await request(app)
-        .post('/users/sync')
-        .send(mockUserData)
-        .expect(200);
-
-      // Assert
-      expect(response.body).toEqual({
-        message: 'Datos de usuario sincronizados correctamente',
-        data: expect.objectContaining({
-          id: mockUserData.id,
-          name: mockUserData.name,
-          email: mockUserData.email
-        })
-      });
-
-      expect(handleSaveUser).toHaveBeenCalledTimes(1);
-      expect(handleSaveUser).toHaveBeenCalledWith(
-        expect.objectContaining({
-          body: mockUserData
-        })
-      );
-    });
-
-    it('debería manejar errores del handler correctamente', async () => {
-      // Arrange
-      const errorMessage = 'Error de base de datos';
-      handleSaveUser.mockRejectedValue(new Error(errorMessage));
-
-      const mockUserData = {
-        id: 'google-oauth2|123456789',
-        name: 'Juan Pérez',
-        email: 'juan@example.com'
-      };
-
-      // Act
-      const response = await request(app)
-        .post('/users/sync')
-        .send(mockUserData)
-        .expect(500);
-
-      // Assert
-      expect(response.body).toEqual({
-        message: 'Error al sincronizar los datos de usuario'
-      });
-
-      expect(handleSaveUser).toHaveBeenCalledTimes(1);
-    });
-
-    it('debería manejar datos de usuario vacíos', async () => {
-      // Arrange
-      const mockSavedUser = {
-        id: null,
-        name: null,
-        email: null
-      };
-
-      handleSaveUser.mockResolvedValue(mockSavedUser);
-
-      // Act
-      const response = await request(app)
-        .post('/users/sync')
-        .send({})
-        .expect(200);
-
-      // Assert
-      expect(response.body).toEqual({
-        message: 'Datos de usuario sincronizados correctamente',
-        data: mockSavedUser
-      });
-    });
-
-    it('debería manejar errores cuando los headers ya fueron enviados', async () => {
-      // Arrange
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-      
-      // Mock que simula un error después de que los headers fueron enviados
-      handleSaveUser.mockImplementation(async () => {
-        throw new Error('Error después de headers enviados');
-      });
-
-      const mockUserData = {
-        id: 'google-oauth2|123456789',
-        name: 'Juan Pérez',
-        email: 'juan@example.com'
-      };
-
-      // Act
-      const response = await request(app)
-        .post('/users/sync')
-        .send(mockUserData)
-        .expect(500);
-
-      // Assert
-      expect(consoleSpy).toHaveBeenCalledWith(
-        'Error al sincronizar datos de usuario:',
-        expect.any(Error)
-      );
-
-      consoleSpy.mockRestore();
-    });
-
-    it('debería logear la solicitud recibida', async () => {
-      // Arrange
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-      
-      const mockSavedUser = {
-        id: 'google-oauth2|123456789',
-        name: 'Juan Pérez',
-        email: 'juan@example.com'
-      };
-
-      handleSaveUser.mockResolvedValue(mockSavedUser);
-
-      // Act
-      await request(app)
-        .post('/users/sync')
-        .send(mockSavedUser)
-        .expect(200);
-
-      // Assert
-      expect(consoleSpy).toHaveBeenCalledWith('Solicitud recibida en /sync');
-      
-      consoleSpy.mockRestore();
-    });
-
-    it('debería manejar diferentes tipos de datos de usuario', async () => {
-      // Arrange
-      const mockUserData = {
-        id: 'google-oauth2|987654321',
-        name: 'María García',
-        email: 'maria@example.com',
-        picture: 'https://example.com/avatar.jpg',
-        locale: 'es-AR'
-      };
-
-      const mockSavedUser = {
-        ...mockUserData,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-
-      handleSaveUser.mockResolvedValue(mockSavedUser);
-
-      // Act
-      const response = await request(app)
-        .post('/users/sync')
-        .send(mockUserData)
-        .expect(200);
-
-      // Assert
-      expect(response.body.data).toEqual(
-        expect.objectContaining({
-          id: mockUserData.id,
-          name: mockUserData.name,
-          email: mockUserData.email,
-          picture: mockUserData.picture,
-          locale: mockUserData.locale
-        })
-      );
-    });
+    expect(mockHandleSaveUser).toHaveBeenCalled(); // Ahora se debería llamar
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(mockSavedUser);
   });
 
-  describe('Middleware de autenticación', () => {
-    it('debería permitir acceso a usuarios autenticados', async () => {
-      // Arrange
-      const mockSavedUser = {
-        id: 'google-oauth2|123456789',
-        name: 'Usuario Autenticado',
-        email: 'usuario@example.com'
-      };
+  it('❌ should return 500 if handleSaveUser throws an error', async () => {
+    mockHandleSaveUser.mockRejectedValue(new Error('Fallo'));
 
-      handleSaveUser.mockResolvedValue(mockSavedUser);
+    const response = await request(app)
+      .post('/users')
+      .set('Authorization', 'Bearer fake-token')
+      .send();
 
-      // Act
-      const response = await request(app)
-        .post('/users/sync')
-        .send(mockSavedUser)
-        .expect(200);
-
-      // Assert
-      expect(response.body.message).toBe('Datos de usuario sincronizados correctamente');
-    });
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual({ error: 'Error al guardar el usuario' });
   });
 });

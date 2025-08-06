@@ -1,31 +1,29 @@
 const { Reservation } = require('../../models');
 
-const deleteReservationByIdController = async (reservationId, isAdmin) => {
+const deleteReservationByIdController = async (id) => {
+  if (typeof id !== 'string' || !id.trim()) {
+    throw new Error('Error al eliminar la reserva: ID inválido');
+  }
+
   try {
-    const reservation = await Reservation.findByPk(reservationId);
+    const reservation = await Reservation.findByPk(id);
 
     if (!reservation) {
-      throw new Error('Reserva no encontrada');
+     return false;  
     }
 
-    const { status } = reservation;
-    console.log('Estado de la reserva y es Administrador?:', status, isAdmin);
-
-    // Validación para usuarios comunes
-    if (!isAdmin && status !== 'pending') {
-      throw new Error('Solo puedes eliminar reservas en estado pendiente');
-    }
-
-    // Validación para administradores
-    if (isAdmin && !['pending', 'confirmed', 'cancelled'].includes(status)) {
-      throw new Error(
-        'Como administrador solo puedes eliminar reservas pendientes o confirmadas'
-      );
+    if (reservation.status !== 'pendiente') {
+      throw new Error('Error al eliminar la reserva: Solo puedes eliminar reservas en estado pendiente');
     }
 
     await reservation.destroy();
-    return 'Reserva eliminada exitosamente';
+
+    return true;
   } catch (error) {
+    if (error.message.startsWith('Error al eliminar la reserva:')) {
+      throw error;
+    }
+
     throw new Error(`Error al eliminar la reserva: ${error.message}`);
   }
 };
