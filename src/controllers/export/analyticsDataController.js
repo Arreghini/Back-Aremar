@@ -219,16 +219,18 @@ const getRevenueByRoomType = async (startDate, endDate) => {
   );
 
   const roomTypes = new Set();
-  rooms.forEach((room) => {
+rooms.forEach((room) => {
+  if (room.roomType && room.roomType.name) {
     roomTypes.add(room.roomType.name);
-  });
+  }
+});
 
   const analyticsData = [];
 
   for (const roomType of roomTypes) {
     const roomIds = rooms
-      .filter((room) => room.roomType.name === roomType)
-      .map((room) => room.id);
+  .filter((room) => room.roomType && room.roomType.name === roomType)
+  .map((room) => room.id);
 
     const income = await Reservation.sum('totalPrice', {
       where: {

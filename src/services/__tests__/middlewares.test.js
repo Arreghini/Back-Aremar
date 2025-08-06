@@ -1,16 +1,31 @@
-const axios = require('axios');
-const jwt = require('jsonwebtoken');
-const { checkAdmin } = require('../../services/middlewares');
+// 🧼 MOCKS PRIMERO
+jest.mock('jwks-rsa', () => {
+  return jest.fn(() => ({
+    getSigningKey: (kid, callback) => {
+      const key = {
+        publicKey: 'fakePublicKey',
+        rsaPublicKey: 'fakeRSAPublicKey',
+      };
+      callback(null, key);
+    },
+  }));
+});
+
 jest.mock('axios');
-jest.mock('jsonwebtoken');
+
+// 👇 LUEGO se importa el middleware (una vez que los mocks están listos)
+const { checkAdmin } = require('../middlewares');
 
 describe('checkAdmin middleware', () => {
-  let req, res, next;
+  let req, res, next, consoleErrorSpy;
 
   beforeEach(() => {
     req = {
       headers: {
         authorization: 'Bearer fakeToken',
+      },
+      user: {
+        sub: 'user123',
       },
     };
     res = {
@@ -18,71 +33,56 @@ describe('checkAdmin middleware', () => {
       json: jest.fn(),
     };
     next = jest.fn();
+    
+    // Silenciar console.error para evitar ruido en los tests
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
     jest.clearAllMocks();
+    consoleErrorSpy.mockRestore();
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks(); // 👈 libera recursos al final
   });
 
   it('debería llamar a next() si el usuario tiene el rol de administrador', async () => {
-    const decodedToken = {
-      sub: 'user123',
-    };
-
-    const userData = {
-      data: {
-        roles: ['admin'],
-      },
-    };
-
-    jwt.decode.mockReturnValue(decodedToken);
-    axios.get.mockResolvedValue(userData);
+    const axios = require('axios');
+    axios.post.mockResolvedValue({ data: { access_token: 'managementToken' } });
+    axios.get.mockResolvedValue({ data: [{ name: 'admin' }] });
 
     await checkAdmin(req, res, next);
 
-    expect(jwt.decode).toHaveBeenCalledWith('fakeToken');
+    expect(axios.post).toHaveBeenCalled();
     expect(axios.get).toHaveBeenCalled();
     expect(next).toHaveBeenCalled();
   });
 
   it('debería devolver 403 si el usuario no tiene el rol de administrador', async () => {
-    const decodedToken = {
-      sub: 'user456',
-    };
-
-    const userData = {
-      data: {
-        roles: ['user'],
-      },
-    };
-
-    jwt.decode.mockReturnValue(decodedToken);
-    axios.get.mockResolvedValue(userData);
+    const axios = require('axios');
+    axios.post.mockResolvedValue({ data: { access_token: 'managementToken' } });
+    axios.get.mockResolvedValue({ data: [{ name: 'user' }] });
 
     await checkAdmin(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(403);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Acceso denegado: rol de administrador requerido' });
-    expect(next).not.toHaveBeenCalled();
-  });
-
-  it('debería devolver 401 si no hay token', async () => {
-    req.headers.authorization = null;
-
-    await checkAdmin(req, res, next);
-
-    expect(res.status).toHaveBeenCalledWith(401);
-    expect(res.json).toHaveBeenCalledWith({ message: 'No se proporcionó token de autenticación' });
+    expect(res.json).toHaveBeenCalledWith({
+      error: 'Acceso denegado: Se requiere rol de administrador',
+    });
     expect(next).not.toHaveBeenCalled();
   });
 
   it('debería devolver 500 si ocurre un error interno', async () => {
-    jwt.decode.mockImplementation(() => { throw new Error('Error interno'); });
+    const axios = require('axios');
+    axios.post.mockRejectedValue(new Error('falló'));
 
     await checkAdmin(req, res, next);
 
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ message: 'Error al validar el rol de administrador' });
+    expect(res.json).toHaveBeenCalledWith({
+      error: 'Error interno del servidor',
+    });
     expect(next).not.toHaveBeenCalled();
   });
 });

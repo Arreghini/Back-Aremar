@@ -53,7 +53,7 @@ const getSoldVsUnsoldByDay = async (startDate, endDate) => {
     const unsoldRooms = rooms.length - occupiedRooms.size;
     
     // Calcular el precio promedio por habitación para estimar ingresos no aprovechados
-    const avgRoomPrice = rooms.reduce((sum, room) => sum + room.price, 0) / rooms.length;
+    const avgRoomPrice = rooms.length > 0 ? rooms.reduce((sum, room) => sum + room.price, 0) / rooms.length : 0;
     const unsold = unsoldRooms * avgRoomPrice;
 
     result.push({

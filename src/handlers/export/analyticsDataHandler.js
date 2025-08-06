@@ -87,6 +87,8 @@ const generateChart = (startDate, endDate, authToken) => {
 };
 
 const exportAnalyticsToExcel = async (req, res) => {
+  let chartFilesToCleanup = [];
+  
   try {
     const { startDate, endDate } = req.query;
     const workbook = new ExcelJS.Workbook();
@@ -201,7 +203,6 @@ const exportAnalyticsToExcel = async (req, res) => {
     styleHeader(occupancySheet.getRow(1));
 
     // --- HOJA 5: Gráfico Ingresos (imagen PNG) ---
-    let chartFilesToCleanup = [];
     try {
       console.log('📊 Iniciando generación de gráfico...');
       const { pngPath } = await generateChart(startDate, endDate, authToken);
