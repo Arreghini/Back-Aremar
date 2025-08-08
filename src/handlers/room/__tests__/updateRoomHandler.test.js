@@ -1,11 +1,8 @@
-jest.mock('../../../controllers/image/uploadImageController', () => ({
-  uploadImageController: jest.fn()
-}));
-
+jest.mock('../../../controllers/image/uploadImageController', () => jest.fn());
 const updateRoomHandler = require('../updateRoomHandler');
 const { Room } = require('../../../models');
 const updateRoomController = require('../../../controllers/room/updateRoomController');
-const { uploadImageController } = require('../../../controllers/image/uploadImageController');
+const uploadImageController = require('../../../controllers/image/uploadImageController');
 
 jest.mock('../../../models');
 jest.mock('../../../controllers/room/updateRoomController');

@@ -1,6 +1,7 @@
 const request = require('supertest');
 const express = require('express');
 const exportRoutes = require('../exportRoutes');
+const dayjs = require('dayjs');
 
 // Mock de los controladores
 jest.mock('../../controllers/export/analyticsDataController', () => ({
@@ -147,10 +148,17 @@ describe('Export Routes', () => {
       expect(response.headers['content-type']).toBe(
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
       );
+      expect(response.headers['content-disposition']).toContain(
+        'attachment; filename=analytics_'
+      );
 
-      expect(getAnalyticsData).toHaveBeenCalledWith(undefined, undefined);
-      expect(getRevenueByRoomType).toHaveBeenCalledWith(undefined, undefined);
-      expect(getFrequentCustomers).toHaveBeenCalledWith(undefined, undefined);
+      // Calcula las fechas por defecto igual que el handler
+      const defaultStart = dayjs().subtract(7, 'day').format('YYYY-MM-DD');
+      const defaultEnd = dayjs().format('YYYY-MM-DD');
+
+      expect(getAnalyticsData).toHaveBeenCalledWith(defaultStart, defaultEnd);
+      expect(getRevenueByRoomType).toHaveBeenCalledWith(defaultStart, defaultEnd);
+      expect(getFrequentCustomers).toHaveBeenCalledWith(defaultStart, defaultEnd);
     }, 15000);
 
     it('debería manejar errores en la generación del Excel', async () => {

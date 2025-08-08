@@ -53,8 +53,13 @@ describe('App integration', () => {
   });
 
   it('maneja errores de autenticación', async () => {
-    // Simula error de autenticación removiendo el mock temporalmente
-    jest.resetModules();
+    // Mockea el middleware para devolver 401
+    jest.doMock('../services/middlewares', () => ({
+      jwtCheck: (req, res, next) => res.status(401).json({ error: 'Unauthorized' }),
+      checkAdmin: (req, res, next) => next(),
+    }));
+
+    // Requiere app después del mock
     const realApp = require('../app');
     const res = await request(realApp).get('/api/users');
     expect([401, 404]).toContain(res.statusCode);

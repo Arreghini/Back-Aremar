@@ -31,6 +31,7 @@
     "express-jwt": "^8.4.1",
     "express-oauth2-jwt-bearer": "^1.6.0",
     "express-unless": "^2.1.3",
+    "express-validator": "^7.2.1",
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.1.0",
@@ -59,12 +60,13 @@
     "collectCoverage": true,
     "collectCoverageFrom": [
       "src/controllers/**/*.js",
-      "src/handlers/**/*.jsx",
+      "src/handlers/**/*.js",
       "src/services/**/*.js",
       "src/utils/**/*.js",
       "src/middlewares/**/*.js",
       "src/routes/**/*.js",
       "src/models/**/*.js",
+      "src/validators/**/*.js",
       "!**/__tests__/**"
     ],
     "coverageDirectory": "coverage",

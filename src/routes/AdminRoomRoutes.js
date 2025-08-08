@@ -6,6 +6,9 @@ const getRoomById = require('../handlers/room/getRoomByIdHandler');
 const getRoomTypeById = require('../handlers/room/roomType/getRoomTypeByRoomIdHandler');
 const getRoomHandler = require('../handlers/room/getRoomHandler');
 const updateRoomHandler = require('../handlers/room/updateRoomHandler');
+const validate = require('../services/validate');
+const { createRoomValidationRules } = require('../validators/createRoomValidations');
+const { searchRoomsValidator } = require('../validators/searchRoomValidator');
 
 const router = express.Router();
 
@@ -16,7 +19,12 @@ const upload = multer({
   }
 });
 
-router.get('/all', getRoomHandler.getAllRooms);
+router.get('/all',   
+searchRoomsValidator,
+validate,
+getRoomHandler.getAllRooms
+);
+
 router.get(
   '/',
   (req, res, next) => {
@@ -35,7 +43,11 @@ router.get('/:id', getRoomById);
 
 
 // Usar multer.array() para aceptar hasta 5 archivos en el campo 'photoRoom'
-router.post('/', upload.array('photoRoom', 5), createRoomHandler);
+router.post('/', 
+upload.array('photoRoom', 5),
+createRoomValidationRules,
+validate,
+createRoomHandler);
 
 router.delete('/:id', deleteRoomHandler);
 

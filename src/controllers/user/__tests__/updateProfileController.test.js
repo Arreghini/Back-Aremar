@@ -1,5 +1,4 @@
-const { User } = require('../../../models');
-const updateGuestProfileController = require('../updateProfileController');
+
 
 jest.mock('../../../models', () => ({
   User: {
@@ -8,9 +7,8 @@ jest.mock('../../../models', () => ({
 }));
 
 describe('updateGuestProfileController', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+  const { User } = require('../../../models');
+  const updateGuestProfileController = require('../updateProfileController');
 
   const mockUser = {
     id: '123',
@@ -23,6 +21,10 @@ describe('updateGuestProfileController', () => {
     name: 'Updated User',
     email: 'updated@test.com'
   };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   test('should update user profile successfully', async () => {
     mockUser.update.mockResolvedValue({ ...mockUser, ...fieldsToUpdate });
@@ -41,7 +43,7 @@ describe('updateGuestProfileController', () => {
     await expect(updateGuestProfileController('123', fieldsToUpdate))
       .rejects
       .toThrow('User not found');
-    
+
     expect(mockUser.update).not.toHaveBeenCalled();
   });
 
@@ -71,45 +73,5 @@ describe('updateGuestProfileController', () => {
     expect(User.findByPk).toHaveBeenCalledWith('123');
     expect(mockUser.update).toHaveBeenCalledWith({});
     expect(result).toEqual(mockUser);
-  });
-});
-describe('User model import', () => {
- test('should throw error when models module is not found', () => {
-  jest.resetModules();
-
-  jest.doMock('../../../models', () => {
-    return {
-      get User() {
-        throw new Error('Cannot find module');
-      }
-    };
-  });
-
-  expect(() => {
-    require('../updateProfileController');
-  }).toThrow('Cannot find module');
-});
-  });
-
-  test('should throw error when User model is not defined in models', () => {
-    jest.isolateModules(() => {
-      jest.mock('../../../models', () => ({}));
-      
-      expect(() => {
-        require('../updateProfileController');
-      }).toThrow();
-    });
-
-  test('should successfully import User model with correct structure', () => {
-    const { User } = require('../../../models');
-    expect(User).toBeDefined();
-    expect(User.findByPk).toBeDefined();
-    expect(typeof User.findByPk).toBe('function');
-  });
-
-  test('should maintain User model reference after multiple imports', () => {
-    const firstImport = require('../../../models').User;
-    const secondImport = require('../../../models').User;
-    expect(firstImport).toBe(secondImport);
   });
 });

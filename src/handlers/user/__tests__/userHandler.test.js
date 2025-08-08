@@ -1,4 +1,3 @@
-
 // ✅ Importa la implementación real
 const { handleSaveUser } = require('../userHandler');
 
@@ -39,25 +38,23 @@ describe('handleSaveUser', () => {
     });
   });
 
-describe('handleSaveUser', () => {
-  it('❌ should throw an error if user_id is missing', async () => {
+  it('❌ should throw an error if user_id is missing (no sub or body)', async () => {
     const mockReq = {
-      user: {}, // no hay 'sub'
-      body: {}, // 👈 necesario para evitar el error de lectura
+      user: {}, // no sub
+      body: {}, // existe pero vacío
       headers: { authorization: 'Bearer fake-token' }
     };
 
-    // Este test espera que se lance un error con ese mensaje
     await expect(handleSaveUser(mockReq)).rejects.toThrow('No se pudo obtener el user_id del usuario');
   });
-});
 
-  it('❌ should throw an error if user_id is missing', async () => {
+  it('❌ should throw an error if req.user is undefined', async () => {
     const mockReq = {
-      user: {},
+      body: { auth0Id: 'auth0|123456' },
       headers: { authorization: 'Bearer fake-token' }
+      // no hay req.user
     };
 
-    await expect(handleSaveUser(mockReq)).rejects.toThrow('No se pudo obtener el user_id del usuario');
+    await expect(handleSaveUser(mockReq)).rejects.toThrow('Usuario no autenticado');
   });
 });

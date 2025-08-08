@@ -1,7 +1,7 @@
 jest.mock('../../../controllers/room/getRoomByIdController');
 const httpMocks = require('node-mocks-http');
-const  getRoomByIdHandler  = require('../../../handlers/room/getRoomByIdHandler');
-const  getRoomByIdController  = require('../../../controllers/room/getRoomByIdController');
+const getRoomByIdHandler = require('../../../handlers/room/getRoomByIdHandler');
+const getRoomByIdController = require('../../../controllers/room/getRoomByIdController');
 const { Room, RoomType, RoomDetail } = require('../../../models');
 
 jest.mock('../../../models');
@@ -49,6 +49,44 @@ describe('getRoomByIdHandler', () => {
 
     expect(res.statusCode).toBe(500);
     expect(res._getJSONData()).toEqual({ message: 'Something went wrong' });
+    expect(getRoomByIdController).toHaveBeenCalledWith('123');
+  });
+
+  it('should return 400 if id param is missing', async () => {
+    const req = httpMocks.createRequest({ method: 'GET', url: '/rooms/123', params: {} });
+    const res = httpMocks.createResponse();
+
+    await getRoomByIdHandler(req, res);
+
+    expect(res.statusCode).toBe(400);
+    expect(res._getJSONData()).toEqual({ message: 'Room ID is required' });
+    expect(getRoomByIdController).not.toHaveBeenCalled();
+  });
+
+  it('should return 400 if id param is invalid', async () => {
+    const req = httpMocks.createRequest({ method: 'GET', url: '/rooms/abc', params: { id: '' } });
+    const res = httpMocks.createResponse();
+
+    await getRoomByIdHandler(req, res);
+
+    expect(res.statusCode).toBe(400);
+    expect(res._getJSONData()).toEqual({ message: 'Room ID is required' });
+    expect(getRoomByIdController).not.toHaveBeenCalled();
+  });
+
+  it('should return room data with additional fields if present', async () => {
+    const mockRoom = { id: '123', name: 'Room 1', extra: 'info' };
+
+    getRoomByIdController.mockResolvedValue(mockRoom);
+
+    const req = httpMocks.createRequest({ method: 'GET', url: '/rooms/123', params: { id: '123' } });
+    const res = httpMocks.createResponse();
+
+    await getRoomByIdHandler(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(res._getJSONData()).toEqual(mockRoom);
+    expect(res._getJSONData()).toHaveProperty('extra', 'info');
     expect(getRoomByIdController).toHaveBeenCalledWith('123');
   });
 });

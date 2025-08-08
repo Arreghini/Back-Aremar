@@ -88,9 +88,11 @@ const generateChart = (startDate, endDate, authToken) => {
 
 const exportAnalyticsToExcel = async (req, res) => {
   let chartFilesToCleanup = [];
-  
+
   try {
-    const { startDate, endDate } = req.query;
+    const { startDate: rawStart, endDate: rawEnd } = req.query;
+    const startDate = rawStart || dayjs().subtract(7, 'day').format('YYYY-MM-DD');
+    const endDate = rawEnd || dayjs().format('YYYY-MM-DD');
     const workbook = new ExcelJS.Workbook();
 
     // Obtener token de autorización del header
