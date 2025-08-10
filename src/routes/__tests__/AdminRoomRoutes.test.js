@@ -144,11 +144,15 @@ describe('AdminRoomRoutes', () => {
 
       const response = await request(app)
         .post('/admin/rooms/')
-        .field('name', 'Nueva Habitación')
-        .field('price', '200')
-        .field('description', 'Descripción de la habitación')
+        .field('id', 'test-room')
+        .field('name', 'Test Room')
+        .field('price', '100')
+        .field('capacity', '2')
         .attach('photoRoom', Buffer.from('fake image 1'), 'image1.jpg')
         .attach('photoRoom', Buffer.from('fake image 2'), 'image2.jpg')
+        .attach('photoRoom', Buffer.from('fake image 3'), 'image3.jpg')
+        .attach('photoRoom', Buffer.from('fake image 4'), 'image4.jpg')
+        .attach('photoRoom', Buffer.from('fake image 5'), 'image5.jpg')
         .expect(201);
 
       expect(response.body).toEqual(mockNewRoom);
@@ -241,14 +245,17 @@ describe('AdminRoomRoutes', () => {
       });
 
       await request(app)
-        .post('/admin/rooms/')
-        .field('name', 'Test Room')
-        .attach('photoRoom', Buffer.from('fake image 1'), 'image1.jpg')
-        .attach('photoRoom', Buffer.from('fake image 2'), 'image2.jpg')
-        .attach('photoRoom', Buffer.from('fake image 3'), 'image3.jpg')
-        .attach('photoRoom', Buffer.from('fake image 4'), 'image4.jpg')
-        .attach('photoRoom', Buffer.from('fake image 5'), 'image5.jpg')
-        .expect(201);
+  .post('/admin/rooms/')
+  .field('id', 'test-room')
+  .field('name', 'Test Room')
+  .field('price', '100')
+  .field('capacity', '2')
+  .attach('photoRoom', Buffer.from('fake image 1'), 'image1.jpg')
+  .attach('photoRoom', Buffer.from('fake image 2'), 'image2.jpg')
+  .attach('photoRoom', Buffer.from('fake image 3'), 'image3.jpg')
+  .attach('photoRoom', Buffer.from('fake image 4'), 'image4.jpg')
+  .attach('photoRoom', Buffer.from('fake image 5'), 'image5.jpg')
+  .expect(201);
 
       expect(createRoomHandler).toHaveBeenCalled();
     });

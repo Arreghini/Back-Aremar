@@ -1,6 +1,6 @@
 const { body } = require('express-validator');
 
-const createRoomValidationRules = [
+const createRoomValidatorRules = [
   body('id')
     .notEmpty().withMessage('El ID es obligatorio')
     .isString().withMessage('El ID debe ser una cadena'),
@@ -19,5 +19,5 @@ const createRoomValidationRules = [
 ];
 
 module.exports = {
-  createRoomValidationRules,
+  createRoomValidatorRules,
 };

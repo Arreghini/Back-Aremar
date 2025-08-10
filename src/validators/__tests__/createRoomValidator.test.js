@@ -8,19 +8,19 @@ const app = express();
 app.use(express.json());
 
 // Ruta de prueba solo para testear la validación
-app.post('/test-validation', createRoomValidatorRules, validate, (req, res) => {
+app.post('/', createRoomValidatorRules, validate, (req, res) => {
   res.status(200).json({ message: 'Valid data' });
 });
 
 describe('createRoomValidationRules', () => {
   it('should fail when required fields are missing', async () => {
-    const res = await request(app).post('/test-validation').send({});
+    const res = await request(app).post('/').send({});
     expect(res.statusCode).toBe(400);
     expect(res.body.errors).toBeDefined();
   });
 
   it('should pass when all fields are valid', async () => {
-    const res = await request(app).post('/test-validation').send({
+    const res = await request(app).post('/').send({
       id: 'room123',
       price: 100,
       capacity: 2,
@@ -31,7 +31,7 @@ describe('createRoomValidationRules', () => {
   });
 
   it('should fail when price is negative', async () => {
-    const res = await request(app).post('/test-validation').send({
+    const res = await request(app).post('/').send({
       id: 'room123',
       price: -50,
       capacity: 2,
