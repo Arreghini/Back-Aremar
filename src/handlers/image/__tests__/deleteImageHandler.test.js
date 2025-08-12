@@ -1,10 +1,9 @@
-// tests/handlers/deleteImageHandler.test.js
 const request = require('supertest');
 const express = require('express');
 
-jest.mock('../../controllers/image/imageDeleteController');
-const deleteImageController = require('../../controllers/image/imageDeleteController');
-const deleteImageHandler = require('../../handlers/image/deleteImageHandler');
+jest.mock('../../../controllers/image/deleteImageController');
+const deleteImageController = require('../../../controllers/image/deleteImageController');
+const deleteImageHandler = require('../deleteImageHandler');
 
 describe('deleteImageHandler', () => {
   let app;

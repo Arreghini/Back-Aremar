@@ -95,7 +95,7 @@ describe('getReservationHandler', () => {
   });
 
   it('debe devolver 400 si falta reservationId', async () => {
-    const res = await request(app).get('/reservations/');
+    const res = await request(app).get('/reservations//');
 
     expect(res.status).toBe(404); // Express no matchea si falta el param
   });

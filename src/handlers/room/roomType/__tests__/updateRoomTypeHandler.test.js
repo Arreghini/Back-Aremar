@@ -1,33 +1,25 @@
-// src/handlers/room/roomType/__tests__/updateRoomTypeHandler.test.js
 const request = require('supertest');
 const express = require('express');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-
-// Importar el handler
-const updateRoomTypeHandler = require('../updateRoomTypeHandler');
-const updateRoomTypeController = require('../../../../controllers/room/roomType/updateRoomTypeController');
-const uploadImageController = require('../../../../controllers/image/uploadImageController');
 
 // Mocks
-jest.mock('../../../../controllers/room/roomType/updateRoomTypeController');
-jest.mock('../../../../controllers/image/uploadImageController');
+jest.mock('../../../../controllers/room/roomType/updateRoomTypeController.js');
+jest.mock('../../../../controllers/image/uploadImageController.js', () => {
+  return jest.fn((file, folder) => Promise.resolve({ secure_url: 'new.jpg' }));
+});
+
+const updateRoomTypeHandler = require('../updateRoomTypeHandler.js');
+const updateRoomTypeController = require('../../../../controllers/room/roomType/updateRoomTypeController.js');
+const uploadImageController = require('../../../../controllers/image/uploadImageController.js');
 
 describe('PATCH /room-type/:id', () => {
   let app;
 
   beforeAll(() => {
     app = express();
-    const upload = multer({ dest: 'uploads/' }); // Para simular req.files
-
-    // Middleware para parsear JSON y multipart/form-data
+    const upload = multer({ dest: 'uploads/' });
     app.use(express.json());
-    app.patch(
-      '/room-type/:id',
-      upload.array('files'),
-      updateRoomTypeHandler
-    );
+    app.patch('/room-type/:id', upload.array('files'), updateRoomTypeHandler);
   });
 
   afterEach(() => {
@@ -36,7 +28,7 @@ describe('PATCH /room-type/:id', () => {
 
   it('debería responder 400 si no se envía el ID', async () => {
     const res = await request(app).patch('/room-type/').send({ name: 'Suite' });
-    expect(res.statusCode).toBe(404); // Express devuelve 404 si no hay :id en la ruta
+    expect(res.statusCode).toBe(404); // Express responde 404 porque falta el param :id
   });
 
   it('debería responder 200 cuando se actualiza con éxito sin archivos', async () => {
@@ -59,7 +51,6 @@ describe('PATCH /room-type/:id', () => {
   it('debería procesar archivos y combinarlos con existingPhotos', async () => {
     const mockUpdated = { id: '2', name: 'Suite con fotos', photos: ['old.jpg', 'new.jpg'] };
     updateRoomTypeController.mockResolvedValue(mockUpdated);
-    uploadImageController.mockResolvedValue({ secure_url: 'new.jpg' });
 
     const res = await request(app)
       .patch('/room-type/2')
@@ -76,7 +67,7 @@ describe('PATCH /room-type/:id', () => {
     });
   });
 
-  it('debería responder 404 si el controlador devuelve null', async () => {
+  it('debería responder 404 si el controlador devuelve null (tipo no encontrado)', async () => {
     updateRoomTypeController.mockResolvedValue(null);
 
     const res = await request(app)
@@ -103,5 +94,36 @@ describe('PATCH /room-type/:id', () => {
       error: 'Error interno del servidor',
       details: 'DB error',
     });
+  });
+
+  it('debería manejar error al parsear existingPhotos malformado', async () => {
+    const mockUpdated = { id: '4', name: 'Suite Mal Formateada', photos: ['new.jpg'] };
+    updateRoomTypeController.mockResolvedValue(mockUpdated);
+
+    const res = await request(app)
+      .patch('/room-type/4')
+      .field('name', 'Suite Mal Formateada')
+      .field('existingPhotos', 'esto no es JSON')
+      .attach('files', Buffer.from('test file'), 'test.jpg');
+
+    expect(res.statusCode).toBe(200);
+    expect(uploadImageController).toHaveBeenCalled();
+    expect(updateRoomTypeController).toHaveBeenCalledWith('4', {
+      name: 'Suite Mal Formateada',
+      existingPhotos: 'esto no es JSON',
+      photos: ['new.jpg'],
+    });
+  });
+
+  it('debería actualizar sin enviar existingPhotos ni archivos', async () => {
+    const mockUpdated = { id: '5', name: 'Solo nombre cambiado' };
+    updateRoomTypeController.mockResolvedValue(mockUpdated);
+
+    const res = await request(app)
+      .patch('/room-type/5')
+      .send({ name: 'Solo nombre cambiado' });
+
+    expect(res.statusCode).toBe(200);
+    expect(updateRoomTypeController).toHaveBeenCalledWith('5', { name: 'Solo nombre cambiado' });
   });
 });

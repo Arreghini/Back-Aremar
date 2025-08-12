@@ -7,7 +7,7 @@ jest.mock('../../handlers/reservation/createReservationHandler');
 jest.mock('../../handlers/reservation/getReservationHandler');
 jest.mock('../../handlers/reservation/updateReservationHandler');
 jest.mock('../../handlers/reservation/deleteReservationByIdHandler');
-jest.mock('../../handlers/reservation/cancelReservationHandlerByAdmin');
+jest.mock('../../handlers/reservation/cancelReservationByAdminHandler');
 jest.mock('../../handlers/reservation/cancelReservationWithRefundHandler');
 jest.mock('../../handlers/reservation/confirmedReservationByAdminHandler');
 jest.mock('../../handlers/reservation/createPreferenceHandler');
@@ -16,7 +16,7 @@ const createReservationHandler = require('../../handlers/reservation/createReser
 const getReservationHandler = require('../../handlers/reservation/getReservationHandler');
 const updateReservationHandler = require('../../handlers/reservation/updateReservationHandler');
 const deleteReservationByIdHandler = require('../../handlers/reservation/deleteReservationByIdHandler');
-const cancelReservationByAdminHandler = require('../../handlers/reservation/cancelReservationHandlerByAdmin');
+const cancelReservationByAdminHandler = require('../../handlers/reservation/cancelReservationByAdminHandler');
 const cancelReservationWithRefundHandler = require('../../handlers/reservation/cancelReservationWithRefundHandler');
 const confirmedReservationByAdminHandler = require('../../handlers/reservation/confirmedReservationByAdminHandler');
 

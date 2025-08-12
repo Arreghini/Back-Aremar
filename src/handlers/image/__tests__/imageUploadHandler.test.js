@@ -1,14 +1,14 @@
-// tests/handlers/uploadImageHandler.test.js
 const request = require('supertest');
 const express = require('express');
 
-jest.mock('../../../controllers/image/uploadImageController');
+// mock explícito para que sea una jest.fn()
+jest.mock('../../../controllers/image/uploadImageController', () => jest.fn());
 const uploadImageController = require('../../../controllers/image/uploadImageController');
 
 const {
   uploadMultipleImagesHandler,
   uploadSingleImageHandler,
-} = require('../../../handlers/image/uploadImageHandler');
+} = require('../imageUploadHandler');
 
 describe('uploadImages handlers', () => {
   let app;
@@ -18,7 +18,6 @@ describe('uploadImages handlers', () => {
     app = express();
     app.use(express.json());
 
-    // Rutas para testear
     app.post('/upload-multiple', (req, res) => uploadMultipleImagesHandler(req, res));
     app.post('/upload-single', (req, res) => uploadSingleImageHandler(req, res));
   });
@@ -31,13 +30,10 @@ describe('uploadImages handlers', () => {
     });
 
     it('debe subir múltiples archivos y responder 200 con resultados', async () => {
-      const fakeResults = [{ url: 'url1' }, { url: 'url2' }];
       uploadImageController.mockImplementation((file, folder) =>
         Promise.resolve({ url: `uploaded_${file.originalname}_to_${folder}` })
       );
 
-      // Simulamos req.files en la llamada manual (Supertest no soporta multipart con req.files directamente sin multer)
-      // Aquí llamamos directo al handler con objeto simulado:
       const req = {
         files: [
           { originalname: 'file1.jpg' },

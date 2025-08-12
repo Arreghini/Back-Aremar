@@ -1,4 +1,4 @@
-const deleteImageController = require('../../controllers/image/imageDeleteController');
+const deleteImageController = require('../../controllers/image/deleteImageController');
 
 const deleteImageHandler = async (req, res) => {
   try {
