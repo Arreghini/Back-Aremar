@@ -1,92 +1,55 @@
-jest.mock('../../../controllers/room/getRoomByIdController');
-const httpMocks = require('node-mocks-http');
-const getRoomByIdHandler = require('../../../handlers/room/getRoomByIdHandler');
+
+
 const getRoomByIdController = require('../../../controllers/room/getRoomByIdController');
 const { Room, RoomType, RoomDetail } = require('../../../models');
 
-jest.mock('../../../models');
+jest.mock('../../../models', () => ({
+  Room: {
+    findByPk: jest.fn(),
+  },
+  RoomType: jest.fn(),
+  RoomDetail: jest.fn(),
+}));
 
-describe('getRoomByIdHandler', () => {
-  afterEach(() => {
+describe('getRoomByIdController', () => {
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should return room data if room is found', async () => {
-    const mockRoom = { id: '123', name: 'Room 1' };
-
-    getRoomByIdController.mockResolvedValue(mockRoom);
-
-    const req = httpMocks.createRequest({ method: 'GET', url: '/rooms/123', params: { id: '123' } });
-    const res = httpMocks.createResponse();
-
-    await getRoomByIdHandler(req, res);
-
-    expect(res.statusCode).toBe(200);
-    expect(res._getJSONData()).toEqual(mockRoom);
-    expect(getRoomByIdController).toHaveBeenCalledWith('123');
+  it('lanza error si id no es string', async () => {
+    await expect(getRoomByIdController(123)).rejects.toThrow('Room ID must be a string');
   });
 
-  it('should return 404 if room is not found', async () => {
-    getRoomByIdController.mockResolvedValue(null);
-
-    const req = httpMocks.createRequest({ method: 'GET', url: '/rooms/123', params: { id: '123' } });
-    const res = httpMocks.createResponse();
-
-    await getRoomByIdHandler(req, res);
-
-    expect(res.statusCode).toBe(404);
-    expect(res._getJSONData()).toEqual({ message: 'Room not found' });
-    expect(getRoomByIdController).toHaveBeenCalledWith('123');
+  it('lanza error si id es string vacío', async () => {
+    await expect(getRoomByIdController('  ')).rejects.toThrow('Room ID is required');
   });
 
-  it('should handle errors and return 500', async () => {
-    getRoomByIdController.mockRejectedValue(new Error('Something went wrong'));
+  it('retorna room si existe', async () => {
+    const mockRoom = { id: 'abc123', name: 'Room 1' };
+    Room.findByPk.mockResolvedValue(mockRoom);
 
-    const req = httpMocks.createRequest({ method: 'GET', url: '/rooms/123', params: { id: '123' } });
-    const res = httpMocks.createResponse();
+    const result = await getRoomByIdController('abc123');
 
-    await getRoomByIdHandler(req, res);
-
-    expect(res.statusCode).toBe(500);
-    expect(res._getJSONData()).toEqual({ message: 'Something went wrong' });
-    expect(getRoomByIdController).toHaveBeenCalledWith('123');
+    expect(Room.findByPk).toHaveBeenCalledWith('abc123', {
+      include: [
+        { model: RoomType, as: 'roomType' },
+        { model: RoomDetail, as: 'roomDetail' },
+      ],
+    });
+    expect(result).toEqual(mockRoom);
   });
 
-  it('should return 400 if id param is missing', async () => {
-    const req = httpMocks.createRequest({ method: 'GET', url: '/rooms/123', params: {} });
-    const res = httpMocks.createResponse();
+  it('retorna null si room no existe', async () => {
+    Room.findByPk.mockResolvedValue(null);
 
-    await getRoomByIdHandler(req, res);
+    const result = await getRoomByIdController('nonexistent');
 
-    expect(res.statusCode).toBe(400);
-    expect(res._getJSONData()).toEqual({ message: 'Room ID is required' });
-    expect(getRoomByIdController).not.toHaveBeenCalled();
+    expect(result).toBeNull();
   });
 
-  it('should return 400 if id param is invalid', async () => {
-    const req = httpMocks.createRequest({ method: 'GET', url: '/rooms/abc', params: { id: '' } });
-    const res = httpMocks.createResponse();
+  it('lanza error si findByPk falla', async () => {
+    Room.findByPk.mockRejectedValue(new Error('DB failure'));
 
-    await getRoomByIdHandler(req, res);
-
-    expect(res.statusCode).toBe(400);
-    expect(res._getJSONData()).toEqual({ message: 'Room ID is required' });
-    expect(getRoomByIdController).not.toHaveBeenCalled();
-  });
-
-  it('should return room data with additional fields if present', async () => {
-    const mockRoom = { id: '123', name: 'Room 1', extra: 'info' };
-
-    getRoomByIdController.mockResolvedValue(mockRoom);
-
-    const req = httpMocks.createRequest({ method: 'GET', url: '/rooms/123', params: { id: '123' } });
-    const res = httpMocks.createResponse();
-
-    await getRoomByIdHandler(req, res);
-
-    expect(res.statusCode).toBe(200);
-    expect(res._getJSONData()).toEqual(mockRoom);
-    expect(res._getJSONData()).toHaveProperty('extra', 'info');
-    expect(getRoomByIdController).toHaveBeenCalledWith('123');
+    await expect(getRoomByIdController('abc123')).rejects.toThrow('DB failure');
   });
 });

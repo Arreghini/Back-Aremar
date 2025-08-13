@@ -1,19 +1,23 @@
-const updateUserController = require('../../controllers/user/updateProfileController');
+const updateUserController = require('../../controllers/user/updateUserController');
 
 const updateUserHandler = async (req, res) => {
-  const { id } = req.params;
+  // Acepta userId desde body o id desde params
+  const userId = req.body.userId || req.params.id;
   const updateData = req.body;
 
-  if (!id) {
+  // 401 si no hay userId
+  if (!userId) {
+    return res.status(401).json({ message: 'User ID is required' });
+  }
+
+  // 400 si no hay datos para actualizar (solo viene el userId)
+  if (!updateData || typeof updateData !== 'object' || Object.keys(updateData).length <= 1) {
     return res.status(400).json({ message: 'User ID is required' });
   }
 
-  if (!updateData || typeof updateData !== 'object') {
-    return res.status(400).json({ message: 'Update data is required' });
-  }
-
-  const hasValidFields = Object.values(updateData).some(
-    (val) => val !== null && val !== undefined && val !== ''
+  // Validar que al menos un campo no esté vacío
+  const hasValidFields = Object.entries(updateData).some(
+    ([key, val]) => key !== 'userId' && val !== null && val !== undefined && val !== ''
   );
 
   if (!hasValidFields) {
@@ -21,14 +25,11 @@ const updateUserHandler = async (req, res) => {
   }
 
   try {
-    const updatedUser = await updateUserController(id, updateData);
-    return res.status(200).json({
-      message: 'User updated successfully',
-      user: updatedUser
-    });
+    const updatedUser = await updateUserController(updateData);
+    return res.status(200).json(updatedUser);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message || 'Update failed' });
   }
 };
 

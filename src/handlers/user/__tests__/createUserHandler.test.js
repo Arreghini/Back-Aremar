@@ -1,50 +1,85 @@
+// tests/handlers/createUserHandler.test.js
+const httpMocks = require('node-mocks-http');
 const { v4: uuidv4 } = require('uuid');
-jest.mock('uuid');
+const createUserHandler = require('../../../handlers/user/createUserHandler');
+const userCreateController = require('../../../controllers/user/createUserController');
 
-describe('UUID Generation', () => {
+jest.mock('uuid');
+jest.mock('../../../controllers/user/createUserController');
+
+describe('createUserHandler', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('should generate a valid UUID', () => {
+  it('debe generar un id si no está presente', async () => {
     const mockUUID = '123e4567-e89b-12d3-a456-426614174000';
     uuidv4.mockReturnValue(mockUUID);
 
-    const generatedUUID = uuidv4();
-    
-    expect(generatedUUID).toBe(mockUUID);
-    expect(uuidv4).toHaveBeenCalledTimes(1);
-  });
-
-  test('should generate unique UUIDs on multiple calls', () => {
-    const mockUUID1 = '123e4567-e89b-12d3-a456-426614174000';
-    const mockUUID2 = '987fcdeb-51a2-34ef-8901-234567890123';
-    
-    uuidv4
-      .mockReturnValueOnce(mockUUID1)
-      .mockReturnValueOnce(mockUUID2);
-
-    const firstUUID = uuidv4();
-    const secondUUID = uuidv4();
-
-    expect(firstUUID).toBe(mockUUID1);
-    expect(secondUUID).toBe(mockUUID2);
-    expect(firstUUID).not.toBe(secondUUID);
-    expect(uuidv4).toHaveBeenCalledTimes(2);
-  });
-
-  test('should handle multiple UUID generations in sequence', () => {
-    const mockUUIDs = [
-      '123e4567-e89b-12d3-a456-426614174000',
-      '987fcdeb-51a2-34ef-8901-234567890123',
-      'abc12345-6789-def0-1234-567890abcdef'
-    ];
-
-    mockUUIDs.forEach(uuid => {
-      uuidv4.mockReturnValueOnce(uuid);
-      expect(uuidv4()).toBe(uuid);
+    const req = httpMocks.createRequest({
+      method: 'POST',
+      body: { name: 'John Doe' }
     });
+    const res = httpMocks.createResponse();
 
-    expect(uuidv4).toHaveBeenCalledTimes(3);
+    const mockUser = { id: mockUUID, name: 'John Doe' };
+    userCreateController.mockResolvedValue(mockUser);
+
+    await createUserHandler(req, res);
+
+    expect(uuidv4).toHaveBeenCalled();
+    expect(userCreateController).toHaveBeenCalledWith({ id: mockUUID, name: 'John Doe' });
+    expect(res.statusCode).toBe(201);
+    expect(res._getJSONData()).toEqual({
+      message: 'Cliente creado exitosamente',
+      user: mockUser
+    });
+  });
+
+  it('no debe generar id si ya está presente', async () => {
+    const req = httpMocks.createRequest({
+      method: 'POST',
+      body: { id: 'fixed-id', name: 'Jane Doe' }
+    });
+    const res = httpMocks.createResponse();
+
+    const mockUser = { id: 'fixed-id', name: 'Jane Doe' };
+    userCreateController.mockResolvedValue(mockUser);
+
+    await createUserHandler(req, res);
+
+    expect(uuidv4).not.toHaveBeenCalled();
+    expect(userCreateController).toHaveBeenCalledWith({ id: 'fixed-id', name: 'Jane Doe' });
+    expect(res.statusCode).toBe(201);
+  });
+
+  it('debe devolver 400 si el id ya existe', async () => {
+    const req = httpMocks.createRequest({
+      method: 'POST',
+      body: { id: 'existing-id', name: 'Dup User' }
+    });
+    const res = httpMocks.createResponse();
+
+    userCreateController.mockRejectedValue(new Error('User with this ID already exists'));
+
+    await createUserHandler(req, res);
+
+    expect(res.statusCode).toBe(400);
+    expect(res._getJSONData()).toEqual({ error: 'User with this ID already exists' });
+  });
+
+  it('debe devolver 500 en error inesperado', async () => {
+    const req = httpMocks.createRequest({
+      method: 'POST',
+      body: { name: 'Error User' }
+    });
+    const res = httpMocks.createResponse();
+
+    userCreateController.mockRejectedValue(new Error('Unexpected DB error'));
+
+    await createUserHandler(req, res);
+
+    expect(res.statusCode).toBe(500);
+    expect(res._getData()).toBe('Error al manejar la solicitud');
   });
 });

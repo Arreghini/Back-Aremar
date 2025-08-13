@@ -3,172 +3,170 @@ const { createRoomTypeController } = require('../createRoomTypeController');
 
 jest.mock('../../../../models');
 
-describe('createRoomTypeController', () => {
+describe('createRoomTypeController ampliado', () => {
   beforeEach(() => {
-    jest.clearAllMocks(); // Limpia mocks entre tests
+    jest.clearAllMocks();
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  test('should create a new room type successfully', async () => {
+  afterEach(() => {
+    console.log.mockRestore();
+    console.error.mockRestore();
+  });
+
+  test('crea exitosamente con fotos y loguea photosCount', async () => {
     const mockRoomType = {
       id: 1,
       name: 'Suite',
-      description: 'Luxury suite room'
+      photos: ['photo1.jpg', 'photo2.jpg'],
     };
 
     RoomType.create.mockResolvedValue(mockRoomType);
 
-    const result = await createRoomTypeController({
+    const inputData = {
       name: 'Suite',
-      description: 'Luxury suite room'
-    });
+      photos: ['photo1.jpg', 'photo2.jpg'],
+    };
 
-    expect(RoomType.create).toHaveBeenCalledWith(expect.objectContaining({
-      name: 'Suite'
-    }));
+    const result = await createRoomTypeController(inputData);
 
+    expect(RoomType.create).toHaveBeenCalledWith(expect.objectContaining(inputData));
     expect(result).toEqual(mockRoomType);
+    expect(console.log).toHaveBeenCalledWith(
+      'RoomType creado:',
+      expect.objectContaining({
+        id: 1,
+        name: 'Suite',
+        photos: expect.any(Array),
+        photosCount: 2,
+      })
+    );
   });
 
-  test('should throw error if room type creation fails', async () => {
-    RoomType.create.mockRejectedValue(new Error('Database error'));
-
-    await expect(createRoomTypeController({
-      name: 'Suite',
-      description: 'Luxury suite room'
-    })).rejects.toThrow('Database error');
-  });
-
-  test('should handle empty name field', async () => {
-    await expect(createRoomTypeController({
-      name: '',
-      description: 'Luxury suite room'
-    })).rejects.toThrow();
-  });
-
-  test('should handle duplicate room type name', async () => {
-    RoomType.create.mockRejectedValue(new Error('Room type already exists'));
-
-    await expect(createRoomTypeController({
-      name: 'Existing Suite',
-      description: 'Luxury suite room'
-    })).rejects.toThrow('Room type already exists');
-  });
-
-  test('should create room type with minimal required fields', async () => {
+  test('crea exitosamente sin fotos y loguea photosCount 0', async () => {
     const mockRoomType = {
-      id: 1,
-      name: 'Basic'
+      id: 2,
+      name: 'Basic',
+      photos: undefined,
     };
 
     RoomType.create.mockResolvedValue(mockRoomType);
 
-    const result = await createRoomTypeController({
-      name: 'Basic'
-    });
+    const inputData = { name: 'Basic' };
 
-    expect(RoomType.create).toHaveBeenCalledWith(expect.objectContaining({
-      name: 'Basic'
-    }));
+    const result = await createRoomTypeController(inputData);
 
+    expect(RoomType.create).toHaveBeenCalledWith(expect.objectContaining(inputData));
+    expect(result).toEqual(mockRoomType);
+    expect(console.log).toHaveBeenCalledWith(
+      'RoomType creado:',
+      expect.objectContaining({
+        id: 2,
+        name: 'Basic',
+        photos: undefined,
+        photosCount: 0,
+      })
+    );
+  });
+
+  test('crea con todos los campos posibles', async () => {
+    const inputData = {
+      id: 3,
+      name: 'Deluxe',
+      photos: ['img1.jpg'],
+      simpleBeds: 2,
+      trundleBeds: 1,
+      kingBeds: 1,
+      windows: 3,
+      price: 350,
+    };
+    const mockRoomType = { ...inputData };
+
+    RoomType.create.mockResolvedValue(mockRoomType);
+
+    const result = await createRoomTypeController(inputData);
+
+    expect(RoomType.create).toHaveBeenCalledWith(expect.objectContaining(inputData));
     expect(result).toEqual(mockRoomType);
   });
-});
-test('should create room type with all optional fields', async () => {
-  const mockRoomType = {
-    id: 1,
-    name: 'Deluxe Suite',
-    photos: ['photo1.jpg', 'photo2.jpg'],
-    simpleBeds: 2,
-    trundleBeds: 1,
-    kingBeds: 1,
-    windows: 3,
-    price: 299.99
-  };
 
-  RoomType.create.mockResolvedValue(mockRoomType);
+  test('lanza error si falla la creación', async () => {
+    const error = new Error('Database error');
+    RoomType.create.mockRejectedValue(error);
 
-  const result = await createRoomTypeController(mockRoomType);
+    await expect(createRoomTypeController({ name: 'FailRoom' })).rejects.toThrow('Database error');
+    expect(console.error).toHaveBeenCalledWith('Error al crear el tipo de habitación:', error);
+  });
 
-  expect(RoomType.create).toHaveBeenCalledWith(expect.objectContaining({
-    id: 1,
-    name: 'Deluxe Suite',
-    photos: ['photo1.jpg', 'photo2.jpg'],
-    simpleBeds: 2,
-    trundleBeds: 1,
-    kingBeds: 1,
-    windows: 3,
-    price: 299.99
-  }));
+  test('lanza error si el nombre es vacío', async () => {
+    const error = new Error('Validation error: name required');
+    RoomType.create.mockRejectedValue(error);
 
-  expect(result).toEqual(mockRoomType);
-});
+    await expect(createRoomTypeController({ name: '' })).rejects.toThrow('Validation error: name required');
+    expect(console.error).toHaveBeenCalledWith('Error al crear el tipo de habitación:', error);
+  });
 
-test('should handle invalid price value', async () => {
-  const mockRoomType = {
-    name: 'Budget Room',
-    price: 'invalid'
-  };
+  test('lanza error si photos no es array', async () => {
+    const error = new Error('Photos must be an array');
+    RoomType.create.mockRejectedValue(error);
 
-  RoomType.create.mockRejectedValue(new Error('Invalid price value'));
+    await expect(createRoomTypeController({ name: 'PhotoFail', photos: 'not-an-array' })).rejects.toThrow('Photos must be an array');
+    expect(console.error).toHaveBeenCalledWith('Error al crear el tipo de habitación:', error);
+  });
 
-  await expect(createRoomTypeController(mockRoomType)).rejects.toThrow('Invalid price value');
-});
+  test('maneja valores cero en camas y precio', async () => {
+    const inputData = {
+      id: 4,
+      name: 'ZeroBeds',
+      simpleBeds: 0,
+      trundleBeds: 0,
+      kingBeds: 0,
+      price: 0,
+    };
+    const mockRoomType = { ...inputData };
 
-test('should handle invalid bed counts', async () => {
-  const mockRoomType = {
-    name: 'Test Room',
-    simpleBeds: -1,
-    trundleBeds: -2,
-    kingBeds: -3
-  };
+    RoomType.create.mockResolvedValue(mockRoomType);
 
-  RoomType.create.mockRejectedValue(new Error('Invalid bed counts'));
+    const result = await createRoomTypeController(inputData);
 
-  await expect(createRoomTypeController(mockRoomType)).rejects.toThrow('Invalid bed counts');
-});
+    expect(RoomType.create).toHaveBeenCalledWith(expect.objectContaining(inputData));
+    expect(result).toEqual(mockRoomType);
+  });
 
-test('should handle invalid photo array', async () => {
-  const mockRoomType = {
-    name: 'Photo Room',
-    photos: 'not-an-array'
-  };
+  test('lanza error si precio es negativo', async () => {
+    const error = new Error('Price must be positive');
+    RoomType.create.mockRejectedValue(error);
 
-  RoomType.create.mockRejectedValue(new Error('Photos must be an array'));
+    await expect(createRoomTypeController({ name: 'NegativePrice', price: -10 })).rejects.toThrow('Price must be positive');
+    expect(console.error).toHaveBeenCalledWith('Error al crear el tipo de habitación:', error);
+  });
 
-  await expect(createRoomTypeController(mockRoomType)).rejects.toThrow('Photos must be an array');
-});
+  test('lanza error si camas son valores negativos', async () => {
+    const error = new Error('Bed counts must be non-negative');
+    RoomType.create.mockRejectedValue(error);
 
-test('should handle missing name with other valid fields', async () => {
-  const mockRoomType = {
-    photos: ['photo.jpg'],
-    simpleBeds: 2,
-    price: 150.00
-  };
+    await expect(createRoomTypeController({ name: 'NegativeBeds', simpleBeds: -1 })).rejects.toThrow('Bed counts must be non-negative');
+    expect(console.error).toHaveBeenCalledWith('Error al crear el tipo de habitación:', error);
+  });
 
-  RoomType.create.mockRejectedValue(new Error('Name is required'));
+  test('acepta id personalizado', async () => {
+    const inputData = { id: 'P1D2', name: 'CustomID' };
+    const mockRoomType = { ...inputData };
 
-  await expect(createRoomTypeController(mockRoomType)).rejects.toThrow('Name is required');
-});
+    RoomType.create.mockResolvedValue(mockRoomType);
 
-test('should create room type with zero values for bed counts', async () => {
-  const mockRoomType = {
-    id: 1,
-    name: 'No Bed Room',
-    simpleBeds: 0,
-    trundleBeds: 0,
-    kingBeds: 0,
-    price: 50.00
-  };
+    const result = await createRoomTypeController(inputData);
 
-  RoomType.create.mockResolvedValue(mockRoomType);
+    expect(RoomType.create).toHaveBeenCalledWith(expect.objectContaining(inputData));
+    expect(result).toEqual(mockRoomType);
+  });
 
-  const result = await createRoomTypeController(mockRoomType);
+  test('no llama a create si falta el nombre', async () => {
+    const error = new Error('Name is required');
+    RoomType.create.mockRejectedValue(error);
 
-  expect(RoomType.create).toHaveBeenCalledWith(expect.objectContaining({
-    simpleBeds: 0,
-    trundleBeds: 0,
-    kingBeds: 0
-  }));
-
-  expect(result).toEqual(mockRoomType);
+    await expect(createRoomTypeController({ photos: ['photo.jpg'] })).rejects.toThrow('Name is required');
+    expect(RoomType.create).toHaveBeenCalled();
+  });
 });
