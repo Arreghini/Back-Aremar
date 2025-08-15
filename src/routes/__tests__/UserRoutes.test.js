@@ -1,5 +1,7 @@
-jest.mock('../../handlers/user/userHandler', () => jest.fn());
-const SaveUserHandler = require('../../handlers/user/userHandler');
+jest.mock('../../handlers/user/userHandler', () => ({
+  handleSaveUser: jest.fn(),
+}));
+const { handleSaveUser } = require('../../handlers/user/userHandler');
 
 const request = require('supertest');
 const express = require('express');
@@ -11,19 +13,19 @@ app.use('/users', userRoutes);
 
 describe('UserRoutes', () => {
   beforeEach(() => {
-    SaveUserHandler.mockReset();
+    handleSaveUser.mockReset();
   });
 
   it('✅ POST /users/sync should call SaveUserHandler and return 200 with user data', async () => {
     const mockSavedUser = { id: '123', name: 'Test User', isAdmin: true };
-    SaveUserHandler.mockResolvedValue(mockSavedUser);
+    handleSaveUser.mockResolvedValue(mockSavedUser);
 
     const response = await request(app)
       .post('/users/sync')
       .set('Authorization', 'Bearer fake-token')
       .send();
 
-    expect(SaveUserHandler).toHaveBeenCalled();
+    expect(handleSaveUser).toHaveBeenCalled();
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       message: 'Datos de usuario sincronizados correctamente',
@@ -32,7 +34,7 @@ describe('UserRoutes', () => {
   });
 
   it('❌ should return 500 if SaveUserHandler throws an error', async () => {
-    SaveUserHandler.mockRejectedValue(new Error('Fallo'));
+    handleSaveUser.mockRejectedValue(new Error('Fallo'));
 
     const response = await request(app)
       .post('/users/sync')

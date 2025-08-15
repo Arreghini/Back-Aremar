@@ -7,11 +7,15 @@ jest.mock('../../handlers/room/roomDetail/getRoomDetailHandler');
 jest.mock('../../handlers/room/roomDetail/createRoomDetailHandler');
 jest.mock('../../handlers/room/roomDetail/updateRoomDetailHandler');
 jest.mock('../../handlers/room/roomDetail/deleteRoomDetailHandler');
+jest.mock('../../handlers/room/roomDetail/getAllRoomDetailsHandler');
+jest.mock('../../handlers/room/roomDetail/createRoomDetailWithoutIdHandler');
 
 const getRoomDetailHandler = require('../../handlers/room/roomDetail/getRoomDetailHandler');
 const createRoomDetailHandler = require('../../handlers/room/roomDetail/createRoomDetailHandler');
 const updateRoomDetailHandler = require('../../handlers/room/roomDetail/updateRoomDetailHandler');
 const deleteRoomDetailHandler = require('../../handlers/room/roomDetail/deleteRoomDetailHandler');
+const getAllRoomDetailsHandler = require('../../handlers/room/roomDetail/getAllRoomDetailsHandler');
+const createRoomDetailWithoutIdHandler = require('../../handlers/room/roomDetail/createRoomDetailWithoutIdHandler');
 
 // Configuración de la aplicación de prueba
 const app = express();
@@ -27,7 +31,7 @@ describe('AdminRoomDetailsRoutes', () => {
     it('debería llamar al handler getRoomDetailHandler', async () => {
       // Arrange
       const mockResponse = { success: true, data: [] };
-      getRoomDetailHandler.mockImplementation((req, res) => {
+      getAllRoomDetailsHandler.mockImplementation((req, res) => {
         res.status(200).json(mockResponse);
       });
 
@@ -37,13 +41,13 @@ describe('AdminRoomDetailsRoutes', () => {
         .expect(200);
 
       // Assert
-      expect(getRoomDetailHandler).toHaveBeenCalledTimes(1);
+      expect(getAllRoomDetailsHandler).toHaveBeenCalledTimes(1);
       expect(response.body).toEqual(mockResponse);
     });
 
     it('debería manejar errores del handler getRoomDetailHandler', async () => {
       // Arrange
-      getRoomDetailHandler.mockImplementation((req, res) => {
+      getAllRoomDetailsHandler.mockImplementation((req, res) => {
         res.status(500).json({ error: 'Error interno del servidor' });
       });
 
@@ -67,7 +71,7 @@ describe('AdminRoomDetailsRoutes', () => {
       };
       const mockResponse = { success: true, data: { id: 1, ...newRoomDetail } };
       
-      createRoomDetailHandler.mockImplementation((req, res) => {
+      createRoomDetailWithoutIdHandler.mockImplementation((req, res) => {
         res.status(201).json(mockResponse);
       });
 
@@ -78,13 +82,13 @@ describe('AdminRoomDetailsRoutes', () => {
         .expect(201);
 
       // Assert
-      expect(createRoomDetailHandler).toHaveBeenCalledTimes(1);
+      expect(createRoomDetailWithoutIdHandler).toHaveBeenCalledTimes(1);
       expect(response.body).toEqual(mockResponse);
     });
 
     it('debería manejar errores de validación en POST', async () => {
       // Arrange
-      createRoomDetailHandler.mockImplementation((req, res) => {
+      createRoomDetailWithoutIdHandler.mockImplementation((req, res) => {
         res.status(400).json({ error: 'Datos de entrada inválidos' });
       });
 

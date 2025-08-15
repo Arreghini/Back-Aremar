@@ -1,8 +1,9 @@
-const getDetailController = require('../../../controllers/room/roomDetail/getRoomDetailController');
+const getRoomDetailController = require('../../../controllers/room/roomDetail/getRoomDetailController');
 
-const getDetailHandler = async (req, res) => {
+const getRoomDetailHandler = async (req, res) => {
+  const { id } = req.params;
   try {
-    const roomDetails = await getDetailController();
+    const roomDetails = await getRoomDetailController(id);
 
     return res.status(200).json(roomDetails);
   } catch (error) {
@@ -11,4 +12,4 @@ const getDetailHandler = async (req, res) => {
   }
 };
 
-module.exports = getDetailHandler;
+module.exports = getRoomDetailHandler;
