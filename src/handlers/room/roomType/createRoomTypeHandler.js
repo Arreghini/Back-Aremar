@@ -1,7 +1,5 @@
 const uploadImageController = require('../../../controllers/image/uploadImageController');
-const {
-  createRoomTypeController,
-} = require('../../../controllers/room/roomType/createRoomTypeController');
+const { createRoomTypeController } = require('../../../controllers/room/roomType/createRoomTypeController');
 
 const createRoomTypeHandler = async (req, res) => {
   try {

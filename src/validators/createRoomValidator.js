@@ -7,10 +7,12 @@ const createRoomValidatorRules = [
 
   body('price')
     .notEmpty().withMessage('El precio es obligatorio')
+    .toFloat()
     .isFloat({ gt: 0 }).withMessage('El precio debe ser mayor a 0'),
 
   body('capacity')
     .notEmpty().withMessage('La capacidad es obligatoria')
+    .toInt()
     .isInt({ min: 1 }).withMessage('La capacidad debe ser un entero positivo'),
 
   body('description')

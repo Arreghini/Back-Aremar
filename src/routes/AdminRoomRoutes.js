@@ -10,9 +10,12 @@ const { createRoomValidatorRules } = require('../validators/createRoomValidator'
 
 // Middleware de validación adaptado a lo que el test espera
 const { validationResult } = require('express-validator');
+
 function validate(req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    console.log('Errores de validación:', errors.array());
+    // 🚨 Cambiado: devolvemos SOLO el objeto que espera el test
     return res.status(400).json({ error: 'Datos inválidos' });
   }
   next();
@@ -20,10 +23,7 @@ function validate(req, res, next) {
 
 const router = express.Router();
 
-// Configurar multer para aceptar hasta 5 archivos
-const upload = multer({
-  limits: { files: 5 }
-});
+
 
 // Obtener todas las habitaciones (sin validadores que bloqueen)
 router.get('/all', getRoomHandler.getAllRooms);
@@ -47,10 +47,19 @@ router.get('/types', getRoomTypeById);
 // Habitación por ID
 router.get('/:id', getRoomById);
 
+const upload = multer({ limits: { files: 5 } });
+// Configurar multer para aceptar hasta 5 archivos
+
 // Crear habitación (hasta 5 imágenes)
 router.post(
   '/',
-  upload.array('photoRoom', 5),
+  (req, res, next) => {
+    if (req.headers['content-type']?.includes('multipart/form-data')) {
+      upload.array('photoRoom', 5)(req, res, next);
+    } else {
+      next();
+    }
+  },
   createRoomValidatorRules,
   validate,
   createRoomHandler
