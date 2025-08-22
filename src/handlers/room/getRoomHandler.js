@@ -12,7 +12,7 @@ const getAllRooms = async (req, res) => {
   }
 };
 const getAvailableRooms = async (req, res) => {
-  const { reservationId, roomTypeId, checkIn, checkOut, numberOfGuests } =
+  const { reservationId, roomTypeId, checkIn, checkOut, numberOfGuests, photoRoom } =
     req.query;
 
   if (!roomTypeId || !checkIn || !checkOut || !numberOfGuests) {

@@ -12,6 +12,7 @@ const router = express.Router();
 
 // Rutas públicas para consulta de habitaciones
 router.get('/all', getRoomHandler.getAllRooms);
+
 router.get(
   '/available',
   (req, res, next) => {
