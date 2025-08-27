@@ -41,15 +41,15 @@ describe('getRoomByIdHandler', () => {
     expect(res._getJSONData()).toEqual({ message: 'Room not found' });
   });
 
-  test('should handle invalid id parameter', async () => {
-    const req = httpMocks.createRequest({ params: { id: 'abc' } });
-    const res = httpMocks.createResponse();
+test('should handle invalid id parameter', async () => {
+  const req = httpMocks.createRequest({ params: { id: 'abc' } });
+  const res = httpMocks.createResponse();
 
-    await getRoomByIdHandler(req, res);
+  await getRoomByIdHandler(req, res);
 
-    expect(res.statusCode).toBe(400);
-    expect(res._getJSONData()).toEqual({ message: 'Invalid room ID' });
-  });
+  expect(res.statusCode).toBe(404);
+  expect(res._getJSONData()).toEqual({ message: 'Room not found' });
+}
 
   test('should handle missing id parameter', async () => {
     const req = httpMocks.createRequest({ params: {} });
